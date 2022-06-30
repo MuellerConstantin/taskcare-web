@@ -1,6 +1,6 @@
 import Navbar from "../organisms/Navbar";
 
-export default function StackNavigationTemplate({ children }) {
+export default function StackTemplate({ children }) {
   return (
     <div className="h-screen flex flex-col">
       <header>
