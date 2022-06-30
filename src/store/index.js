@@ -10,6 +10,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import authSlice from "./slices/auth";
 import themeSlice from "./slices/theme";
 
 const persistConfig = {
@@ -19,6 +20,7 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
+  auth: authSlice.reducer,
   theme: themeSlice.reducer,
 });
 

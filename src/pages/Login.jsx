@@ -2,45 +2,54 @@ import { useEffect, useState } from "react";
 import { Formik } from "formik";
 import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import { useDispatch } from "react-redux";
 import StackTemplate from "../components/templates/StackTemplate";
 import TextField from "../components/atoms/TextField";
 import Button from "../components/atoms/Button";
-import { createUser } from "../api/users";
+import authSlice from "../store/slices/auth";
+import { generateToken, fetchPrincipal } from "../api/auth";
 
 import Logo from "../assets/images/logo.svg";
 
 const schema = yup.object().shape({
   username: yup.string().required("Is required"),
-  email: yup.string().email("Must be a valid email").required("Is required"),
   password: yup.string().required("Is required"),
 });
 
-export default function Register() {
+export default function Login() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    document.title = "TaskCare | Register";
+    document.title = "TaskCare | Login";
   }, []);
 
-  const onCreate = async (values, { setFieldError }) => {
+  const onLogin = async (values) => {
     setLoading(true);
     setError(null);
 
     try {
-      await createUser({
-        username: values.username,
-        email: values.email,
-        password: values.password,
-      });
+      const tokenRes = await generateToken(values.username, values.password);
 
-      navigate("/login");
+      dispatch(
+        authSlice.actions.setAuthentication({
+          accessToken: tokenRes.data.accessToken,
+          accessExpiresIn: tokenRes.data.accessExpiresIn,
+          refreshToken: tokenRes.data.refreshToken,
+          refreshExpiresIn: tokenRes.data.refreshExpiresIn,
+        })
+      );
+
+      const principalRes = await fetchPrincipal(tokenRes.data.subject);
+
+      dispatch(authSlice.actions.setPrincipal(principalRes.data));
+
+      navigate("/");
     } catch (err) {
-      if (err.response && err.response.status === 422) {
-        err.response.data.details?.forEach((detail) =>
-          setFieldError(detail.field.split(".").pop(), detail.message)
-        );
+      if (err.response && err.response.status === 401) {
+        setError("Either username or password are wrong!");
       } else {
         setError("An unexpected error occurred, please retry!");
       }
@@ -62,14 +71,14 @@ export default function Register() {
               alt="Logo"
             />
             <h1 className="mt-4 text-center lg:text-3xl text-2xl font-bold">
-              Create your new account
+              Sign in to your account
             </h1>
           </div>
           {error && <p className="text-center text-red-500">{error}</p>}
           <Formik
-            initialValues={{ username: "", email: "", password: "" }}
+            initialValues={{ username: "", password: "" }}
             validationSchema={schema}
-            onSubmit={onCreate}
+            onSubmit={onLogin}
           >
             {(props) => (
               <form
@@ -92,19 +101,6 @@ export default function Register() {
                 </div>
                 <div>
                   <TextField
-                    name="email"
-                    type="email"
-                    placeholder="E-Mail"
-                    disabled={loading}
-                    onChange={props.handleChange}
-                    onBlur={props.handleBlur}
-                    value={props.values.email}
-                    error={props.errors.email}
-                    touched={props.errors.email && props.touched.email}
-                  />
-                </div>
-                <div>
-                  <TextField
                     name="password"
                     type="password"
                     placeholder="Password"
@@ -121,37 +117,20 @@ export default function Register() {
                   disabled={!(props.isValid && props.dirty) || loading}
                   className="w-full flex justify-center bg-green-500 focus:outline-green-500"
                 >
-                  {!loading && <span>Register</span>}
+                  {!loading && <span>Login</span>}
                   {loading && (
                     <div className="w-6 h-6 border-b-2 border-white rounded-full animate-spin" />
                   )}
                 </Button>
-                <p className="text-center text-xs">
-                  By clicking &quot;Register&quot; you agree to our&nbsp;
-                  <Link
-                    className="text-green-500 hover:text-green-400"
-                    to="/terms-of-use"
-                  >
-                    Terms of Use
-                  </Link>
-                  &nbsp;and our&nbsp;
-                  <Link
-                    className="text-green-500 hover:text-green-400"
-                    to="/data-policy"
-                  >
-                    Data Policy
-                  </Link>
-                  .
-                </p>
               </form>
             )}
           </Formik>
           <div className="text-center">
             <Link
               className="text-sm text-green-500 hover:text-green-400"
-              to="/login"
+              to="/register"
             >
-              Already have an account?
+              Don&apos;t have an account?
             </Link>
           </div>
         </div>

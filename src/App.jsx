@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
+import Login from "./pages/Login";
 
 export default function App() {
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -20,6 +21,7 @@ export default function App() {
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={<Home />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
     </Routes>
   );
 }
