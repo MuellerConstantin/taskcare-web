@@ -5,6 +5,7 @@ import RouteProtector from "./components/organisms/RouteProtector";
 import Overview from "./pages/Overview";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -19,6 +20,7 @@ export default function App() {
 
   return (
     <Routes>
+      <Route path="*" element={<Navigate to="/404" />} />
       <Route path="/" element={<Navigate to="/overview" />} />
       <Route
         path="/overview"
@@ -30,6 +32,7 @@ export default function App() {
       />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/404" element={<NotFound />} />
     </Routes>
   );
 }
