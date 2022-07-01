@@ -46,7 +46,7 @@ export default function Login() {
 
       dispatch(authSlice.actions.setPrincipal(principalRes.data));
 
-      navigate("/");
+      navigate("/overview");
     } catch (err) {
       if (err.response && err.response.status === 401) {
         setError("Either username or password are wrong!");

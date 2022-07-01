@@ -2,10 +2,9 @@ import { Fragment } from "react";
 import { Popover, Transition, Switch } from "@headlessui/react";
 import { DotsVerticalIcon, LogoutIcon } from "@heroicons/react/solid";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Avatar from "../atoms/Avatar";
 import Button from "../atoms/Button";
-import authSlice from "../../store/slices/auth";
 import themeSlice from "../../store/slices/theme";
 
 import Logo from "../../assets/images/logo.svg";
@@ -14,15 +13,9 @@ import LogoTextDark from "../../assets/images/logo-text-dark.svg";
 
 export default function Navbar() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const principal = useSelector((state) => state.auth.principal);
   const darkMode = useSelector((state) => state.theme.darkMode);
-
-  const onLogout = () => {
-    dispatch(authSlice.actions.clearAuthentication());
-    navigate("/login");
-  };
 
   const onThemeToggle = (value) => {
     dispatch(themeSlice.actions.setDarkMode(value));
@@ -33,7 +26,7 @@ export default function Navbar() {
       <div className="xl:container mx-auto px-4">
         <div className="relative flex items-center justify-between h-16">
           <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-            <Link to="/">
+            <Link to={principal ? "/overview" : "/"}>
               <div className="flex-shrink-0 flex items-center">
                 <img
                   className="block lg:hidden h-8 w-auto"
@@ -111,16 +104,15 @@ export default function Navbar() {
                             </div>
                           </div>
                           <div>
-                            <button
-                              type="button"
-                              onClick={onLogout}
+                            <Link
+                              to="/logout"
                               className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
                             >
                               <LogoutIcon
                                 className="h-6 w-6"
                                 aria-hidden="true"
                               />
-                            </button>
+                            </Link>
                           </div>
                         </div>
                       ) : (

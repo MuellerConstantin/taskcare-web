@@ -1,28 +1,18 @@
 import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { Tab } from "@headlessui/react";
 import { CogIcon, LogoutIcon } from "@heroicons/react/solid";
-import Button from "../components/atoms/Button";
 import Avatar from "../components/atoms/Avatar";
 import AccountSettings from "../components/organisms/AccountSettings";
 import StackTemplate from "../components/templates/StackTemplate";
-import authSlice from "../store/slices/auth";
 
 export default function Settings() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const principal = useSelector((state) => state.auth.principal);
 
   useEffect(() => {
     document.title = "Twaddle Web | Settings";
   }, []);
-
-  const onLogout = () => {
-    dispatch(authSlice.actions.clearAuthentication());
-    navigate("/login");
-  };
 
   return (
     <StackTemplate>
@@ -61,13 +51,13 @@ export default function Settings() {
                   <div>Account</div>
                 </Tab>
                 <hr />
-                <Button
-                  onClick={onLogout}
-                  className="w-full flex justify-center space-x-2 bg-transparent border border-red-500 !text-red-500 focus:outline-red-500"
+                <Link
+                  to="/logout"
+                  className="group relative py-2 px-3 text-sm font-medium rounded-md outline-none hover:brightness-110 disabled:opacity-50 w-full flex justify-center space-x-2 bg-transparent border border-red-500 text-red-500 focus:outline-red-500"
                 >
                   <div>Logout</div>
                   <LogoutIcon className="h-6 w-6" aria-hidden="true" />
-                </Button>
+                </Link>
               </Tab.List>
             </div>
             <Tab.Panels as="div" className="w-full md:w-2/3 lg:w-3/4 xl:w-4/5">

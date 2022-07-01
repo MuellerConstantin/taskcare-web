@@ -1,13 +1,21 @@
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import StackTemplate from "../components/templates/StackTemplate";
+import authSlice from "../store/slices/auth";
 
-import NotFoundImage from "../assets/images/not-found.svg";
+import LogoutImage from "../assets/images/logout.svg";
 
-export default function NotFound() {
+export default function Logout() {
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    document.title = "TaskCare | 404";
+    document.title = "TaskCare | Logout";
   }, []);
+
+  useEffect(() => {
+    dispatch(authSlice.actions.clearAuthentication());
+  }, [dispatch]);
 
   return (
     <StackTemplate>
@@ -15,22 +23,17 @@ export default function NotFound() {
         <div className="w-full max-w-2xl">
           <div className="flex flex-col md:flex-row md:space-x-8 space-y-6 md:space-y-0 justify-center items-center text-gray-800 dark:text-white">
             <div className="w-1/2 sm:w-1/3 md:w-2/3">
-              <img
-                className="w-full h-full"
-                src={NotFoundImage}
-                alt="Not Found"
-              />
+              <img className="w-full h-full" src={LogoutImage} alt="Logout" />
             </div>
             <div className="flex flex-col text-center md:text-left">
-              <div className="text-2xl">Oops! Page not found.</div>
+              <div className="text-2xl">Hope to see you soon</div>
               <div>
-                The page you are looking for was not found. You may return
-                to&nbsp;
+                You have been logged out. To log in again click&nbsp;
                 <Link
                   className="text-sm text-green-500 hover:text-green-400"
-                  to="/"
+                  to="/login"
                 >
-                  home page
+                  here
                 </Link>
                 .
               </div>
