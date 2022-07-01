@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Home from "./pages/Home";
+import RouteProtector from "./components/organisms/RouteProtector";
+import Overview from "./pages/Overview";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 
@@ -18,8 +19,15 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/home" />} />
-      <Route path="/home" element={<Home />} />
+      <Route path="/" element={<Navigate to="/overview" />} />
+      <Route
+        path="/overview"
+        element={
+          <RouteProtector>
+            <Overview />
+          </RouteProtector>
+        }
+      />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
     </Routes>
