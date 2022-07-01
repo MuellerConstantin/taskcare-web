@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import RouteProtector from "./components/organisms/RouteProtector";
 import Overview from "./pages/Overview";
+import Settings from "./pages/Settings";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
@@ -27,6 +28,14 @@ export default function App() {
         element={
           <RouteProtector>
             <Overview />
+          </RouteProtector>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <RouteProtector>
+            <Settings />
           </RouteProtector>
         }
       />

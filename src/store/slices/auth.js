@@ -19,10 +19,10 @@ const authSlice = createSlice({
         refreshToken: action.payload.refreshToken,
         accessExpiresAt: new Date(
           new Date().getTime() + action.payload.accessExpiresIn
-        ),
+        ).getTime(),
         refreshExpiresAt: new Date(
           new Date().getTime() + action.payload.refreshExpiresIn
-        ),
+        ).getTime(),
       };
     },
     setPrincipal: (state, action) => {

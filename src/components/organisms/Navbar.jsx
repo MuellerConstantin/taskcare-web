@@ -140,6 +140,13 @@ export default function Navbar() {
                         </div>
                       )}
                       <div className="p-2 text-gray-800 dark:text-white flex flex-col space-y-2">
+                        {principal && (
+                          <Link to="/settings">
+                            <div className="flex justify-left items-center p-2 hover:bg-gray-100 hover:cursor-pointer hover:dark:bg-gray-700 rounded">
+                              <div className="text-sm">Settings</div>
+                            </div>
+                          </Link>
+                        )}
                         <div className="flex justify-between items-center p-2 rounded">
                           <div className="text-sm">Dark Mode</div>
                           <div>
