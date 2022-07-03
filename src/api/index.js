@@ -23,9 +23,38 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
-    if (err.response && err.response.status === 401) {
-      store.dispatch(authSlice.actions.clearAuthentication());
+  async (err) => {
+    const { response, config } = err;
+
+    if (response && config.url !== "/auth/refresh") {
+      // eslint-disable-next-line no-underscore-dangle
+      if (response.status === 401 && !config._retry) {
+        // eslint-disable-next-line no-underscore-dangle
+        config._retry = true;
+        const state = store.getState();
+
+        if (state.auth.refreshToken) {
+          try {
+            const refreshRes = await api.post("/auth/refresh", {
+              refreshToken: state.auth.refreshToken,
+            });
+
+            store.dispatch(
+              authSlice.actions.setAuthentication({
+                accessToken: refreshRes.data.accessToken,
+                accessExpiresIn: refreshRes.data.accessExpiresIn,
+                refreshToken: refreshRes.data.refreshToken,
+                refreshExpiresIn: refreshRes.data.refreshExpiresIn,
+              })
+            );
+
+            config.headers.Authorization = `Bearer ${refreshRes.data.accessToken}`;
+            return axios(config);
+          } catch (refeshError) {
+            return Promise.reject(refeshError);
+          }
+        }
+      }
     }
 
     return Promise.reject(err);

@@ -69,8 +69,7 @@ export default function AccountSettingsTab() {
           setFieldError(detail.field.split(".").pop(), detail.message)
         );
       } else if (err.response && err.response.status === 401) {
-        dispatch(authSlice.actions.logout());
-        navigate("/login");
+        navigate("/logout");
       } else {
         setNameError("An unexpected error occurred, please retry!");
       }
@@ -104,8 +103,7 @@ export default function AccountSettingsTab() {
           setFieldError(detail.field.split(".").pop(), detail.message)
         );
       } else if (err.response && err.response.status === 401) {
-        dispatch(authSlice.actions.logout());
-        navigate("/login");
+        navigate("/logout");
       } else {
         setEmailError("An unexpected error occurred, please retry!");
       }
@@ -136,8 +134,7 @@ export default function AccountSettingsTab() {
           setFieldError(detail.field.split(".").pop(), detail.message)
         );
       } else if (err.response && err.response.status === 401) {
-        dispatch(authSlice.actions.logout());
-        navigate("/login");
+        navigate("/logout");
       } else {
         setPasswordError("An unexpected error occurred, please retry!");
       }
@@ -377,10 +374,7 @@ export default function AccountSettingsTab() {
         <div className="w-full">
           <AccountDeletionModal
             username={principal.username}
-            onSuccess={() => {
-              dispatch(authSlice.actions.clearAuthentication());
-              navigate("/login");
-            }}
+            onSuccess={() => navigate("/logout")}
           >
             <Button
               type="button"

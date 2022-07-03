@@ -33,7 +33,7 @@ export default function RoomDeletionModal({ username, onSuccess, children }) {
       onSuccess();
     } catch (err) {
       if (err.response && err.response.status === 401) {
-        navigate("/login");
+        navigate("/logout");
       } else {
         setError("An unexpected error occurred, please retry!");
       }
