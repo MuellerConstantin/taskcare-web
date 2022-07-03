@@ -3,12 +3,9 @@ import { useSelector } from "react-redux";
 
 export default function RouteProtector({ children }) {
   const principal = useSelector((state) => state.auth.principal);
-  const accessExpiresAt = useSelector((state) => state.auth.accessExpiresAt);
   const refreshExpiresAt = useSelector((state) => state.auth.refreshExpiresAt);
 
-  return principal &&
-    Date.now() < accessExpiresAt &&
-    Date.now() < refreshExpiresAt ? (
+  return principal && Date.now() < refreshExpiresAt ? (
     children
   ) : (
     <Navigate to="/logout" />

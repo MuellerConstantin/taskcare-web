@@ -97,8 +97,21 @@ export default function Navbar() {
                                 <Avatar value={principal.username} />
                               </div>
                             </div>
-                            <div className="space-y-1">
-                              <div className="whitespace-nowrap">
+                            <div className="space-y-1 overflow-hidden">
+                              {(principal.firstName || principal.lastName) && (
+                                <div className="truncate">
+                                  {principal.firstName && (
+                                    <span>{principal.firstName}&nbsp;</span>
+                                  )}
+                                  {principal.lastName && principal.lastName}
+                                </div>
+                              )}
+                              <div
+                                className={`truncate ${
+                                  (principal.firstName || principal.lastName) &&
+                                  "text-sm font-light"
+                                }`}
+                              >
                                 {principal.username}
                               </div>
                             </div>
@@ -151,7 +164,7 @@ export default function Navbar() {
                                   : "bg-gray-100 dark:bg-gray-800"
                               }`}
                             >
-                              <span className="sr-only">Use setting</span>
+                              <span className="sr-only">Toggle dark mode</span>
                               <span
                                 aria-hidden="true"
                                 className={`pointer-events-none inline-block h-[20px] w-[20px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200 ${
