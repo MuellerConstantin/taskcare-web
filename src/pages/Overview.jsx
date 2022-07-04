@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/solid";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  PlusIcon,
+} from "@heroicons/react/solid";
 import Button from "../components/atoms/Button";
 import BoardThumbnail from "../components/molecules/BoardThumbnail";
 import BoardThumbnailSkeleton from "../components/molecules/BoardThumbnailSkeleton";
+import BoardCreationModal from "../components/organisms/BoardCreationModal";
 import StackTemplate from "../components/templates/StackTemplate";
 import { fetchBoardsByMembership } from "../api/boards";
 
@@ -63,9 +68,20 @@ export default function Overview() {
         <div className="xl:container mx-auto p-4">
           <div className="flex flex-col space-y-4">
             <div className="space-y-2">
-              <h1 className="text-xl text-gray-800 dark:text-white">
-                Your Boards
-              </h1>
+              <div className="flex justify-between">
+                <h1 className="text-xl text-gray-800 dark:text-white">
+                  Your Boards
+                </h1>
+                <BoardCreationModal onSuccess={() => onFetchBoards()}>
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center bg-transparent text-amber-500"
+                  >
+                    <PlusIcon className="h-6 w-6" aria-hidden="true" />
+                    <div className="ml-2">Add board</div>
+                  </button>
+                </BoardCreationModal>
+              </div>
               <hr className="border-gray-300 dark:border-gray-400" />
             </div>
             {loading && (

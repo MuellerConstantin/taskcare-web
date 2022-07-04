@@ -27,9 +27,18 @@ import api from "./index";
  * @param {number} page Zero based index of the page to load
  * @returns {Promise<AxiosResponse<BoardPageDTO>>} Returns the API response
  */
-// eslint-disable-next-line import/prefer-default-export
 export const fetchBoardsByMembership = (username, page) => {
   return api.get(`/users/${username}/boards`, {
     params: { page },
   });
+};
+
+/**
+ * Create a new board.
+ *
+ * @param {{name: string, description: string}} data Fields of the new board to be created
+ * @returns {Promise<AxiosResponse<RoomDTO>>} Returns the API response
+ */
+export const createBoard = (data) => {
+  return api.post("/boards", data);
 };
