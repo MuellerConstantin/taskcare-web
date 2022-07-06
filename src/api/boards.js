@@ -34,6 +34,16 @@ export const fetchBoardsByMembership = (username, page) => {
 };
 
 /**
+ * Loads the information of a single board based on its id.
+ *
+ * @param {string} id Unique identifier of the resource
+ * @returns {Promise<AxiosResponse<BoardDTO>>} Returns the API response
+ */
+export const fetchBoard = (id) => {
+  return api.get(`/boards/${id}`);
+};
+
+/**
  * Create a new board.
  *
  * @param {{name: string, description: string}} data Fields of the new board to be created

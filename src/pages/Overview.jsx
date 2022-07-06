@@ -5,6 +5,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   PlusIcon,
+  ExclamationIcon,
 } from "@heroicons/react/solid";
 import Button from "../components/atoms/Button";
 import BoardThumbnail from "../components/molecules/BoardThumbnail";
@@ -32,17 +33,12 @@ export default function Overview() {
       const res = await fetchBoardsByMembership(principal.username, _page);
 
       setBoards(res.data.content);
-      setPageable({
-        perPage: res.data.perPage,
-        page: res.data.page,
-        totalElements: res.data.totalElements,
-        totalPages: res.data.totalPages,
-      });
+      setPageable(res.data.info);
     } catch (err) {
       if (err.response && err.response.status === 401) {
         navigate("/logout");
       } else {
-        setError("An unexpected error occurred, please retry!");
+        setError("The list of available boards could not be loaded.");
       }
 
       throw err;
@@ -84,25 +80,32 @@ export default function Overview() {
               </div>
               <hr className="border-gray-300 dark:border-gray-400" />
             </div>
-            {loading && (
-              <div className="flex flex-wrap gap-4">
-                {[...Array(4).keys()].map((key) => (
-                  <BoardThumbnailSkeleton key={key} />
-                ))}
+            {(loading || error) && (
+              <div className="w-full relative">
+                {error && (
+                  <button
+                    type="button"
+                    className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
+                  >
+                    <div className="rounded-full p-1 bg-gray-100 dark:bg-gray-700 opacity-80">
+                      <ExclamationIcon className="h-6" />
+                    </div>
+                    <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
+                      {error}
+                    </div>
+                  </button>
+                )}
+                <div className="flex flex-wrap gap-4">
+                  {[...Array(4).keys()].map((key) => (
+                    <BoardThumbnailSkeleton key={key} error={error} />
+                  ))}
+                </div>
               </div>
-            )}
-            {!loading && error && (
-              <p className="text-center text-red-500">{error}</p>
             )}
             {!loading && !error && boards.length > 0 && (
               <div className="flex flex-wrap gap-4">
                 {boards.map((board) => (
-                  <BoardThumbnail
-                    key={board.id}
-                    id={board.id}
-                    name={board.name}
-                    description={board.description}
-                  />
+                  <BoardThumbnail key={board.id} board={board} />
                 ))}
               </div>
             )}
@@ -111,7 +114,7 @@ export default function Overview() {
                 No boards available.
               </p>
             )}
-            {!loading && boards.length > 0 && (
+            {!loading && !error && boards.length > 0 && (
               <div className="flex flex-col items-center">
                 <span className="text-sm text-gray-700 dark:text-gray-400">
                   Showing&nbsp;

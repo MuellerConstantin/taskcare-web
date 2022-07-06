@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import RouteProtector from "./components/organisms/RouteProtector";
 import Overview from "./pages/Overview";
+import Board from "./pages/Board";
 import Settings from "./pages/Settings";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
@@ -30,6 +31,14 @@ export default function App() {
         element={
           <RouteProtector>
             <Overview />
+          </RouteProtector>
+        }
+      />
+      <Route
+        path="/boards/:boardId"
+        element={
+          <RouteProtector>
+            <Board />
           </RouteProtector>
         }
       />
