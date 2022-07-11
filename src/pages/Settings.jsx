@@ -39,16 +39,22 @@ export default function Settings() {
               <Tab.List className="rounded-xl w-full text-gray-700 dark:text-gray-200 space-y-4">
                 <Tab
                   className={({ selected }) =>
-                    `w-full flex items-center space-x-2 p-2 text-sm leading-5 font-medium rounded-lg outline-none
-                      ${
-                        selected
-                          ? "border-l-4 border-l-amber-500 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white"
-                          : "hover:bg-gray-100 hover:dark:bg-gray-700"
-                      }`
+                    `w-full flex items-center space-x-2 text-sm leading-5 font-medium outline-none pl-1 border-l-4
+                      ${selected ? "border-l-amber-500" : "border-transparent"}`
                   }
                 >
-                  <CogIcon className="h-6 w-6" aria-hidden="true" />
-                  <div>Account</div>
+                  {({ selected }) => (
+                    <div
+                      className={`truncate w-full h-full flex items-center rounded-lg p-2 text-gray-800 dark:text-white ${
+                        selected
+                          ? "bg-gray-100 dark:bg-gray-700"
+                          : "hover:bg-gray-100 hover:dark:bg-gray-700"
+                      }`}
+                    >
+                      <CogIcon className="h-6" />
+                      <div className="ml-2 truncate">Account</div>
+                    </div>
+                  )}
                 </Tab>
                 <hr />
                 <Link

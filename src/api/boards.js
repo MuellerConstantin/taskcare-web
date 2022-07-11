@@ -47,8 +47,29 @@ export const fetchBoard = (id) => {
  * Create a new board.
  *
  * @param {{name: string, description: string}} data Fields of the new board to be created
- * @returns {Promise<AxiosResponse<RoomDTO>>} Returns the API response
+ * @returns {Promise<AxiosResponse<void>>} Returns the API response
  */
 export const createBoard = (data) => {
   return api.post("/boards", data);
+};
+
+/**
+ * Update an existing board by its identifier.
+ *
+ * @param {string} id Unique identifier of the resource
+ * @param {{name: string|undefined, description: string|undefined}} data Fields of the board to be updated
+ * @returns {Promise<AxiosResponse<void>>} Returns the API response
+ */
+export const updateBoard = (id, data) => {
+  return api.patch(`/boards/${id}`, data);
+};
+
+/**
+ * Deletes an existing user account by its identifier.
+ *
+ * @param {string} id Unique identifier of the resource
+ * @returns {Promise<AxiosResponse<void>>} Returns the API response
+ */
+export const deleteBoard = (id) => {
+  return api.delete(`/boards/${id}`);
 };

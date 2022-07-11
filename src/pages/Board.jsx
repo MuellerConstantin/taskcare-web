@@ -5,10 +5,12 @@ import {
   CollectionIcon,
   CogIcon,
   ExclamationIcon,
+  UserGroupIcon,
 } from "@heroicons/react/solid";
 import { Tab } from "@headlessui/react";
 import BoardHeader from "../components/molecules/BoardHeader";
 import BoardHeaderSkeleton from "../components/molecules/BoardHeaderSkeleton";
+import BoardSettings from "../components/organisms/BoardSettings";
 import StackTemplate from "../components/templates/StackTemplate";
 import { fetchBoard } from "../api/boards";
 import { fetchMember } from "../api/members";
@@ -89,12 +91,12 @@ export default function Board() {
                 </div>
               )}
               {!loading && !error && <BoardHeader board={board} />}
-              <Tab.Group>
+              <Tab.Group as="div" className="space-y-6">
                 <Tab.List className="flex rounded-xl space-x-2">
                   <Tab
                     disabled={loading}
                     className={({ selected }) =>
-                      `w-24 md:w-28 flex items-center space-x-2 text-sm leading-5 font-medium outline-none pb-1
+                      `max-w-full grow md:max-w-[10rem] flex items-center space-x-2 text-sm leading-5 font-medium outline-none pb-1
                       ${
                         selected
                           ? "border-b-4 border-b-amber-500"
@@ -102,16 +104,48 @@ export default function Board() {
                       }`
                     }
                   >
-                    <div className="truncate w-full h-full flex justify-center items-center rounded-lg hover:bg-gray-100 hover:dark:bg-gray-700 p-2 text-gray-800 dark:text-white">
-                      <CollectionIcon className="h-4" />
-                      <div className="ml-2 truncate">Tasks</div>
-                    </div>
+                    {({ selected }) => (
+                      <div
+                        className={`truncate w-full h-full flex justify-center items-center rounded-lg p-2 text-gray-800 dark:text-white ${
+                          selected
+                            ? "bg-gray-100 dark:bg-gray-700"
+                            : "hover:bg-gray-100 hover:dark:bg-gray-700"
+                        }`}
+                      >
+                        <CollectionIcon className="h-4" />
+                        <div className="ml-2 truncate">Tasks</div>
+                      </div>
+                    )}
+                  </Tab>
+                  <Tab
+                    disabled={loading}
+                    className={({ selected }) =>
+                      `max-w-full grow md:max-w-[10rem] flex items-center space-x-2 text-sm leading-5 font-medium outline-none pb-1
+                        ${
+                          selected
+                            ? "border-b-4 border-b-amber-500"
+                            : "border-b-4 border-transparent"
+                        }`
+                    }
+                  >
+                    {({ selected }) => (
+                      <div
+                        className={`truncate w-full h-full flex justify-center items-center rounded-lg p-2 text-gray-800 dark:text-white ${
+                          selected
+                            ? "bg-gray-100 dark:bg-gray-700"
+                            : "hover:bg-gray-100 hover:dark:bg-gray-700"
+                        }`}
+                      >
+                        <UserGroupIcon className="h-4" />
+                        <div className="ml-2 truncate">Members</div>
+                      </div>
+                    )}
                   </Tab>
                   {member && member.role === "ADMINISTRATOR" && (
                     <Tab
                       disabled={loading}
                       className={({ selected }) =>
-                        `w-24 md:w-28 flex items-center space-x-2 text-sm leading-5 font-medium outline-none pb-1
+                        `max-w-full grow md:max-w-[10rem] flex items-center space-x-2 text-sm leading-5 font-medium outline-none pb-1
                         ${
                           selected
                             ? "border-b-4 border-b-amber-500"
@@ -119,14 +153,32 @@ export default function Board() {
                         }`
                       }
                     >
-                      <div className="truncate w-full h-full flex justify-center items-center rounded-lg hover:bg-gray-100 hover:dark:bg-gray-700 p-2 text-gray-800 dark:text-white">
-                        <CogIcon className="h-4" />
-                        <div className="ml-2 truncate">Settings</div>
-                      </div>
+                      {({ selected }) => (
+                        <div
+                          className={`truncate w-full h-full flex justify-center items-center rounded-lg p-2 text-gray-800 dark:text-white ${
+                            selected
+                              ? "bg-gray-100 dark:bg-gray-700"
+                              : "hover:bg-gray-100 hover:dark:bg-gray-700"
+                          }`}
+                        >
+                          <CogIcon className="h-4" />
+                          <div className="ml-2 truncate">Settings</div>
+                        </div>
+                      )}
                     </Tab>
                   )}
                 </Tab.List>
                 <hr className="border-gray-300 dark:border-gray-400 !m-0 !p-0" />
+                <Tab.Panels as="div">
+                  <Tab.Panel />
+                  <Tab.Panel />
+                  <Tab.Panel>
+                    <BoardSettings
+                      board={board}
+                      onSuccess={() => onFetchBoard(board.id)}
+                    />
+                  </Tab.Panel>
+                </Tab.Panels>
               </Tab.Group>
             </div>
           </div>

@@ -3,13 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/solid";
 import Button from "../atoms/Button";
-import { deleteUser } from "../../api/users";
+import { deleteBoard } from "../../api/boards";
 
-export default function AccountDeletionModal({
-  username,
-  onSuccess,
-  children,
-}) {
+export default function BoardDeletionModal({ id, onSuccess, children }) {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
@@ -26,12 +22,12 @@ export default function AccountDeletionModal({
     setOpen(true);
   };
 
-  const onDeleteUser = async () => {
+  const onDeleteBoard = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      await deleteUser(username);
+      await deleteBoard(id);
 
       setOpen(false);
 
@@ -92,7 +88,7 @@ export default function AccountDeletionModal({
                     as="h3"
                     className="text-lg font-medium leading-6"
                   >
-                    Delete account
+                    Delete board
                   </Dialog.Title>
                   <button
                     type="button"
@@ -105,20 +101,21 @@ export default function AccountDeletionModal({
                 </div>
                 {error && <p className="text-center text-red-500">{error}</p>}
                 <div>
-                  Are you sure you want to delete your account? The following
+                  Are you sure you want to delete this board? The following
                   things take effect immediately:
                 </div>
                 <div>
                   <ul className="list-disc pl-6">
-                    <li>All your data will be irrevocably deleted.</li>
-                    <li>Your username will be released for use by others.</li>
-                    <li>You will lose access to the TaskCare Platform.</li>
+                    <li>All your tasks will be irrevocably deleted.</li>
+                    <li>
+                      All members will be removed and lose access to the board.
+                    </li>
                   </ul>
                 </div>
                 <div>Do you still want to continue?</div>
                 <div className="flex justify-between">
                   <Button
-                    onClick={onDeleteUser}
+                    onClick={onDeleteBoard}
                     disabled={loading}
                     className="bg-green-500 focus:outline-green-500 w-32 flex justify-center"
                   >

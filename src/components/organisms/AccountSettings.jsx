@@ -149,7 +149,7 @@ export default function AccountSettingsTab() {
     <div className="space-y-8">
       <div className="text-gray-800 dark:text-white space-y-4">
         <div>
-          <h2 className="text-2xl">Change Display Name</h2>
+          <h2 className="text-2xl">Change display name</h2>
           <hr className="border-gray-300 dark:border-gray-400 mt-2" />
         </div>
         <p>
@@ -225,7 +225,7 @@ export default function AccountSettingsTab() {
       </div>
       <div className="text-gray-800 dark:text-white space-y-4">
         <div>
-          <h2 className="text-2xl">Change E-Mail</h2>
+          <h2 className="text-2xl">Change e-mail</h2>
           <hr className="border-gray-300 dark:border-gray-400 mt-2" />
         </div>
         <p>
@@ -286,7 +286,7 @@ export default function AccountSettingsTab() {
       </div>
       <div className="text-gray-800 dark:text-white space-y-4">
         <div>
-          <h2 className="text-2xl">Change Password</h2>
+          <h2 className="text-2xl">Change password</h2>
           <hr className="border-gray-300 dark:border-gray-400 mt-2" />
         </div>
         <p>
