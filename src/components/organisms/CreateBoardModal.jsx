@@ -20,19 +20,7 @@ const schema = yup.object().shape({
     .required("Is required"),
 });
 
-/**
- * @typedef {object} RoomCreationModalProperties
- * @property {JSX.Element=} children
- * @property {() => void} onSuccess
- */
-
-/**
- * Constructs a room creation modal component.
- *
- * @param {RoomCreationModalProperties} properties The modal properties
- * @returns {JSX.Element} Returns the modal component
- */
-export default function RoomCreationModal({ onSuccess, children }) {
+export default function CreateBoardModal({ onSubmit, onCancel, children }) {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
@@ -49,7 +37,7 @@ export default function RoomCreationModal({ onSuccess, children }) {
     setOpen(true);
   };
 
-  const onCreateRoom = async (values, { setFieldError }) => {
+  const onSumitModal = async (values, { setFieldError }) => {
     setLoading(true);
     setError(null);
 
@@ -60,7 +48,7 @@ export default function RoomCreationModal({ onSuccess, children }) {
       });
 
       setOpen(false);
-      onSuccess();
+      if (onSubmit) onSubmit();
     } catch (err) {
       if (err.response && err.response.status === 422) {
         err.response.data.details?.forEach((detail) =>
@@ -76,6 +64,11 @@ export default function RoomCreationModal({ onSuccess, children }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onCancelModal = () => {
+    setOpen(false);
+    if (onCancel) onCancel();
   };
 
   return (
@@ -125,7 +118,7 @@ export default function RoomCreationModal({ onSuccess, children }) {
                   </Dialog.Title>
                   <button
                     type="button"
-                    onClick={onCloseModal}
+                    onClick={onCancelModal}
                     disabled={loading}
                     className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white disabled:opacity-50"
                   >
@@ -136,7 +129,7 @@ export default function RoomCreationModal({ onSuccess, children }) {
                 <Formik
                   initialValues={{ name: "", description: "" }}
                   validationSchema={schema}
-                  onSubmit={onCreateRoom}
+                  onSubmit={onSumitModal}
                 >
                   {(props) => (
                     <form

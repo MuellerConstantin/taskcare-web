@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -10,7 +10,9 @@ import {
 import { Tab } from "@headlessui/react";
 import BoardHeader from "../components/molecules/BoardHeader";
 import BoardHeaderSkeleton from "../components/molecules/BoardHeaderSkeleton";
-import BoardSettings from "../components/organisms/BoardSettings";
+import ChangeBoardNameForm from "../components/organisms/ChangeBoardNameForm";
+import ChangeBoardDescriptionForm from "../components/organisms/ChangeBoardDescriptionForm";
+import DeleteBoardForm from "../components/organisms/DeleteBoardForm";
 import StackTemplate from "../components/templates/StackTemplate";
 import { fetchBoard } from "../api/boards";
 import { fetchMember } from "../api/members";
@@ -24,32 +26,52 @@ export default function Board() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [board, setBoard] = useState(null);
-  const [member, setMember] = useState(null);
+  const [currentMember, setCurrentMember] = useState(null);
 
-  const onFetchBoard = async (id) => {
-    setLoading(true);
-    setError(null);
+  const onFetchBoard = useCallback(
+    async (id) => {
+      setError(null);
 
-    try {
-      const boardRes = await fetchBoard(id);
-      const memberRes = await fetchMember(id, principal.username);
+      try {
+        const boardRes = await fetchBoard(id);
+        setBoard(boardRes.data);
+      } catch (err) {
+        if (err.response && err.response.status === 401) {
+          navigate("/logout");
+        } else if (err.response && err.response.status === 404) {
+          navigate("/not-found");
+        } else {
+          setError("The board information could not be loaded.");
+        }
 
-      setBoard(boardRes.data);
-      setMember(memberRes.data);
-    } catch (err) {
-      if (err.response && err.response.status === 401) {
-        navigate("/logout");
-      } else if (err.response && err.response.status === 404) {
-        navigate("/not-found");
-      } else {
-        setError("The board information could not be loaded.");
+        throw err;
       }
+    },
+    [navigate]
+  );
 
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const onFetchCurrentMember = useCallback(
+    async (id, currentUsername) => {
+      setError(null);
+
+      try {
+        const currentMemberRes = await fetchMember(id, currentUsername);
+
+        setCurrentMember(currentMemberRes.data);
+      } catch (err) {
+        if (err.response && err.response.status === 401) {
+          navigate("/logout");
+        } else if (err.response && err.response.status === 404) {
+          navigate("/not-found");
+        } else {
+          setError("The board information could not be loaded.");
+        }
+
+        throw err;
+      }
+    },
+    [navigate]
+  );
 
   useEffect(() => {
     if (board) {
@@ -60,11 +82,14 @@ export default function Board() {
   }, [board]);
 
   useEffect(() => {
-    if (boardId) {
-      onFetchBoard(boardId);
+    if (boardId && principal) {
+      setLoading(true);
+
+      onFetchCurrentMember(boardId, principal.username)
+        .then(() => onFetchBoard(boardId))
+        .finally(() => setLoading(false));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [boardId]);
+  }, [boardId, onFetchBoard, onFetchCurrentMember, principal]);
 
   return (
     <StackTemplate>
@@ -141,7 +166,7 @@ export default function Board() {
                       </div>
                     )}
                   </Tab>
-                  {member && member.role === "ADMINISTRATOR" && (
+                  {currentMember && currentMember.role === "ADMINISTRATOR" && (
                     <Tab
                       disabled={loading}
                       className={({ selected }) =>
@@ -173,10 +198,22 @@ export default function Board() {
                   <Tab.Panel />
                   <Tab.Panel />
                   <Tab.Panel>
-                    <BoardSettings
-                      board={board}
-                      onSuccess={() => onFetchBoard(board.id)}
-                    />
+                    <div className="space-y-8">
+                      <ChangeBoardNameForm
+                        boardId={boardId}
+                        currentName={board?.name}
+                        onChange={() => onFetchBoard(boardId)}
+                      />
+                      <ChangeBoardDescriptionForm
+                        boardId={boardId}
+                        currentDescription={board?.description}
+                        onChange={() => onFetchBoard(boardId)}
+                      />
+                      <DeleteBoardForm
+                        boardId={boardId}
+                        onChange={() => navigate("/overview")}
+                      />
+                    </div>
                   </Tab.Panel>
                 </Tab.Panels>
               </Tab.Group>

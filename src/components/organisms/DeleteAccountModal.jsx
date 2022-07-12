@@ -3,9 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/solid";
 import Button from "../atoms/Button";
-import { deleteBoard } from "../../api/boards";
+import { deleteUser } from "../../api/users";
 
-export default function BoardDeletionModal({ id, onSuccess, children }) {
+export default function DeleteAccountModal({
+  username,
+  onSubmit,
+  onCancel,
+  children,
+}) {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
@@ -22,16 +27,15 @@ export default function BoardDeletionModal({ id, onSuccess, children }) {
     setOpen(true);
   };
 
-  const onDeleteBoard = async () => {
+  const onSubmitModal = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      await deleteBoard(id);
+      await deleteUser(username);
 
       setOpen(false);
-
-      if (onSuccess()) onSuccess();
+      if (onSubmit) onSubmit();
     } catch (err) {
       if (err.response && err.response.status === 401) {
         navigate("/logout");
@@ -43,6 +47,11 @@ export default function BoardDeletionModal({ id, onSuccess, children }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onCancelModal = () => {
+    setOpen(false);
+    if (onCancel) onCancel();
   };
 
   return (
@@ -88,11 +97,11 @@ export default function BoardDeletionModal({ id, onSuccess, children }) {
                     as="h3"
                     className="text-lg font-medium leading-6"
                   >
-                    Delete board
+                    Delete account
                   </Dialog.Title>
                   <button
                     type="button"
-                    onClick={onCloseModal}
+                    onClick={onCancelModal}
                     disabled={loading}
                     className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white disabled:opacity-50"
                   >
@@ -101,21 +110,20 @@ export default function BoardDeletionModal({ id, onSuccess, children }) {
                 </div>
                 {error && <p className="text-center text-red-500">{error}</p>}
                 <div>
-                  Are you sure you want to delete this board? The following
+                  Are you sure you want to delete your account? The following
                   things take effect immediately:
                 </div>
                 <div>
                   <ul className="list-disc pl-6">
-                    <li>All your tasks will be irrevocably deleted.</li>
-                    <li>
-                      All members will be removed and lose access to the board.
-                    </li>
+                    <li>All your data will be irrevocably deleted.</li>
+                    <li>Your username will be released for use by others.</li>
+                    <li>You will lose access to the TaskCare Platform.</li>
                   </ul>
                 </div>
                 <div>Do you still want to continue?</div>
                 <div className="flex justify-between">
                   <Button
-                    onClick={onDeleteBoard}
+                    onClick={onSubmitModal}
                     disabled={loading}
                     className="bg-green-500 focus:outline-green-500 w-32 flex justify-center"
                   >
@@ -125,7 +133,7 @@ export default function BoardDeletionModal({ id, onSuccess, children }) {
                     )}
                   </Button>
                   <Button
-                    onClick={onCloseModal}
+                    onClick={onCancelModal}
                     disabled={loading}
                     className="bg-red-500 focus:outline-red-500 w-32"
                   >

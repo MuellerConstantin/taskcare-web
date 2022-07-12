@@ -1,14 +1,45 @@
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { Tab } from "@headlessui/react";
 import { CogIcon, LogoutIcon } from "@heroicons/react/solid";
 import Avatar from "../components/atoms/Avatar";
-import AccountSettings from "../components/organisms/AccountSettings";
 import StackTemplate from "../components/templates/StackTemplate";
+import ChangeAccountNameForm from "../components/organisms/ChangeAccountNameForm";
+import ChangeAccountEmailForm from "../components/organisms/ChangeAccountEmailForm";
+import ChangeAccountPasswordForm from "../components/organisms/ChangeAccountPasswordForm";
+import DeleteAccountForm from "../components/organisms/DeleteAccountForm";
+import { fetchPrincipal } from "../api/auth";
+import authSlice from "../store/slices/auth";
 
 export default function Settings() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const principal = useSelector((state) => state.auth.principal);
+
+  const [, setLoading] = useState(false);
+  const [, setError] = useState(null);
+
+  const onFetchPrincipal = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const principalRes = await fetchPrincipal(principal.username);
+      dispatch(authSlice.actions.setPrincipal(principalRes.data));
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        navigate("/logout");
+      } else {
+        setError("An unexpected error occurred, please retry!");
+      }
+
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     document.title = "Twaddle Web | Settings";
@@ -68,7 +99,24 @@ export default function Settings() {
             </div>
             <Tab.Panels as="div" className="w-full md:w-2/3 lg:w-3/4 xl:w-4/5">
               <Tab.Panel>
-                <AccountSettings />
+                <div className="space-y-8">
+                  <ChangeAccountNameForm
+                    username={principal.username}
+                    currentFirstName={principal?.firstName}
+                    currentLastName={principal?.lastName}
+                    onChange={() => onFetchPrincipal()}
+                  />
+                  <ChangeAccountEmailForm
+                    username={principal.username}
+                    currentEmail={principal?.email}
+                    onChange={() => onFetchPrincipal()}
+                  />
+                  <ChangeAccountPasswordForm username={principal.username} />
+                  <DeleteAccountForm
+                    username={principal.username}
+                    onChange={() => navigate("/logout")}
+                  />
+                </div>
               </Tab.Panel>
             </Tab.Panels>
           </Tab.Group>

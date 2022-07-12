@@ -15,7 +15,16 @@ import api from "./index";
  * @param {string} username Unique username of member
  * @returns {Promise<AxiosResponse<MemberDTO>>} Returns the API response
  */
-// eslint-disable-next-line import/prefer-default-export
 export const fetchMember = (id, username) => {
   return api.get(`/boards/${id}/members/${username}`);
+};
+
+/**
+ * Loads the information of all board members for a specific board.
+ *
+ * @param {string} id Unique identifier of the board
+ * @returns {Promise<AxiosResponse<MemberDTO[]>>} Returns the API response
+ */
+export const fetchMembers = (id) => {
+  return api.get(`/boards/${id}/members`);
 };

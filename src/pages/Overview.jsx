@@ -1,16 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  PlusIcon,
-  ExclamationIcon,
-} from "@heroicons/react/solid";
-import Button from "../components/atoms/Button";
+import { PlusIcon, ExclamationIcon } from "@heroicons/react/solid";
 import BoardThumbnail from "../components/molecules/BoardThumbnail";
 import BoardThumbnailSkeleton from "../components/molecules/BoardThumbnailSkeleton";
-import BoardCreationModal from "../components/organisms/BoardCreationModal";
+import Pagination from "../components/molecules/Pagination";
+import CreateBoardModal from "../components/organisms/CreateBoardModal";
 import StackTemplate from "../components/templates/StackTemplate";
 import { fetchBoardsByMembership } from "../api/boards";
 
@@ -68,7 +63,7 @@ export default function Overview() {
                 <h1 className="text-xl text-gray-800 dark:text-white">
                   Your Boards
                 </h1>
-                <BoardCreationModal onSuccess={() => onFetchBoards()}>
+                <CreateBoardModal onSubmit={() => onFetchBoards()}>
                   <button
                     type="button"
                     className="inline-flex items-center justify-center bg-transparent text-amber-500"
@@ -76,7 +71,7 @@ export default function Overview() {
                     <PlusIcon className="h-6 w-6" aria-hidden="true" />
                     <div className="ml-2">Add board</div>
                   </button>
-                </BoardCreationModal>
+                </CreateBoardModal>
               </div>
               <hr className="border-gray-300 dark:border-gray-400" />
             </div>
@@ -115,55 +110,12 @@ export default function Overview() {
               </p>
             )}
             {!loading && !error && boards.length > 0 && (
-              <div className="flex flex-col items-center">
-                <span className="text-sm text-gray-700 dark:text-gray-400">
-                  Showing&nbsp;
-                  <span className="font-semibold text-gray-900 dark:text-white">
-                    {pageable.page * pageable.perPage + 1}
-                  </span>
-                  &nbsp;to&nbsp;
-                  <span className="font-semibold text-gray-900 dark:text-white">
-                    {Math.min(
-                      pageable.page * pageable.perPage + pageable.perPage,
-                      pageable.totalElements
-                    )}
-                  </span>
-                  &nbsp;of&nbsp;
-                  <span className="font-semibold text-gray-900 dark:text-white">
-                    {pageable.totalElements}
-                  </span>
-                  &nbsp;Boards
-                </span>
-                <div className="inline-flex mt-2 xs:mt-0">
-                  <Button
-                    disabled={pageable.page * pageable.perPage + 1 <= 1}
-                    className="border-r-0 rounded-r-none inline-flex bg-green-500 focus:outline-green-500"
-                    onClick={() => setCurrentPage(pageable.page - 1)}
-                  >
-                    <ArrowLeftIcon
-                      className="h-6 w-6 mr-2"
-                      aria-hidden="true"
-                    />
-                    Prev
-                  </Button>
-                  <Button
-                    disabled={
-                      Math.min(
-                        pageable.page * pageable.perPage + pageable.perPage,
-                        pageable.totalElements
-                      ) >= pageable.totalElements
-                    }
-                    className="border-l-0 rounded-l-none inline-flex bg-green-500 focus:outline-green-500"
-                    onClick={() => setCurrentPage(pageable.page + 1)}
-                  >
-                    Next
-                    <ArrowRightIcon
-                      className="h-6 w-6 ml-2"
-                      aria-hidden="true"
-                    />
-                  </Button>
-                </div>
-              </div>
+              <Pagination
+                currentPage={pageable.page}
+                perPage={pageable.perPage}
+                totalElements={pageable.totalElements}
+                onChange={setCurrentPage}
+              />
             )}
           </div>
         </div>

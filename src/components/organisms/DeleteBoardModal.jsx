@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/solid";
 import Button from "../atoms/Button";
-import { deleteUser } from "../../api/users";
+import { deleteBoard } from "../../api/boards";
 
-export default function AccountDeletionModal({
-  username,
-  onSuccess,
+export default function DeleteBoardModal({
+  boardId,
+  onSubmit,
+  onCancel,
   children,
 }) {
   const navigate = useNavigate();
@@ -26,16 +27,15 @@ export default function AccountDeletionModal({
     setOpen(true);
   };
 
-  const onDeleteUser = async () => {
+  const onSubmitModal = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      await deleteUser(username);
+      await deleteBoard(boardId);
 
       setOpen(false);
-
-      if (onSuccess()) onSuccess();
+      if (onSubmit) onSubmit();
     } catch (err) {
       if (err.response && err.response.status === 401) {
         navigate("/logout");
@@ -47,6 +47,11 @@ export default function AccountDeletionModal({
     } finally {
       setLoading(false);
     }
+  };
+
+  const onCancelModal = () => {
+    setOpen(false);
+    if (onCancel) onCancel();
   };
 
   return (
@@ -92,11 +97,11 @@ export default function AccountDeletionModal({
                     as="h3"
                     className="text-lg font-medium leading-6"
                   >
-                    Delete account
+                    Delete board
                   </Dialog.Title>
                   <button
                     type="button"
-                    onClick={onCloseModal}
+                    onClick={onCancelModal}
                     disabled={loading}
                     className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white disabled:opacity-50"
                   >
@@ -105,20 +110,21 @@ export default function AccountDeletionModal({
                 </div>
                 {error && <p className="text-center text-red-500">{error}</p>}
                 <div>
-                  Are you sure you want to delete your account? The following
+                  Are you sure you want to delete this board? The following
                   things take effect immediately:
                 </div>
                 <div>
                   <ul className="list-disc pl-6">
-                    <li>All your data will be irrevocably deleted.</li>
-                    <li>Your username will be released for use by others.</li>
-                    <li>You will lose access to the TaskCare Platform.</li>
+                    <li>All your tasks will be irrevocably deleted.</li>
+                    <li>
+                      All members will be removed and lose access to the board.
+                    </li>
                   </ul>
                 </div>
                 <div>Do you still want to continue?</div>
                 <div className="flex justify-between">
                   <Button
-                    onClick={onDeleteUser}
+                    onClick={onSubmitModal}
                     disabled={loading}
                     className="bg-green-500 focus:outline-green-500 w-32 flex justify-center"
                   >
