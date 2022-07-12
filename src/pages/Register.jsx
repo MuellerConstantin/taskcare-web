@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Formik } from "formik";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import StackTemplate from "../components/templates/StackTemplate";
 import TextField from "../components/atoms/TextField";
 import Button from "../components/atoms/Button";
+import Link from "../components/atoms/Link";
+
 import { createUser } from "../api/users";
 
 import Logo from "../assets/images/logo.svg";
@@ -53,7 +55,7 @@ export default function Register() {
 
   return (
     <StackTemplate>
-      <div className="h-full bg-amber-500 flex items-center justify-center p-4">
+      <div className="h-full bg-amber-500 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md rounded-md p-8 space-y-6">
           <div>
             <img
@@ -128,29 +130,15 @@ export default function Register() {
                 </Button>
                 <p className="text-center text-xs">
                   By clicking &quot;Register&quot; you agree to our&nbsp;
-                  <Link
-                    className="text-green-500 hover:text-green-400"
-                    to="/terms-of-use"
-                  >
-                    Terms of Use
-                  </Link>
+                  <Link to="/terms-of-use">Terms of Use</Link>
                   &nbsp;and our&nbsp;
-                  <Link
-                    className="text-green-500 hover:text-green-400"
-                    to="/data-policy"
-                  >
-                    Data Policy
-                  </Link>
-                  .
+                  <Link to="/privacy-policy">Privacy Policy</Link>.
                 </p>
               </form>
             )}
           </Formik>
           <div className="text-center">
-            <Link
-              className="text-sm text-green-500 hover:text-green-400"
-              to="/login"
-            >
+            <Link className="text-sm" to="/login">
               Already have an account?
             </Link>
           </div>

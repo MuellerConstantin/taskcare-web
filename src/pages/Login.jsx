@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Formik } from "formik";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
 import StackTemplate from "../components/templates/StackTemplate";
 import TextField from "../components/atoms/TextField";
 import Button from "../components/atoms/Button";
+import Link from "../components/atoms/Link";
 import authSlice from "../store/slices/auth";
 import { generateToken, fetchPrincipal } from "../api/auth";
 
@@ -62,7 +63,7 @@ export default function Login() {
 
   return (
     <StackTemplate>
-      <div className="h-full bg-amber-500 flex items-center justify-center p-4">
+      <div className="h-full bg-amber-500 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-md rounded-md p-8 space-y-6">
           <div>
             <img
@@ -126,10 +127,7 @@ export default function Login() {
             )}
           </Formik>
           <div className="text-center">
-            <Link
-              className="text-sm text-green-500 hover:text-green-400"
-              to="/register"
-            >
+            <Link className="text-sm" to="/register">
               Don&apos;t have an account?
             </Link>
           </div>

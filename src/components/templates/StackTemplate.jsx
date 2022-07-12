@@ -1,4 +1,5 @@
 import Navbar from "../organisms/Navbar";
+import Footer from "../molecules/Footer";
 
 export default function StackTemplate({ children }) {
   return (
@@ -7,7 +8,9 @@ export default function StackTemplate({ children }) {
         <Navbar />
       </header>
       <main className="grow">{children}</main>
-      <footer />
+      <footer>
+        <Footer />
+      </footer>
     </div>
   );
 }

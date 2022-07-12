@@ -51,7 +51,7 @@ export default function Navbar() {
               <div className="hidden md:flex bg-gray-100 dark:bg-gray-800 space-x-4 items-center justify-between">
                 <Link
                   to="/login"
-                  className="text-green-500 hover:text-green-400"
+                  className="text-green-500 hover:brightness-110"
                 >
                   Login
                 </Link>
