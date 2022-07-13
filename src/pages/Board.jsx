@@ -10,6 +10,7 @@ import {
 import { Tab } from "@headlessui/react";
 import BoardHeader from "../components/molecules/BoardHeader";
 import BoardHeaderSkeleton from "../components/molecules/BoardHeaderSkeleton";
+import MemberList from "../components/organisms/MemberList";
 import ChangeBoardNameForm from "../components/organisms/ChangeBoardNameForm";
 import ChangeBoardDescriptionForm from "../components/organisms/ChangeBoardDescriptionForm";
 import DeleteBoardForm from "../components/organisms/DeleteBoardForm";
@@ -85,8 +86,8 @@ export default function Board() {
     if (boardId && principal) {
       setLoading(true);
 
-      onFetchCurrentMember(boardId, principal.username)
-        .then(() => onFetchBoard(boardId))
+      onFetchBoard(boardId)
+        .then(() => onFetchCurrentMember(boardId, principal.username))
         .finally(() => setLoading(false));
     }
   }, [boardId, onFetchBoard, onFetchCurrentMember, principal]);
@@ -196,7 +197,9 @@ export default function Board() {
                 <hr className="border-gray-300 dark:border-gray-400 !m-0 !p-0" />
                 <Tab.Panels as="div">
                   <Tab.Panel />
-                  <Tab.Panel />
+                  <Tab.Panel>
+                    <MemberList boardId={boardId} />
+                  </Tab.Panel>
                   <Tab.Panel>
                     <div className="space-y-8">
                       <ChangeBoardNameForm

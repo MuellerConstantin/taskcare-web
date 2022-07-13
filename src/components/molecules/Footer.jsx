@@ -5,7 +5,7 @@ import Logo from "../../assets/images/logo.svg";
 export default function Footer() {
   return (
     <div className="text-center lg:text-left bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white">
-      <div className="mx-6 py-10 flex">
+      <div className="xl:container mx-auto px-4 py-10 flex">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 justify-center">
           <div className="col-span-2 md:col-auto">
             <h6 className="mb-4 space-x-2 flex items-center justify-center md:justify-start">

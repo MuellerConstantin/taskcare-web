@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PlusIcon, ExclamationIcon } from "@heroicons/react/solid";
@@ -20,38 +20,37 @@ export default function Overview() {
   const [boards, setBoards] = useState([]);
   const [pageable, setPageable] = useState(null);
 
-  const onFetchBoards = async (_page) => {
-    setLoading(true);
-    setError(null);
+  const onFetchBoards = useCallback(
+    async (_page) => {
+      setError(null);
 
-    try {
-      const res = await fetchBoardsByMembership(principal.username, _page);
+      try {
+        const res = await fetchBoardsByMembership(principal.username, _page);
 
-      setBoards(res.data.content);
-      setPageable(res.data.info);
-    } catch (err) {
-      if (err.response && err.response.status === 401) {
-        navigate("/logout");
-      } else {
-        setError("The list of available boards could not be loaded.");
+        setBoards(res.data.content);
+        setPageable(res.data.info);
+      } catch (err) {
+        if (err.response && err.response.status === 401) {
+          navigate("/logout");
+        } else {
+          setError("The list of available boards could not be loaded.");
+        }
+
+        throw err;
       }
-
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [navigate, principal]
+  );
 
   useEffect(() => {
     document.title = "TaskCare | Overview";
   }, []);
 
   useEffect(() => {
-    if (!loading) {
-      onFetchBoards(currentPage);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+    setLoading(true);
+
+    onFetchBoards(currentPage).finally(() => setLoading(false));
+  }, [currentPage, onFetchBoards]);
 
   return (
     <StackTemplate>
