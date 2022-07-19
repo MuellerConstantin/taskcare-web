@@ -1,10 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { PlusIcon, ExclamationIcon } from "@heroicons/react/solid";
-import BoardThumbnail from "../components/molecules/BoardThumbnail";
-import BoardThumbnailSkeleton from "../components/molecules/BoardThumbnailSkeleton";
-import Pagination from "../components/molecules/Pagination";
+import { PlusIcon } from "@heroicons/react/solid";
+import BoardList from "../components/molecules/BoardList";
 import CreateBoardModal from "../components/organisms/CreateBoardModal";
 import StackTemplate from "../components/templates/StackTemplate";
 import { fetchBoardsByMembership } from "../api/boards";
@@ -14,26 +12,25 @@ export default function Overview() {
 
   const principal = useSelector((state) => state.auth.principal);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [boardsError, setBoardsError] = useState(null);
+  const [boardsLoading, setBoardsLoading] = useState(false);
   const [boards, setBoards] = useState([]);
-  const [pageable, setPageable] = useState(null);
+  const [boardsPageable, setBoardsPageable] = useState(null);
 
   const onFetchBoards = useCallback(
     async (_page) => {
-      setError(null);
+      setBoardsError(null);
 
       try {
         const res = await fetchBoardsByMembership(principal.username, _page);
 
         setBoards(res.data.content);
-        setPageable(res.data.info);
+        setBoardsPageable(res.data.info);
       } catch (err) {
         if (err.response && err.response.status === 401) {
           navigate("/logout");
         } else {
-          setError("The list of available boards could not be loaded.");
+          setBoardsError("The list of available boards could not be loaded.");
         }
 
         throw err;
@@ -47,10 +44,10 @@ export default function Overview() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
+    setBoardsLoading(true);
 
-    onFetchBoards(currentPage).finally(() => setLoading(false));
-  }, [currentPage, onFetchBoards]);
+    onFetchBoards(0).finally(() => setBoardsLoading(false));
+  }, [onFetchBoards]);
 
   return (
     <StackTemplate>
@@ -62,7 +59,7 @@ export default function Overview() {
                 <h1 className="text-xl text-gray-800 dark:text-white">
                   Your Boards
                 </h1>
-                <CreateBoardModal onSubmit={() => onFetchBoards()}>
+                <CreateBoardModal onSubmit={() => onFetchBoards(0)}>
                   <button
                     type="button"
                     className="inline-flex items-center justify-center bg-transparent text-amber-500"
@@ -74,48 +71,13 @@ export default function Overview() {
               </div>
               <hr className="border-gray-300 dark:border-gray-400" />
             </div>
-            {(loading || error) && (
-              <div className="w-full relative">
-                {error && (
-                  <button
-                    type="button"
-                    className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
-                  >
-                    <div className="rounded-full p-1 bg-gray-100 dark:bg-gray-700 opacity-80">
-                      <ExclamationIcon className="h-6" />
-                    </div>
-                    <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
-                      {error}
-                    </div>
-                  </button>
-                )}
-                <div className="flex flex-wrap gap-4">
-                  {[...Array(4).keys()].map((key) => (
-                    <BoardThumbnailSkeleton key={key} error={error} />
-                  ))}
-                </div>
-              </div>
-            )}
-            {!loading && !error && boards.length > 0 && (
-              <div className="flex flex-wrap gap-4">
-                {boards.map((board) => (
-                  <BoardThumbnail key={board.id} board={board} />
-                ))}
-              </div>
-            )}
-            {!loading && !error && boards.length <= 0 && (
-              <p className="text-center text-gray-800 dark:text-white">
-                No boards available.
-              </p>
-            )}
-            {!loading && !error && boards.length > 0 && (
-              <Pagination
-                currentPage={pageable.page}
-                perPage={pageable.perPage}
-                totalElements={pageable.totalElements}
-                onChange={setCurrentPage}
-              />
-            )}
+            <BoardList
+              boards={boards}
+              pageable={boardsPageable}
+              error={boardsError}
+              loading={boardsLoading}
+              onPageChange={onFetchBoards}
+            />
           </div>
         </div>
       </div>

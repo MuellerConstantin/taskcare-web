@@ -14,10 +14,7 @@ const schema = yup.object().shape({
     .string()
     .max(50, "Maximum 50 characters allowed")
     .required("Is required"),
-  description: yup
-    .string()
-    .max(200, "Maximum 200 characters allowed")
-    .required("Is required"),
+  description: yup.string().max(200, "Maximum 200 characters allowed"),
 });
 
 export default function CreateBoardModal({ onSubmit, onCancel, children }) {
@@ -44,7 +41,7 @@ export default function CreateBoardModal({ onSubmit, onCancel, children }) {
     try {
       await createBoard({
         name: values.name,
-        description: values.description,
+        description: values.description === "" ? null : values.description,
       });
 
       setOpen(false);

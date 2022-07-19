@@ -1,47 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { ExclamationIcon } from "@heroicons/react/solid";
-import MemberThumbnail from "../molecules/MemberThumbnail";
-import MemberThumbnailSkeleton from "../molecules/MemberThumbnailSkeleton";
-import { fetchMembers } from "../../api/members";
+import MemberThumbnail from "./MemberThumbnail";
+import MemberThumbnailSkeleton from "./MemberThumbnailSkeleton";
 
-export default function MemberList({ boardId }) {
-  const navigate = useNavigate();
-
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [members, setMembers] = useState([]);
-
-  const onFetchMembers = useCallback(
-    async (id) => {
-      setError(null);
-
-      try {
-        const membersRes = await fetchMembers(id);
-        setMembers(membersRes.data);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          navigate("/logout");
-        } else if (err.response && err.response.status === 404) {
-          navigate("/not-found");
-        } else {
-          setError("The board member's information could not be loaded.");
-        }
-
-        throw err;
-      }
-    },
-    [navigate]
-  );
-
-  useEffect(() => {
-    if (boardId) {
-      setLoading(true);
-
-      onFetchMembers(boardId).finally(() => setLoading(false));
-    }
-  }, [boardId, onFetchMembers]);
-
+export default function MemberList({ members, error, loading }) {
   return (
     <div className="flex flex-col space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

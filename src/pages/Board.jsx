@@ -6,17 +6,19 @@ import {
   CogIcon,
   ExclamationIcon,
   UserGroupIcon,
+  PlusIcon,
 } from "@heroicons/react/solid";
 import { Tab } from "@headlessui/react";
 import BoardHeader from "../components/molecules/BoardHeader";
 import BoardHeaderSkeleton from "../components/molecules/BoardHeaderSkeleton";
-import MemberList from "../components/organisms/MemberList";
+import MemberList from "../components/molecules/MemberList";
 import ChangeBoardNameForm from "../components/organisms/ChangeBoardNameForm";
 import ChangeBoardDescriptionForm from "../components/organisms/ChangeBoardDescriptionForm";
 import DeleteBoardForm from "../components/organisms/DeleteBoardForm";
+import AddMemberModal from "../components/organisms/AddMemberModal";
 import StackTemplate from "../components/templates/StackTemplate";
 import { fetchBoard } from "../api/boards";
-import { fetchMember } from "../api/members";
+import { fetchMember, fetchMembers } from "../api/members";
 
 export default function Board() {
   const { boardId } = useParams();
@@ -24,14 +26,18 @@ export default function Board() {
 
   const principal = useSelector((state) => state.auth.principal);
 
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [boardError, setBoardError] = useState(null);
+  const [boardLoading, setBoardLoading] = useState(true);
   const [board, setBoard] = useState(null);
   const [currentMember, setCurrentMember] = useState(null);
 
+  const [membersError, setMembersError] = useState(null);
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [members, setMembers] = useState([]);
+
   const onFetchBoard = useCallback(
     async (id) => {
-      setError(null);
+      setBoardError(null);
 
       try {
         const boardRes = await fetchBoard(id);
@@ -42,7 +48,7 @@ export default function Board() {
         } else if (err.response && err.response.status === 404) {
           navigate("/not-found");
         } else {
-          setError("The board information could not be loaded.");
+          setBoardError("The board information could not be loaded.");
         }
 
         throw err;
@@ -53,7 +59,7 @@ export default function Board() {
 
   const onFetchCurrentMember = useCallback(
     async (id, currentUsername) => {
-      setError(null);
+      setBoardError(null);
 
       try {
         const currentMemberRes = await fetchMember(id, currentUsername);
@@ -65,7 +71,31 @@ export default function Board() {
         } else if (err.response && err.response.status === 404) {
           navigate("/not-found");
         } else {
-          setError("The board information could not be loaded.");
+          setBoardError("The board information could not be loaded.");
+        }
+
+        throw err;
+      }
+    },
+    [navigate]
+  );
+
+  const onFetchMembers = useCallback(
+    async (id) => {
+      setMembersError(null);
+
+      try {
+        const membersRes = await fetchMembers(id);
+        setMembers(membersRes.data);
+      } catch (err) {
+        if (err.response && err.response.status === 401) {
+          navigate("/logout");
+        } else if (err.response && err.response.status === 404) {
+          navigate("/not-found");
+        } else {
+          setMembersError(
+            "The board member's information could not be loaded."
+          );
         }
 
         throw err;
@@ -84,13 +114,21 @@ export default function Board() {
 
   useEffect(() => {
     if (boardId && principal) {
-      setLoading(true);
+      setBoardLoading(true);
 
       onFetchBoard(boardId)
         .then(() => onFetchCurrentMember(boardId, principal.username))
-        .finally(() => setLoading(false));
+        .finally(() => setBoardLoading(false));
     }
   }, [boardId, onFetchBoard, onFetchCurrentMember, principal]);
+
+  useEffect(() => {
+    if (boardId && principal) {
+      setMembersLoading(true);
+
+      onFetchMembers(boardId).finally(() => setMembersLoading(false));
+    }
+  }, [boardId, onFetchMembers, principal]);
 
   return (
     <StackTemplate>
@@ -98,9 +136,9 @@ export default function Board() {
         <div className="xl:container mx-auto p-4">
           <div className="flex flex-col space-y-4">
             <div className="space-y-4">
-              {(loading || error) && (
+              {(boardLoading || boardError) && (
                 <div className="w-full relative">
-                  {error && (
+                  {boardError && (
                     <button
                       type="button"
                       className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
@@ -109,18 +147,17 @@ export default function Board() {
                         <ExclamationIcon className="h-6" />
                       </div>
                       <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
-                        {error}
+                        {boardError}
                       </div>
                     </button>
                   )}
-                  <BoardHeaderSkeleton error={error} />
+                  <BoardHeaderSkeleton error={boardError} />
                 </div>
               )}
-              {!loading && !error && <BoardHeader board={board} />}
+              {!boardLoading && !boardError && <BoardHeader board={board} />}
               <Tab.Group as="div" className="space-y-6">
                 <Tab.List className="flex rounded-xl space-x-2">
                   <Tab
-                    disabled={loading}
                     className={({ selected }) =>
                       `max-w-full grow md:max-w-[10rem] flex items-center space-x-2 text-sm leading-5 font-medium outline-none pb-1
                       ${
@@ -144,7 +181,6 @@ export default function Board() {
                     )}
                   </Tab>
                   <Tab
-                    disabled={loading}
                     className={({ selected }) =>
                       `max-w-full grow md:max-w-[10rem] flex items-center space-x-2 text-sm leading-5 font-medium outline-none pb-1
                         ${
@@ -169,7 +205,6 @@ export default function Board() {
                   </Tab>
                   {currentMember && currentMember.role === "ADMINISTRATOR" && (
                     <Tab
-                      disabled={loading}
                       className={({ selected }) =>
                         `max-w-full grow md:max-w-[10rem] flex items-center space-x-2 text-sm leading-5 font-medium outline-none pb-1
                         ${
@@ -198,7 +233,32 @@ export default function Board() {
                 <Tab.Panels as="div">
                   <Tab.Panel />
                   <Tab.Panel>
-                    <MemberList boardId={boardId} />
+                    <div className="flex flex-col space-y-4">
+                      {currentMember && currentMember.role === "ADMINISTRATOR" && (
+                        <div className="flex justify-end">
+                          <AddMemberModal
+                            boardId={boardId}
+                            onSubmit={() => onFetchMembers(boardId)}
+                          >
+                            <button
+                              type="button"
+                              className="inline-flex items-center justify-center bg-transparent text-amber-500"
+                            >
+                              <PlusIcon
+                                className="h-6 w-6"
+                                aria-hidden="true"
+                              />
+                              <div className="ml-2">Add member</div>
+                            </button>
+                          </AddMemberModal>
+                        </div>
+                      )}
+                      <MemberList
+                        members={members}
+                        error={membersError}
+                        loading={membersLoading}
+                      />
+                    </div>
                   </Tab.Panel>
                   <Tab.Panel>
                     <div className="space-y-8">

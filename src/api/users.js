@@ -49,3 +49,17 @@ export const updateUser = (username, data) => {
 export const deleteUser = (username) => {
   return api.delete(`/users/${username}`);
 };
+
+/**
+ * Loads the meta information of all available boards.
+ * The resource is loaded paged.
+ *
+ * @param {number} page Zero based index of the page to load
+ * @param {string} page Optional query string to filter collection
+ * @returns {Promise<AxiosResponse<UserPageDTO>>} Returns the API response
+ */
+export const fetchUsers = (page, filter) => {
+  return api.get(`/users`, {
+    params: { page, filter },
+  });
+};

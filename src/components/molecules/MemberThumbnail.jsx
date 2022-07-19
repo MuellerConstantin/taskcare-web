@@ -13,7 +13,7 @@ export default function MemberThumbnail({ member }) {
         <div className="overflow-hidden">
           <Link
             className="text-lg font-semibold truncate !text-gray-800 dark:!text-white"
-            to="/"
+            to={`/users/${member.username}`}
           >
             {member.username}
           </Link>
