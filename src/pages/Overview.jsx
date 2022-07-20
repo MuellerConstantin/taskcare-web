@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { PlusIcon } from "@heroicons/react/solid";
-import BoardList from "../components/molecules/BoardList";
+import { PlusIcon, ExclamationIcon } from "@heroicons/react/solid";
+import BoardThumbnail from "../components/molecules/BoardThumbnail";
+import BoardThumbnailSkeleton from "../components/molecules/BoardThumbnailSkeleton";
+import Pagination from "../components/molecules/Pagination";
 import CreateBoardModal from "../components/organisms/CreateBoardModal";
 import StackTemplate from "../components/templates/StackTemplate";
 import { fetchBoardsByMembership } from "../api/boards";
@@ -71,13 +73,50 @@ export default function Overview() {
               </div>
               <hr className="border-gray-300 dark:border-gray-400" />
             </div>
-            <BoardList
-              boards={boards}
-              pageable={boardsPageable}
-              error={boardsError}
-              loading={boardsLoading}
-              onPageChange={onFetchBoards}
-            />
+            <div className="flex flex-col space-y-4">
+              {(boardsLoading || boardsError) && (
+                <div className="w-full relative">
+                  {boardsError && (
+                    <button
+                      type="button"
+                      className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
+                    >
+                      <div className="rounded-full p-1 bg-gray-100 dark:bg-gray-700 opacity-80">
+                        <ExclamationIcon className="h-6" />
+                      </div>
+                      <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
+                        {boardsError}
+                      </div>
+                    </button>
+                  )}
+                  <div className="flex flex-wrap gap-4">
+                    {[...Array(4).keys()].map((key) => (
+                      <BoardThumbnailSkeleton key={key} error={boardsError} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {!boardsLoading && !boardsError && boards.length > 0 && (
+                <div className="flex flex-wrap gap-4">
+                  {boards.map((board) => (
+                    <BoardThumbnail key={board.id} board={board} />
+                  ))}
+                </div>
+              )}
+              {!boardsLoading && !boardsError && boards.length <= 0 && (
+                <p className="text-center text-gray-800 dark:text-white">
+                  No boards available.
+                </p>
+              )}
+              {!boardsLoading && !boardsError && boards.length > 0 && (
+                <Pagination
+                  currentPage={boardsPageable.page}
+                  perPage={boardsPageable.perPage}
+                  totalElements={boardsPageable.totalElements}
+                  onChange={onFetchBoards}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

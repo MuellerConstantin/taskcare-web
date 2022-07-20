@@ -39,3 +39,14 @@ export const fetchMembers = (boardId) => {
 export const createMember = (boardId, data) => {
   return api.post(`/boards/${boardId}/members`, data);
 };
+
+/**
+ * Deletes an existing board member by its identifier.
+ *
+ * @param {string} boardId Unique identifier of the board
+ * @param {string} username Unique username of member
+ * @returns {Promise<AxiosResponse<void>>} Returns the API response
+ */
+export const deleteMember = (boardId, username) => {
+  return api.delete(`/boards/${boardId}/members/${username}`);
+};

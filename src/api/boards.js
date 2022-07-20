@@ -65,7 +65,7 @@ export const updateBoard = (id, data) => {
 };
 
 /**
- * Deletes an existing user account by its identifier.
+ * Deletes an existing board by its identifier.
  *
  * @param {string} id Unique identifier of the resource
  * @returns {Promise<AxiosResponse<void>>} Returns the API response

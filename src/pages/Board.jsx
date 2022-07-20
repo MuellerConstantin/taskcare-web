@@ -7,11 +7,15 @@ import {
   ExclamationIcon,
   UserGroupIcon,
   PlusIcon,
+  TrashIcon,
+  PencilIcon,
 } from "@heroicons/react/solid";
 import { Tab } from "@headlessui/react";
 import BoardHeader from "../components/molecules/BoardHeader";
 import BoardHeaderSkeleton from "../components/molecules/BoardHeaderSkeleton";
-import MemberList from "../components/molecules/MemberList";
+import MemberThumbnail from "../components/molecules/MemberThumbnail";
+import MemberThumbnailSkeleton from "../components/molecules/MemberThumbnailSkeleton";
+import RemoveMemberModal from "../components/organisms/RemoveMemberModal";
 import ChangeBoardNameForm from "../components/organisms/ChangeBoardNameForm";
 import ChangeBoardDescriptionForm from "../components/organisms/ChangeBoardDescriptionForm";
 import DeleteBoardForm from "../components/organisms/DeleteBoardForm";
@@ -253,11 +257,76 @@ export default function Board() {
                           </AddMemberModal>
                         </div>
                       )}
-                      <MemberList
-                        members={members}
-                        error={membersError}
-                        loading={membersLoading}
-                      />
+                      <div className="flex flex-col space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {(membersLoading || membersError) &&
+                            [...Array(4).keys()].map((key) => (
+                              <div key={key} className="w-full relative">
+                                {membersError && (
+                                  <button
+                                    type="button"
+                                    className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
+                                  >
+                                    <div className="rounded-full p-1 bg-gray-100 dark:bg-gray-700 opacity-80">
+                                      <ExclamationIcon className="h-6" />
+                                    </div>
+                                    <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
+                                      {membersError}
+                                    </div>
+                                  </button>
+                                )}
+                                <MemberThumbnailSkeleton error={membersError} />
+                              </div>
+                            ))}
+                          {!membersLoading &&
+                            !membersError &&
+                            members.length > 0 &&
+                            members.map((member) => (
+                              <div className="flex">
+                                <MemberThumbnail
+                                  key={member.username}
+                                  member={member}
+                                />
+                                {currentMember &&
+                                  currentMember.role === "ADMINISTRATOR" && (
+                                    <div className="flex flex-col p-1 place-content-between">
+                                      <button
+                                        type="button"
+                                        className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+                                      >
+                                        <PencilIcon
+                                          className="h-6 w-6"
+                                          aria-hidden="true"
+                                        />
+                                      </button>
+                                      <RemoveMemberModal
+                                        boardId={boardId}
+                                        username={member.username}
+                                        onSubmit={() => onFetchMembers(boardId)}
+                                      >
+                                        <button
+                                          type="button"
+                                          className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+                                        >
+                                          <TrashIcon
+                                            className="h-6 w-6"
+                                            aria-hidden="true"
+                                          />
+                                        </button>
+                                      </RemoveMemberModal>
+                                    </div>
+                                  )}
+                              </div>
+                            ))}
+                        </div>
+                        {!membersLoading &&
+                          !membersError &&
+                          members.length <= 0 && (
+                            <p className="text-center text-gray-800 dark:text-white">
+                              No members available.
+                            </p>
+                          )}
+                      </div>
                     </div>
                   </Tab.Panel>
                   <Tab.Panel>
