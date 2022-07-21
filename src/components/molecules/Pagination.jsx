@@ -33,7 +33,7 @@ export default function Pagination({
       <div className="inline-flex mt-2 xs:mt-0">
         <Button
           disabled={currentPage * perPage + 1 <= 1}
-          className="border-r-0 rounded-r-none inline-flex bg-green-500 focus:outline-green-500"
+          className="border-r-0 rounded-r-none inline-flex !bg-green-500 focus:!outline-green-500"
           onClick={() => onChange(currentPage - 1)}
         >
           <ArrowLeftIcon className="h-6 w-6 mr-2" aria-hidden="true" />
@@ -44,7 +44,7 @@ export default function Pagination({
             Math.min(currentPage * perPage + perPage, totalElements) >=
             totalElements
           }
-          className="border-l-0 rounded-l-none inline-flex bg-green-500 focus:outline-green-500"
+          className="border-l-0 rounded-l-none inline-flex !bg-green-500 focus:!outline-green-500"
           onClick={() => onChange(currentPage + 1)}
         >
           Next

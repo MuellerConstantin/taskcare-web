@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Fragment } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -7,10 +7,9 @@ import {
   ExclamationIcon,
   UserGroupIcon,
   PlusIcon,
-  TrashIcon,
-  PencilIcon,
+  DotsVerticalIcon,
 } from "@heroicons/react/solid";
-import { Tab } from "@headlessui/react";
+import { Tab, Popover, Transition } from "@headlessui/react";
 import BoardHeader from "../components/molecules/BoardHeader";
 import BoardHeaderSkeleton from "../components/molecules/BoardHeaderSkeleton";
 import MemberThumbnail from "../components/molecules/MemberThumbnail";
@@ -24,6 +23,82 @@ import AddMemberModal from "../components/organisms/AddMemberModal";
 import StackTemplate from "../components/templates/StackTemplate";
 import { fetchBoard } from "../api/boards";
 import { fetchMember, fetchMembers } from "../api/members";
+
+function EditableMemberThumbnail({ boardId, member, onSubmit, onClose }) {
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+
+  return (
+    <div className="flex w-full" key={member.username}>
+      <MemberThumbnail member={member} />
+      <RemoveMemberModal
+        boardId={boardId}
+        username={member.username}
+        isOpen={showRemoveModal}
+        onSubmit={() => {
+          setShowRemoveModal(false);
+          if (onSubmit) onSubmit();
+        }}
+        onClose={() => {
+          setShowRemoveModal(false);
+          if (onClose) onClose();
+        }}
+      />
+      <UpdateMemberModal
+        boardId={boardId}
+        username={member.username}
+        currentRole={member.role}
+        isOpen={showUpdateModal}
+        onSubmit={() => {
+          setShowUpdateModal(false);
+          if (onSubmit) onSubmit();
+        }}
+        onClose={() => {
+          setShowUpdateModal(false);
+          if (onClose) onClose();
+        }}
+      />
+      <Popover className="relative">
+        {({ open }) => (
+          <>
+            <Popover.Button className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white focus:outline-none">
+              <DotsVerticalIcon className="h-6 w-6" aria-hidden="true" />
+            </Popover.Button>
+            <Transition
+              as={Fragment}
+              show={open}
+              enter="transition ease-out duration-200"
+              enterFrom="opacity-0 translate-y-1"
+              enterTo="opacity-100 translate-y-0"
+              leave="transition ease-in duration-150"
+              leaveFrom="opacity-100 translate-y-0"
+              leaveTo="opacity-0 translate-y-1"
+            >
+              <Popover.Panel className="absolute shadow-md border dark:border-gray-900 rounded-md z-10 mt-3 w-screen max-w-xs sm:max-w-sm right-0 bg-white dark:bg-gray-600 text-gray-800 dark:text-white">
+                <div className="p-2 text-gray-800 dark:text-white flex flex-col space-y-2">
+                  <button
+                    type="button"
+                    className="flex justify-left items-center p-2 hover:bg-gray-100 hover:cursor-pointer hover:dark:bg-gray-700 rounded"
+                    onClick={() => setShowUpdateModal(true)}
+                  >
+                    <div className="text-sm">Update</div>
+                  </button>
+                  <button
+                    type="button"
+                    className="flex justify-left items-center p-2 hover:bg-gray-100 hover:cursor-pointer hover:dark:bg-gray-700 rounded"
+                    onClick={() => setShowRemoveModal(true)}
+                  >
+                    <div className="text-sm">Remove</div>
+                  </button>
+                </div>
+              </Popover.Panel>
+            </Transition>
+          </>
+        )}
+      </Popover>
+    </div>
+  );
+}
 
 export default function Board() {
   const { boardId } = useParams();
@@ -284,43 +359,16 @@ export default function Board() {
                             members.length > 0 &&
                             members.map((member) => (
                               <div className="flex" key={member.username}>
-                                <MemberThumbnail member={member} />
                                 {currentMember &&
-                                  currentMember.role === "ADMINISTRATOR" && (
-                                    <div className="flex flex-col p-1 place-content-between">
-                                      <UpdateMemberModal
-                                        boardId={boardId}
-                                        username={member.username}
-                                        currentRole={member.role}
-                                        onSubmit={() => onFetchMembers(boardId)}
-                                      >
-                                        <button
-                                          type="button"
-                                          className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
-                                        >
-                                          <PencilIcon
-                                            className="h-6 w-6"
-                                            aria-hidden="true"
-                                          />
-                                        </button>
-                                      </UpdateMemberModal>
-                                      <RemoveMemberModal
-                                        boardId={boardId}
-                                        username={member.username}
-                                        onSubmit={() => onFetchMembers(boardId)}
-                                      >
-                                        <button
-                                          type="button"
-                                          className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
-                                        >
-                                          <TrashIcon
-                                            className="h-6 w-6"
-                                            aria-hidden="true"
-                                          />
-                                        </button>
-                                      </RemoveMemberModal>
-                                    </div>
-                                  )}
+                                currentMember.role === "ADMINISTRATOR" ? (
+                                  <EditableMemberThumbnail
+                                    boardId={boardId}
+                                    member={member}
+                                    onSubmit={() => onFetchMembers(boardId)}
+                                  />
+                                ) : (
+                                  <MemberThumbnail member={member} />
+                                )}
                               </div>
                             ))}
                         </div>
