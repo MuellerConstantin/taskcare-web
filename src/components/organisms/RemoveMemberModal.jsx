@@ -40,6 +40,10 @@ export default function RemoveMemberModal({
     } catch (err) {
       if (err.response && err.response.status === 401) {
         navigate("/logout");
+      } else if (err.response && err.response.status === 409) {
+        setError(
+          "After removing the member, the board would no longer be administrable."
+        );
       } else {
         setError("An unexpected error occurred, please retry!");
       }

@@ -15,6 +15,7 @@ import BoardHeader from "../components/molecules/BoardHeader";
 import BoardHeaderSkeleton from "../components/molecules/BoardHeaderSkeleton";
 import MemberThumbnail from "../components/molecules/MemberThumbnail";
 import MemberThumbnailSkeleton from "../components/molecules/MemberThumbnailSkeleton";
+import UpdateMemberModal from "../components/organisms/UpdateMemberModal";
 import RemoveMemberModal from "../components/organisms/RemoveMemberModal";
 import ChangeBoardNameForm from "../components/organisms/ChangeBoardNameForm";
 import ChangeBoardDescriptionForm from "../components/organisms/ChangeBoardDescriptionForm";
@@ -282,23 +283,27 @@ export default function Board() {
                             !membersError &&
                             members.length > 0 &&
                             members.map((member) => (
-                              <div className="flex">
-                                <MemberThumbnail
-                                  key={member.username}
-                                  member={member}
-                                />
+                              <div className="flex" key={member.username}>
+                                <MemberThumbnail member={member} />
                                 {currentMember &&
                                   currentMember.role === "ADMINISTRATOR" && (
                                     <div className="flex flex-col p-1 place-content-between">
-                                      <button
-                                        type="button"
-                                        className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+                                      <UpdateMemberModal
+                                        boardId={boardId}
+                                        username={member.username}
+                                        currentRole={member.role}
+                                        onSubmit={() => onFetchMembers(boardId)}
                                       >
-                                        <PencilIcon
-                                          className="h-6 w-6"
-                                          aria-hidden="true"
-                                        />
-                                      </button>
+                                        <button
+                                          type="button"
+                                          className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+                                        >
+                                          <PencilIcon
+                                            className="h-6 w-6"
+                                            aria-hidden="true"
+                                          />
+                                        </button>
+                                      </UpdateMemberModal>
                                       <RemoveMemberModal
                                         boardId={boardId}
                                         username={member.username}

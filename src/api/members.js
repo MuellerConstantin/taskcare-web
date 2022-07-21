@@ -50,3 +50,15 @@ export const createMember = (boardId, data) => {
 export const deleteMember = (boardId, username) => {
   return api.delete(`/boards/${boardId}/members/${username}`);
 };
+
+/**
+ * Update an existing board member by its identifier.
+ *
+ * @param {string} boardId Unique identifier of the board
+ * @param {string} username Unique username of member
+ * @param {{role: string|undefined}} data Fields of the member to be updated
+ * @returns {Promise<AxiosResponse<void>>} Returns the API response
+ */
+export const updateMember = (boardId, username, data) => {
+  return api.patch(`/boards/${boardId}/members/${username}`, data);
+};
