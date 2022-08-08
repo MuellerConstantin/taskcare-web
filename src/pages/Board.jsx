@@ -21,8 +21,11 @@ import ChangeBoardDescriptionForm from "../components/organisms/ChangeBoardDescr
 import DeleteBoardForm from "../components/organisms/DeleteBoardForm";
 import AddMemberModal from "../components/organisms/AddMemberModal";
 import StackTemplate from "../components/templates/StackTemplate";
+import KanbanView from "../components/molecules/KanbanView";
+import KanbanViewSkeleton from "../components/molecules/KanbanViewSkeleton";
 import { fetchBoard } from "../api/boards";
 import { fetchMember, fetchMembers } from "../api/members";
+import { fetchTasks } from "../api/tasks";
 
 function EditableMemberThumbnail({ boardId, member, onSubmit, onClose }) {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -115,6 +118,10 @@ export default function Board() {
   const [membersLoading, setMembersLoading] = useState(false);
   const [members, setMembers] = useState([]);
 
+  const [tasksError, setTasksError] = useState(null);
+  const [tasksLoading, setTasksLoading] = useState(false);
+  const [tasks, setTasks] = useState([]);
+
   const onFetchBoard = useCallback(
     async (id) => {
       setBoardError(null);
@@ -125,8 +132,6 @@ export default function Board() {
       } catch (err) {
         if (err.response && err.response.status === 401) {
           navigate("/logout");
-        } else if (err.response && err.response.status === 404) {
-          navigate("/not-found");
         } else {
           setBoardError("The board information could not be loaded.");
         }
@@ -148,8 +153,6 @@ export default function Board() {
       } catch (err) {
         if (err.response && err.response.status === 401) {
           navigate("/logout");
-        } else if (err.response && err.response.status === 404) {
-          navigate("/not-found");
         } else {
           setBoardError("The board information could not be loaded.");
         }
@@ -170,12 +173,30 @@ export default function Board() {
       } catch (err) {
         if (err.response && err.response.status === 401) {
           navigate("/logout");
-        } else if (err.response && err.response.status === 404) {
-          navigate("/not-found");
         } else {
           setMembersError(
             "The board member's information could not be loaded."
           );
+        }
+
+        throw err;
+      }
+    },
+    [navigate]
+  );
+
+  const onFetchTasks = useCallback(
+    async (id) => {
+      setTasksError(null);
+
+      try {
+        const tasksRes = await fetchTasks(id);
+        setTasks(tasksRes.data);
+      } catch (err) {
+        if (err.response && err.response.status === 401) {
+          navigate("/logout");
+        } else {
+          setTasksError("The board card's information could not be loaded.");
         }
 
         throw err;
@@ -203,12 +224,20 @@ export default function Board() {
   }, [boardId, onFetchBoard, onFetchCurrentMember, principal]);
 
   useEffect(() => {
-    if (boardId && principal) {
+    if (boardId) {
       setMembersLoading(true);
 
       onFetchMembers(boardId).finally(() => setMembersLoading(false));
     }
-  }, [boardId, onFetchMembers, principal]);
+  }, [boardId, onFetchMembers]);
+
+  useEffect(() => {
+    if (boardId) {
+      setTasksLoading(true);
+
+      onFetchTasks(boardId).finally(() => setTasksLoading(false));
+    }
+  }, [boardId, onFetchTasks]);
 
   return (
     <StackTemplate>
@@ -311,7 +340,29 @@ export default function Board() {
                 </Tab.List>
                 <hr className="border-gray-300 dark:border-gray-400 !m-0 !p-0" />
                 <Tab.Panels as="div">
-                  <Tab.Panel />
+                  <Tab.Panel>
+                    {(tasksLoading || tasksError) && (
+                      <div className="w-full relative">
+                        {tasksError && (
+                          <button
+                            type="button"
+                            className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
+                          >
+                            <div className="rounded-full p-1 bg-gray-100 dark:bg-gray-700 opacity-80">
+                              <ExclamationIcon className="h-6" />
+                            </div>
+                            <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
+                              {tasksError}
+                            </div>
+                          </button>
+                        )}
+                        <KanbanViewSkeleton error={tasksError} />
+                      </div>
+                    )}
+                    {!tasksLoading && !tasksError && (
+                      <KanbanView tasks={tasks} />
+                    )}
+                  </Tab.Panel>
                   <Tab.Panel>
                     <div className="flex flex-col space-y-4">
                       {currentMember && currentMember.role === "ADMINISTRATOR" && (
