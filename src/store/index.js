@@ -17,6 +17,7 @@ const persistConfig = {
   key: "taskcare",
   version: 1,
   storage,
+  whitelist: ["theme", "auth"],
 };
 
 const rootReducer = combineReducers({

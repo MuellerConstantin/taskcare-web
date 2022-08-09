@@ -18,7 +18,7 @@ export default function UpdateMemberModal({
   username,
   currentRole,
   onSubmit,
-  onClose,
+  onCancel,
   isOpen,
 }) {
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ export default function UpdateMemberModal({
 
   const onCloseModal = () => {
     setOpen(false);
-    if (onClose) onClose();
+    if (onCancel) onCancel();
   };
 
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function UpdateMemberModal({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl space-y-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
+            <Dialog.Panel className="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl space-y-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
               <div className="flex justify-between items-center">
                 <Dialog.Title as="h3" className="text-lg font-medium leading-6">
                   Update member
@@ -208,7 +208,7 @@ export default function UpdateMemberModal({
                   </form>
                 )}
               </Formik>
-            </div>
+            </Dialog.Panel>
           </Transition.Child>
         </div>
       </Dialog>

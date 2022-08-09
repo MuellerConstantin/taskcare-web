@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/solid";
 import Button from "../atoms/Button";
-import { deleteUser } from "../../api/users";
+import { deleteTask } from "../../api/tasks";
 
-export default function DeleteAccountModal({
-  username,
+export default function RemoveTaskModal({
+  boardId,
+  taskId,
   onSubmit,
   onCancel,
   children,
@@ -32,7 +33,7 @@ export default function DeleteAccountModal({
     setError(null);
 
     try {
-      await deleteUser(username);
+      await deleteTask(boardId, taskId);
 
       setOpen(false);
       if (onSubmit) onSubmit();
@@ -97,7 +98,7 @@ export default function DeleteAccountModal({
                     as="h3"
                     className="text-lg font-medium leading-6"
                   >
-                    Delete account
+                    Remove task
                   </Dialog.Title>
                   <button
                     type="button"
@@ -110,14 +111,13 @@ export default function DeleteAccountModal({
                 </div>
                 {error && <p className="text-center text-red-500">{error}</p>}
                 <div>
-                  Are you sure you want to delete your account? The following
+                  Are you sure you want to remove this task? The following
                   things take effect immediately:
                 </div>
                 <div>
                   <ul className="list-disc pl-6">
-                    <li>All your data will be irrevocably deleted.</li>
-                    <li>Your username will be released for use by others.</li>
-                    <li>You will lose access to the TaskCare Platform.</li>
+                    <li>The task is irrevocably deleted.</li>
+                    <li>All attachments and references will be lost.</li>
                   </ul>
                 </div>
                 <div>Do you still want to continue?</div>
@@ -125,7 +125,7 @@ export default function DeleteAccountModal({
                   <Button
                     onClick={onSubmitModal}
                     disabled={loading}
-                    className="bg-green-500 focus:outline-green-500 w-32 flex justify-center"
+                    className="!bg-green-500 focus:!outline-green-500 w-32 flex justify-center"
                   >
                     {!loading && <span>Yes</span>}
                     {loading && (
@@ -133,7 +133,7 @@ export default function DeleteAccountModal({
                     )}
                   </Button>
                   <Button
-                    onClick={onCancelModal}
+                    onClick={onCloseModal}
                     disabled={loading}
                     className="bg-red-500 focus:outline-red-500 w-32"
                   >

@@ -35,3 +35,14 @@ export const fetchTask = (boardId, taskId) => {
 export const fetchTasks = (boardId) => {
   return api.get(`/boards/${boardId}/tasks`);
 };
+
+/**
+ * Deletes an existing task by its identifier.
+ *
+ * @param {string} boardId Unique identifier of the board
+ * @param {string} taskId Unique identifier of task
+ * @returns {Promise<AxiosResponse<void>>} Returns the API response
+ */
+export const deleteTask = (boardId, taskId) => {
+  return api.delete(`/boards/${boardId}/tasks/${taskId}`);
+};
