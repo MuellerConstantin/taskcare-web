@@ -1,6 +1,11 @@
 import axios from "axios";
-import store from "../store";
 import authSlice from "../store/slices/auth";
+
+let store;
+
+export const injectStore = (_store) => {
+  store = _store;
+};
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_TASKCARE_REST_URI,

@@ -24,6 +24,7 @@ import api from "./index";
  * Loads the meta information of all available boards.
  * The resource is loaded paged.
  *
+ * @param {string} username Name of user to fetch boards for
  * @param {number} page Zero based index of the page to load
  * @returns {Promise<AxiosResponse<BoardPageDTO>>} Returns the API response
  */
