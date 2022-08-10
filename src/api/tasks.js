@@ -57,3 +57,15 @@ export const deleteTask = (boardId, taskId) => {
 export const createTask = (boardId, data) => {
   return api.post(`/boards/${boardId}/tasks`, data);
 };
+
+/**
+ * Update an existing task by its identifier.
+ *
+ * @param {string} boardId Unique identifier of the board
+ * @param {string} taskId Unique identifier of the task
+ * @param {{name: string|undefined, description: string|undefined, priority: number|undefined, expiresAt: string|undefined, status: "OPENED"|"IN_PROGRESS"|"FINISHED"|undefined, responsible: string|undefined}} data Fields of the board to be updated
+ * @returns {Promise<AxiosResponse<void>>} Returns the API response
+ */
+export const updateTask = (boardId, taskId, data) => {
+  return api.patch(`/boards/${boardId}/tasks/${taskId}`, data);
+};

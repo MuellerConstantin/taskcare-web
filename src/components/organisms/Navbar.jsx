@@ -132,7 +132,7 @@ export default function Navbar() {
                         <div className="flex md:hidden flex-col">
                           <div className="p-4 bg-gray-100 dark:bg-gray-800 flex space-x-4 items-center justify-between">
                             <Link to="/login" className="block grow">
-                              <Button className="w-full bg-transparent border border-green-500 !text-green-500 focus:outline-green-500">
+                              <Button className="w-full bg-green-500 focus:outline-green-500">
                                 Login
                               </Button>
                             </Link>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -10,10 +10,20 @@ import {
 import CreateTaskModal from "./CreateTaskModal";
 import TaskDetailDrawer from "./TaskDetailDrawer";
 import { fetchBoardTasks } from "../../../store/slices/board";
+import { updateTask } from "../../../api/tasks";
 
-function TaskKanbanColumn({ tasks, onTaskInfo }) {
+function TaskKanbanColumn({ boardId, status, tasks, onTaskInfo, onTaskMove }) {
   const [, drop] = useDrop(() => ({
-    accept: "KanbanCard",
+    accept: "TaskKanbanCard",
+    drop: async (task) => {
+      if (task.status !== status) {
+        await updateTask(boardId, task.id, {
+          status,
+        });
+
+        onTaskMove(task.id, status);
+      }
+    },
   }));
 
   return (
@@ -28,7 +38,8 @@ function TaskKanbanColumn({ tasks, onTaskInfo }) {
 
 function TaskKanbanCard({ task, onInfo }) {
   const [, drag, dragPreview] = useDrag(() => ({
-    type: "KanbanCard",
+    type: "TaskKanbanCard",
+    item: task,
   }));
 
   return (
@@ -77,6 +88,30 @@ export default function TaskKanbanView({ boardId }) {
   const { tasks, loading, error } = useSelector(
     (state) => state.board,
     shallowEqual
+  );
+
+  const openedTasks = useMemo(
+    () =>
+      tasks
+        ?.filter((task) => task.status === "OPENED")
+        .sort((a, b) => a.createdAt - b.createdAt) || [],
+    [tasks]
+  );
+
+  const inProgressTasks = useMemo(
+    () =>
+      tasks
+        ?.filter((task) => task.status === "IN_PROGRESS")
+        .sort((a, b) => a.createdAt - b.createdAt) || [],
+    [tasks]
+  );
+
+  const finishedTasks = useMemo(
+    () =>
+      tasks
+        ?.filter((task) => task.status === "FINISHED")
+        .sort((a, b) => a.createdAt - b.createdAt) || [],
+    [tasks]
   );
 
   return (
@@ -227,58 +262,57 @@ export default function TaskKanbanView({ boardId }) {
               <div className="flex flex-col space-y-2 bg-gray-100 dark:bg-gray-700 rounded-md p-2 h-96 md:h-screen">
                 <div className="mb-4 flex items-center space-x-2">
                   <div className="bg-gray-200 dark:bg-gray-800 rounded-md p-1 text-gray-800 dark:text-white text-xs">
-                    {tasks
-                      ? tasks.filter((task) => task.status === "OPENED").length
-                      : "?"}
+                    {openedTasks ? openedTasks.length : "?"}
                   </div>
                   <h2 className="text-amber-500 text-lg font-semibold">
                     Opened
                   </h2>
                 </div>
-                {tasks && (
+                {openedTasks && (
                   <TaskKanbanColumn
-                    tasks={tasks.filter((task) => task.status === "OPENED")}
+                    boardId={boardId}
+                    status="OPENED"
+                    tasks={openedTasks}
                     onTaskInfo={(task) => setSelected(task)}
+                    onTaskMove={() => dispatch(fetchBoardTasks(boardId))}
                   />
                 )}
               </div>
               <div className="flex flex-col space-y-2 bg-gray-100 dark:bg-gray-700 rounded-md p-2 h-96 md:h-screen">
                 <div className="mb-4 flex items-center space-x-2">
                   <div className="bg-gray-200 dark:bg-gray-800 rounded-md p-1 text-gray-800 dark:text-white text-xs">
-                    {tasks
-                      ? tasks.filter((task) => task.status === "IN_PROGRESS")
-                          .length
-                      : "?"}
+                    {inProgressTasks ? inProgressTasks.length : "?"}
                   </div>
                   <h2 className="text-amber-500 text-lg font-semibold">
                     In Progress
                   </h2>
                 </div>
-                {tasks && (
+                {inProgressTasks && (
                   <TaskKanbanColumn
-                    tasks={tasks.filter(
-                      (task) => task.status === "IN_PROGRESS"
-                    )}
+                    boardId={boardId}
+                    status="IN_PROGRESS"
+                    tasks={inProgressTasks}
                     onTaskInfo={(task) => setSelected(task)}
+                    onTaskMove={() => dispatch(fetchBoardTasks(boardId))}
                   />
                 )}
               </div>
               <div className="flex flex-col space-y-2 bg-gray-100 dark:bg-gray-700 rounded-md p-2 h-96 md:h-screen">
                 <div className="mb-4 flex items-center space-x-2">
                   <div className="bg-gray-200 dark:bg-gray-800 rounded-md p-1 text-gray-800 dark:text-white text-xs">
-                    {tasks
-                      ? tasks.filter((task) => task.status === "FINISHED")
-                          .length
-                      : "?"}
+                    {finishedTasks ? finishedTasks.length : "?"}
                   </div>
                   <h2 className="text-amber-500 text-lg font-semibold">
                     Finished
                   </h2>
                 </div>
-                {tasks && (
+                {finishedTasks && (
                   <TaskKanbanColumn
-                    tasks={tasks.filter((task) => task.status === "FINISHED")}
+                    boardId={boardId}
+                    status="FINISHED"
+                    tasks={finishedTasks}
                     onTaskInfo={(task) => setSelected(task)}
+                    onTaskMove={() => dispatch(fetchBoardTasks(boardId))}
                   />
                 )}
               </div>
