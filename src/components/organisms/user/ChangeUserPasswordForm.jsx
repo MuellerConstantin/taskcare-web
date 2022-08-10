@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from "yup";
-import TextField from "../atoms/TextField";
-import Button from "../atoms/Button";
-import { updateUser } from "../../api/users";
+import TextField from "../../atoms/TextField";
+import Button from "../../atoms/Button";
+import { updateUser } from "../../../api/users";
 
 const schema = yup.object().shape({
   password: yup.string().required("Is required"),
@@ -14,7 +14,7 @@ const schema = yup.object().shape({
     .required("Is required"),
 });
 
-export default function ChangeAccountPasswordForm({
+export default function ChangeUserPasswordForm({
   username,
   onChange,
   disabled,

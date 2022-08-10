@@ -2,17 +2,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from "yup";
-import TextField from "../atoms/TextField";
-import Button from "../atoms/Button";
-import { updateUser } from "../../api/users";
+import TextField from "../../atoms/TextField";
+import Button from "../../atoms/Button";
+import { updateUser } from "../../../api/users";
 
 const schema = yup.object().shape({
-  email: yup.string().email("Must be a valid email").required("Is required"),
+  firstName: yup.string(),
+  lastName: yup.string(),
 });
 
-export default function ChangeAccountEmailForm({
+export default function ChangeUserNameForm({
   username,
-  currentEmail,
+  currentFirstName,
+  currentLastName,
   onChange,
   disabled,
 }) {
@@ -28,7 +30,8 @@ export default function ChangeAccountEmailForm({
     setError(null);
 
     const update = {
-      email: values.email,
+      firstName: values.firstName === "" ? null : values.firstName,
+      lastName: values.lastName === "" ? null : values.lastName,
     };
 
     try {
@@ -58,21 +61,21 @@ export default function ChangeAccountEmailForm({
   return (
     <div className="text-gray-800 dark:text-white space-y-4">
       <div>
-        <h2 className="text-2xl">Change e-mail</h2>
+        <h2 className="text-2xl">Change display name</h2>
         <hr className="border-gray-300 dark:border-gray-400 mt-2" />
       </div>
       <p>
-        Change the E-Mail address under which you want to be reachable and which
-        is used to restore your account. This email address will not be visible
-        to other users.
+        This is the display name consisting of first name and last name which is
+        used when viewing your profile. The display name is optional,
+        alternatively the username is used. You can remove it at any time.
       </p>
       {error && <p className="text-left text-red-500">{error}</p>}
       {success && (
-        <p className="text-left text-green-500">E-Mail changed successfully.</p>
+        <p className="text-left text-green-500">Name changed successfully.</p>
       )}
       <div className="w-full">
         <Formik
-          initialValues={{ email: "" }}
+          initialValues={{ firstName: "", lastName: "" }}
           onSubmit={onUpdate}
           validationSchema={schema}
         >
@@ -82,25 +85,38 @@ export default function ChangeAccountEmailForm({
               onSubmit={props.handleSubmit}
               noValidate
             >
-              <div className="grow">
-                <TextField
-                  type="email"
-                  name="email"
-                  placeholder={currentEmail || "Email"}
-                  value={props.values.email}
-                  onChange={props.handleChange}
-                  onBlur={props.handleBlur}
-                  error={props.errors.email}
-                  touched={props.errors.email && props.touched.email}
-                  disabled={disabled || loading}
-                />
+              <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                <div className="grow">
+                  <TextField
+                    type="text"
+                    name="firstName"
+                    placeholder={currentFirstName || "First Name"}
+                    value={props.values.firstName}
+                    onChange={props.handleChange}
+                    onBlur={props.handleBlur}
+                    error={props.errors.firstName}
+                    touched={props.errors.firstName && props.touched.firstName}
+                    disabled={disabled || loading}
+                  />
+                </div>
+                <div className="grow">
+                  <TextField
+                    type="text"
+                    name="lastName"
+                    placeholder={currentLastName || "Last Name"}
+                    value={props.values.lastName}
+                    onChange={props.handleChange}
+                    onBlur={props.handleBlur}
+                    error={props.errors.lastName}
+                    touched={props.errors.lastName && props.touched.lastName}
+                    disabled={disabled || loading}
+                  />
+                </div>
               </div>
               <Button
                 type="submit"
                 className="max-w-fit bg-green-500 focus:outline-green-500"
-                disabled={
-                  !(props.isValid && props.dirty) || disabled || loading
-                }
+                disabled={!props.isValid || disabled || loading}
               >
                 {!loading && <span>Change</span>}
                 {loading && (

@@ -2,17 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from "yup";
-import TextField from "../atoms/TextField";
-import Button from "../atoms/Button";
-import { updateBoard } from "../../api/boards";
+import TextField from "../../atoms/TextField";
+import Button from "../../atoms/Button";
+import { updateUser } from "../../../api/users";
 
 const schema = yup.object().shape({
-  description: yup.string(),
+  email: yup.string().email("Must be a valid email").required("Is required"),
 });
 
-export default function ChangeBoardDescriptionForm({
-  boardId,
-  currentDescription,
+export default function ChangeUserEmailForm({
+  username,
+  currentEmail,
   onChange,
   disabled,
 }) {
@@ -28,11 +28,11 @@ export default function ChangeBoardDescriptionForm({
     setError(null);
 
     const update = {
-      description: values.description === "" ? null : values.description,
+      email: values.email,
     };
 
     try {
-      await updateBoard(boardId, update);
+      await updateUser(username, update);
 
       setSuccess(true);
       resetForm();
@@ -58,19 +58,21 @@ export default function ChangeBoardDescriptionForm({
   return (
     <div className="text-gray-800 dark:text-white space-y-4">
       <div>
-        <h2 className="text-2xl">Change description</h2>
+        <h2 className="text-2xl">Change e-mail</h2>
         <hr className="border-gray-300 dark:border-gray-400 mt-2" />
       </div>
-      <p>This is an optional description with details about the board.</p>
+      <p>
+        Change the E-Mail address under which you want to be reachable and which
+        is used to restore your account. This email address will not be visible
+        to other users.
+      </p>
       {error && <p className="text-left text-red-500">{error}</p>}
       {success && (
-        <p className="text-left text-green-500">
-          Description changed successfully.
-        </p>
+        <p className="text-left text-green-500">E-Mail changed successfully.</p>
       )}
       <div className="w-full">
         <Formik
-          initialValues={{ description: "" }}
+          initialValues={{ email: "" }}
           onSubmit={onUpdate}
           validationSchema={schema}
         >
@@ -80,27 +82,25 @@ export default function ChangeBoardDescriptionForm({
               onSubmit={props.handleSubmit}
               noValidate
             >
-              <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-                <div className="grow">
-                  <TextField
-                    type="text"
-                    name="description"
-                    placeholder={currentDescription || "Description"}
-                    value={props.values.description}
-                    onChange={props.handleChange}
-                    onBlur={props.handleBlur}
-                    error={props.errors.description}
-                    touched={
-                      props.errors.description && props.touched.description
-                    }
-                    disabled={disabled || loading}
-                  />
-                </div>
+              <div className="grow">
+                <TextField
+                  type="email"
+                  name="email"
+                  placeholder={currentEmail || "Email"}
+                  value={props.values.email}
+                  onChange={props.handleChange}
+                  onBlur={props.handleBlur}
+                  error={props.errors.email}
+                  touched={props.errors.email && props.touched.email}
+                  disabled={disabled || loading}
+                />
               </div>
               <Button
                 type="submit"
                 className="max-w-fit bg-green-500 focus:outline-green-500"
-                disabled={!props.isValid || disabled || loading}
+                disabled={
+                  !(props.isValid && props.dirty) || disabled || loading
+                }
               >
                 {!loading && <span>Change</span>}
                 {loading && (

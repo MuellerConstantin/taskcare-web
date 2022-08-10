@@ -1,5 +1,5 @@
 import { UserIcon, ClockIcon } from "@heroicons/react/solid";
-import Avatar from "../atoms/Avatar";
+import Avatar from "../../atoms/Avatar";
 
 export default function BoardHeader({ board }) {
   return (

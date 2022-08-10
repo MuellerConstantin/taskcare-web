@@ -2,17 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from "yup";
-import TextField from "../atoms/TextField";
-import Button from "../atoms/Button";
-import { updateBoard } from "../../api/boards";
+import TextArea from "../../atoms/TextArea";
+import Button from "../../atoms/Button";
+import { updateBoard } from "../../../api/boards";
 
 const schema = yup.object().shape({
-  name: yup.string().required("Is required"),
+  description: yup.string(),
 });
 
-export default function ChangeBoardNameForm({
+export default function ChangeBoardDescriptionForm({
   boardId,
-  currentName,
+  currentDescription,
   onChange,
   disabled,
 }) {
@@ -28,7 +28,7 @@ export default function ChangeBoardNameForm({
     setError(null);
 
     const update = {
-      name: values.name,
+      description: values.description === "" ? null : values.description,
     };
 
     try {
@@ -58,20 +58,19 @@ export default function ChangeBoardNameForm({
   return (
     <div className="text-gray-800 dark:text-white space-y-4">
       <div>
-        <h2 className="text-2xl">Change display name</h2>
+        <h2 className="text-2xl">Change description</h2>
         <hr className="border-gray-300 dark:border-gray-400 mt-2" />
       </div>
-      <p>
-        This name is the board&apos;s display name. It doesn&apos;t have to be
-        unique, but it helps the human eye with identification.
-      </p>
+      <p>This is an optional description with details about the board.</p>
       {error && <p className="text-left text-red-500">{error}</p>}
       {success && (
-        <p className="text-left text-green-500">Name changed successfully.</p>
+        <p className="text-left text-green-500">
+          Description changed successfully.
+        </p>
       )}
       <div className="w-full">
         <Formik
-          initialValues={{ name: "" }}
+          initialValues={{ description: "" }}
           onSubmit={onUpdate}
           validationSchema={schema}
         >
@@ -83,16 +82,20 @@ export default function ChangeBoardNameForm({
             >
               <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
                 <div className="grow">
-                  <TextField
+                  <TextArea
+                    name="description"
                     type="text"
-                    name="name"
-                    placeholder={currentName || "Name"}
-                    value={props.values.name}
+                    rows="3"
+                    placeholder={currentDescription || "Description"}
+                    disabled={disabled || loading}
                     onChange={props.handleChange}
                     onBlur={props.handleBlur}
-                    error={props.errors.name}
-                    touched={props.errors.name && props.touched.name}
-                    disabled={disabled || loading}
+                    value={props.values.description}
+                    error={props.errors.description}
+                    touched={
+                      props.errors.description && props.touched.description
+                    }
+                    className="resize-none"
                   />
                 </div>
               </div>

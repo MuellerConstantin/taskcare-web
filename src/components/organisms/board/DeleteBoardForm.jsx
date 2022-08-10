@@ -1,7 +1,10 @@
+import { useState } from "react";
 import BoardDeletionModal from "./DeleteBoardModal";
-import Button from "../atoms/Button";
+import Button from "../../atoms/Button";
 
 export default function DeleteBoardForm({ boardId, onChange, disabled }) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   return (
     <div className="text-gray-800 dark:text-white space-y-4">
       <div>
@@ -16,17 +19,20 @@ export default function DeleteBoardForm({ boardId, onChange, disabled }) {
         <BoardDeletionModal
           boardId={boardId}
           onSubmit={() => {
+            setShowDeleteModal(false);
             if (onChange) onChange();
           }}
+          onClose={() => setShowDeleteModal(false)}
+          isOpen={showDeleteModal}
+        />
+        <Button
+          type="button"
+          disabled={disabled}
+          className="bg-red-500 focus:outline-red-500"
+          onClick={() => setShowDeleteModal(true)}
         >
-          <Button
-            type="button"
-            disabled={disabled}
-            className="bg-red-500 focus:outline-red-500"
-          >
-            Delete this board
-          </Button>
-        </BoardDeletionModal>
+          Delete this board
+        </Button>
       </div>
     </div>
   );

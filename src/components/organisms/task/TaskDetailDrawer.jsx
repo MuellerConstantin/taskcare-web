@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   XIcon,
@@ -7,10 +7,12 @@ import {
   FlagIcon,
   BellIcon,
 } from "@heroicons/react/solid";
-import Button from "../atoms/Button";
-import RemoveTaskModal from "./RemoveTaskModal";
+import Button from "../../atoms/Button";
+import DeleteTaskModal from "./DeleteTaskModal";
 
 export default function TaskDetailDrawer({ boardId, task, onClose, isOpen }) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
@@ -85,19 +87,24 @@ export default function TaskDetailDrawer({ boardId, task, onClose, isOpen }) {
                     )}
                   </div>
                   <div className="space-y-4">
-                    <RemoveTaskModal
+                    <DeleteTaskModal
                       boardId={boardId}
                       taskId={task?.id}
-                      onSubmit={() => onClose(true)}
+                      onSubmit={() => {
+                        setShowDeleteModal(false);
+                        onClose(true);
+                      }}
+                      onClose={() => setShowDeleteModal(false)}
+                      isOpen={showDeleteModal}
+                    />
+                    <Button
+                      type="button"
+                      disabled={!task}
+                      className="w-full bg-red-500 focus:!outline-red-500"
+                      onClick={() => setShowDeleteModal(true)}
                     >
-                      <Button
-                        type="button"
-                        disabled={!task}
-                        className="w-full bg-red-500 focus:!outline-red-500"
-                      >
-                        Delete
-                      </Button>
-                    </RemoveTaskModal>
+                      Delete
+                    </Button>
                   </div>
                 </div>
               )}

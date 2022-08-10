@@ -5,10 +5,10 @@ import { Tab } from "@headlessui/react";
 import { CogIcon, LogoutIcon } from "@heroicons/react/solid";
 import Avatar from "../components/atoms/Avatar";
 import StackTemplate from "../components/templates/StackTemplate";
-import ChangeAccountNameForm from "../components/organisms/ChangeAccountNameForm";
-import ChangeAccountEmailForm from "../components/organisms/ChangeAccountEmailForm";
-import ChangeAccountPasswordForm from "../components/organisms/ChangeAccountPasswordForm";
-import DeleteAccountForm from "../components/organisms/DeleteAccountForm";
+import ChangeUserNameForm from "../components/organisms/user/ChangeUserNameForm";
+import ChangeUserEmailForm from "../components/organisms/user/ChangeUserEmailForm";
+import ChangeUserPasswordForm from "../components/organisms/user/ChangeUserPasswordForm";
+import DeleteUserForm from "../components/organisms/user/DeleteUserForm";
 import { fetchPrincipal } from "../api/auth";
 import authSlice from "../store/slices/auth";
 
@@ -83,7 +83,7 @@ export default function Settings() {
                       }`}
                     >
                       <CogIcon className="h-6" />
-                      <div className="ml-2 truncate">Account</div>
+                      <div className="ml-2 truncate">User</div>
                     </div>
                   )}
                 </Tab>
@@ -100,19 +100,19 @@ export default function Settings() {
             <Tab.Panels as="div" className="w-full md:w-2/3 lg:w-3/4 xl:w-4/5">
               <Tab.Panel>
                 <div className="space-y-8">
-                  <ChangeAccountNameForm
+                  <ChangeUserNameForm
                     username={principal.username}
                     currentFirstName={principal?.firstName}
                     currentLastName={principal?.lastName}
                     onChange={() => onFetchPrincipal()}
                   />
-                  <ChangeAccountEmailForm
+                  <ChangeUserEmailForm
                     username={principal.username}
                     currentEmail={principal?.email}
                     onChange={() => onFetchPrincipal()}
                   />
-                  <ChangeAccountPasswordForm username={principal.username} />
-                  <DeleteAccountForm
+                  <ChangeUserPasswordForm username={principal.username} />
+                  <DeleteUserForm
                     username={principal.username}
                     onChange={() => navigate("/logout")}
                   />

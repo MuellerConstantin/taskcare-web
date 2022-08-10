@@ -2,19 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from "yup";
-import TextField from "../atoms/TextField";
-import Button from "../atoms/Button";
-import { updateUser } from "../../api/users";
+import TextField from "../../atoms/TextField";
+import Button from "../../atoms/Button";
+import { updateBoard } from "../../../api/boards";
 
 const schema = yup.object().shape({
-  firstName: yup.string(),
-  lastName: yup.string(),
+  name: yup.string().required("Is required"),
 });
 
-export default function ChangeAccountNameForm({
-  username,
-  currentFirstName,
-  currentLastName,
+export default function ChangeBoardNameForm({
+  boardId,
+  currentName,
   onChange,
   disabled,
 }) {
@@ -30,12 +28,11 @@ export default function ChangeAccountNameForm({
     setError(null);
 
     const update = {
-      firstName: values.firstName === "" ? null : values.firstName,
-      lastName: values.lastName === "" ? null : values.lastName,
+      name: values.name,
     };
 
     try {
-      await updateUser(username, update);
+      await updateBoard(boardId, update);
 
       setSuccess(true);
       resetForm();
@@ -65,9 +62,8 @@ export default function ChangeAccountNameForm({
         <hr className="border-gray-300 dark:border-gray-400 mt-2" />
       </div>
       <p>
-        This is the display name consisting of first name and last name which is
-        used when viewing your profile. The display name is optional,
-        alternatively the username is used. You can remove it at any time.
+        This name is the board&apos;s display name. It doesn&apos;t have to be
+        unique, but it helps the human eye with identification.
       </p>
       {error && <p className="text-left text-red-500">{error}</p>}
       {success && (
@@ -75,7 +71,7 @@ export default function ChangeAccountNameForm({
       )}
       <div className="w-full">
         <Formik
-          initialValues={{ firstName: "", lastName: "" }}
+          initialValues={{ name: "" }}
           onSubmit={onUpdate}
           validationSchema={schema}
         >
@@ -89,26 +85,13 @@ export default function ChangeAccountNameForm({
                 <div className="grow">
                   <TextField
                     type="text"
-                    name="firstName"
-                    placeholder={currentFirstName || "First Name"}
-                    value={props.values.firstName}
+                    name="name"
+                    placeholder={currentName || "Name"}
+                    value={props.values.name}
                     onChange={props.handleChange}
                     onBlur={props.handleBlur}
-                    error={props.errors.firstName}
-                    touched={props.errors.firstName && props.touched.firstName}
-                    disabled={disabled || loading}
-                  />
-                </div>
-                <div className="grow">
-                  <TextField
-                    type="text"
-                    name="lastName"
-                    placeholder={currentLastName || "Last Name"}
-                    value={props.values.lastName}
-                    onChange={props.handleChange}
-                    onBlur={props.handleBlur}
-                    error={props.errors.lastName}
-                    touched={props.errors.lastName && props.touched.lastName}
+                    error={props.errors.name}
+                    touched={props.errors.name && props.touched.name}
                     disabled={disabled || loading}
                   />
                 </div>

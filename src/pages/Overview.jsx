@@ -2,10 +2,10 @@ import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PlusIcon, ExclamationIcon } from "@heroicons/react/solid";
-import BoardThumbnail from "../components/molecules/BoardThumbnail";
-import BoardThumbnailSkeleton from "../components/molecules/BoardThumbnailSkeleton";
+import BoardThumbnail from "../components/molecules/board/BoardThumbnail";
+import BoardThumbnailSkeleton from "../components/molecules/board/BoardThumbnailSkeleton";
 import Pagination from "../components/molecules/Pagination";
-import CreateBoardModal from "../components/organisms/CreateBoardModal";
+import CreateBoardModal from "../components/organisms/board/CreateBoardModal";
 import StackTemplate from "../components/templates/StackTemplate";
 import { fetchBoardsByMembership } from "../api/boards";
 
@@ -13,6 +13,8 @@ export default function Overview() {
   const navigate = useNavigate();
 
   const principal = useSelector((state) => state.auth.principal);
+
+  const [showCreateBoardModal, setShowCreateBoardModal] = useState(false);
 
   const [boardsError, setBoardsError] = useState(null);
   const [boardsLoading, setBoardsLoading] = useState(false);
@@ -61,15 +63,22 @@ export default function Overview() {
                 <h1 className="text-xl text-gray-800 dark:text-white">
                   Your Boards
                 </h1>
-                <CreateBoardModal onSubmit={() => onFetchBoards(0)}>
-                  <button
-                    type="button"
-                    className="inline-flex items-center justify-center bg-transparent text-amber-500"
-                  >
-                    <PlusIcon className="h-6 w-6" aria-hidden="true" />
-                    <div className="ml-2">Add board</div>
-                  </button>
-                </CreateBoardModal>
+                <CreateBoardModal
+                  isOpen={showCreateBoardModal}
+                  onSubmit={() => {
+                    setShowCreateBoardModal(false);
+                    onFetchBoards(0);
+                  }}
+                  onClose={() => setShowCreateBoardModal(false)}
+                />
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center bg-transparent text-amber-500"
+                  onClick={() => setShowCreateBoardModal(true)}
+                >
+                  <PlusIcon className="h-6 w-6" aria-hidden="true" />
+                  <div className="ml-2">Add board</div>
+                </button>
               </div>
               <hr className="border-gray-300 dark:border-gray-400" />
             </div>

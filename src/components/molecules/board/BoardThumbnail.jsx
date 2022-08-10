@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import Avatar from "../atoms/Avatar";
+import Avatar from "../../atoms/Avatar";
 
 export default function BoardThumbnail({ board }) {
   const navigate = useNavigate();

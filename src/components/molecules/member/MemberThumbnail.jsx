@@ -1,5 +1,5 @@
-import Avatar from "../atoms/Avatar";
-import Link from "../atoms/Link";
+import Avatar from "../../atoms/Avatar";
+import Link from "../../atoms/Link";
 
 export default function MemberThumbnail({ member }) {
   return (

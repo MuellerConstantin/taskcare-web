@@ -1,11 +1,11 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, Transition, Listbox } from "@headlessui/react";
 import { XIcon, SelectorIcon, CheckIcon } from "@heroicons/react/solid";
 import * as yup from "yup";
 import { Formik } from "formik";
-import Button from "../atoms/Button";
-import { updateMember } from "../../api/members";
+import Button from "../../atoms/Button";
+import { updateMember } from "../../../api/members";
 
 const roles = ["ADMINISTRATOR", "MAINTAINER", "USER", "VISITOR"];
 
@@ -15,15 +15,13 @@ const schema = yup.object().shape({
 
 export default function UpdateMemberModal({
   boardId,
-  username,
-  currentRole,
+  member,
   onSubmit,
-  onCancel,
+  onClose,
   isOpen,
 }) {
   const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -36,10 +34,8 @@ export default function UpdateMemberModal({
     };
 
     try {
-      await updateMember(boardId, username, update);
-
-      setOpen(false);
-      if (onSubmit) onSubmit();
+      await updateMember(boardId, member.username, update);
+      onSubmit();
     } catch (err) {
       if (err.response && err.response.status === 422) {
         err.response.data.details?.forEach((detail) =>
@@ -62,16 +58,13 @@ export default function UpdateMemberModal({
   };
 
   const onCloseModal = () => {
-    setOpen(false);
-    if (onCancel) onCancel();
+    if (!loading) {
+      onClose();
+    }
   };
 
-  useEffect(() => {
-    setOpen(isOpen);
-  }, [isOpen]);
-
   return (
-    <Transition appear show={open} as={Fragment}>
+    <Transition appear show={isOpen} as={Fragment}>
       <Dialog
         as="div"
         onClose={onCloseModal}
@@ -120,7 +113,7 @@ export default function UpdateMemberModal({
               </div>
               {error && <p className="text-center text-red-500">{error}</p>}
               <Formik
-                initialValues={{ role: currentRole }}
+                initialValues={{ role: member.role }}
                 validationSchema={schema}
                 onSubmit={onSumitModal}
               >

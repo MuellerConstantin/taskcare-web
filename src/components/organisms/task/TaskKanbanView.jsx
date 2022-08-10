@@ -4,7 +4,7 @@ import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { DotsHorizontalIcon, ExclamationIcon } from "@heroicons/react/solid";
 import TaskDetailDrawer from "./TaskDetailDrawer";
-import { fetchTasks } from "../../api/tasks";
+import { fetchTasks } from "../../../api/tasks";
 
 function TaskKanbanColumn({ tasks, onTaskInfo }) {
   const [, drop] = useDrop(() => ({
