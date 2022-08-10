@@ -7,17 +7,32 @@ import { Formik } from "formik";
 import TextField from "../../atoms/TextField";
 import TextArea from "../../atoms/TextArea";
 import Button from "../../atoms/Button";
-import { createBoard } from "../../../api/boards";
+import { createTask } from "../../../api/tasks";
 
 const schema = yup.object().shape({
   name: yup
     .string()
     .max(50, "Maximum 50 characters allowed")
     .required("Is required"),
-  description: yup.string().max(2000, "Maximum 2000 characters allowed"),
+  description: yup
+    .string()
+    .max(2000, "Maximum 2000 characters allowed")
+    .nullable(true),
+  priority: yup
+    .number()
+    .integer()
+    .min(0, "Minimum priority level is zero.")
+    .max(10, "Priority max level is 10.")
+    .nullable(true),
+  expiresAt: yup.date().min(new Date()).nullable(true),
 });
 
-export default function CreateBoardModal({ onSubmit, onClose, isOpen }) {
+export default function CreateTaskModal({
+  boardId,
+  onSubmit,
+  onClose,
+  isOpen,
+}) {
   const navigate = useNavigate();
 
   const [error, setError] = useState(null);
@@ -28,9 +43,14 @@ export default function CreateBoardModal({ onSubmit, onClose, isOpen }) {
     setError(null);
 
     try {
-      await createBoard({
+      await createTask(boardId, {
         name: values.name,
         description: values.description === "" ? null : values.description,
+        priority: values.priority === "" ? null : values.priority,
+        expiresAt:
+          values.expiresAt === ""
+            ? null
+            : new Date(values.expiresAt).toISOString(),
       });
 
       onSubmit();
@@ -94,7 +114,7 @@ export default function CreateBoardModal({ onSubmit, onClose, isOpen }) {
             <Dialog.Panel className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl space-y-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
               <div className="flex justify-between items-center">
                 <Dialog.Title as="h3" className="text-lg font-medium leading-6">
-                  Add board
+                  Create task
                 </Dialog.Title>
                 <button
                   type="button"
@@ -107,7 +127,12 @@ export default function CreateBoardModal({ onSubmit, onClose, isOpen }) {
               </div>
               {error && <p className="text-center text-red-500">{error}</p>}
               <Formik
-                initialValues={{ name: "", description: "" }}
+                initialValues={{
+                  name: "",
+                  description: "",
+                  priority: "",
+                  expiresAt: "",
+                }}
                 validationSchema={schema}
                 onSubmit={onSumitModal}
               >
@@ -145,6 +170,38 @@ export default function CreateBoardModal({ onSubmit, onClose, isOpen }) {
                           props.errors.description && props.touched.description
                         }
                         className="resize-none"
+                      />
+                    </div>
+                    <div>
+                      <TextField
+                        name="priority"
+                        type="number"
+                        min="0"
+                        max="10"
+                        placeholder="Priority"
+                        disabled={loading}
+                        onChange={props.handleChange}
+                        onBlur={props.handleBlur}
+                        value={props.values.priority}
+                        error={props.errors.priority}
+                        touched={
+                          props.errors.priority && props.touched.priority
+                        }
+                      />
+                    </div>
+                    <div>
+                      <TextField
+                        name="expiresAt"
+                        type="datetime-local"
+                        placeholder="Expires At"
+                        disabled={loading}
+                        onChange={props.handleChange}
+                        onBlur={props.handleBlur}
+                        value={props.values.expiresAt}
+                        error={props.errors.expiresAt}
+                        touched={
+                          props.errors.expiresAt && props.touched.expiresAt
+                        }
                       />
                     </div>
                     <Button

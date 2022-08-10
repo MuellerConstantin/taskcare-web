@@ -7,7 +7,7 @@ import Button from "../../atoms/Button";
 import { updateBoard } from "../../../api/boards";
 
 const schema = yup.object().shape({
-  description: yup.string(),
+  description: yup.string().nullable(true),
 });
 
 export default function ChangeBoardDescriptionForm({

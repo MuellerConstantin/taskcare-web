@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   CollectionIcon,
@@ -20,88 +20,35 @@ import DeleteBoardForm from "../components/organisms/board/DeleteBoardForm";
 import CreateMemberModal from "../components/organisms/member/CreateMemberModal";
 import StackTemplate from "../components/templates/StackTemplate";
 import TaskKanbanView from "../components/organisms/task/TaskKanbanView";
-import { fetchBoard } from "../api/boards";
-import { fetchMember, fetchMembers } from "../api/members";
+import {
+  fetchBoard,
+  fetchBoardInfo,
+  fetchBoardMembers,
+} from "../store/slices/board";
 
 export default function Board() {
   const { boardId } = useParams();
   const navigate = useNavigate();
-
-  const principal = useSelector((state) => state.auth.principal);
+  const dispatch = useDispatch();
 
   const [showCreateMemberModal, setShowCreateMemberModal] = useState(false);
 
-  const [boardError, setBoardError] = useState(null);
-  const [boardLoading, setBoardLoading] = useState(true);
-  const [board, setBoard] = useState(null);
-  const [currentMember, setCurrentMember] = useState(null);
-
-  const [membersError, setMembersError] = useState(null);
-  const [membersLoading, setMembersLoading] = useState(false);
-  const [members, setMembers] = useState([]);
-
-  const onFetchBoard = useCallback(
-    async (id) => {
-      setBoardError(null);
-
-      try {
-        const boardRes = await fetchBoard(id);
-        setBoard(boardRes.data);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          navigate("/logout");
-        } else {
-          setBoardError("The board information could not be loaded.");
-        }
-
-        throw err;
-      }
-    },
-    [navigate]
+  const { board, currentMember, members, loading, error } = useSelector(
+    (state) => state.board,
+    shallowEqual
   );
 
-  const onFetchCurrentMember = useCallback(
-    async (id, currentUsername) => {
-      setBoardError(null);
+  useEffect(() => {
+    if (boardId) {
+      dispatch(fetchBoard(boardId));
+    }
+  }, [boardId, dispatch]);
 
-      try {
-        const currentMemberRes = await fetchMember(id, currentUsername);
-
-        setCurrentMember(currentMemberRes.data);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          navigate("/logout");
-        } else {
-          setBoardError("The board information could not be loaded.");
-        }
-
-        throw err;
-      }
-    },
-    [navigate]
-  );
-
-  const onFetchMembers = useCallback(
-    async (id) => {
-      setMembersError(null);
-
-      try {
-        const membersRes = await fetchMembers(id);
-        setMembers(membersRes.data);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          navigate("/logout");
-        } else {
-          setMembersError(
-            "The board member's information could not be loaded."
-          );
-        }
-
-        throw err;
-      }
-    },
-    [navigate]
-  );
+  useEffect(() => {
+    if (error?.response?.status === 401) {
+      navigate("/logout");
+    }
+  }, [error, navigate]);
 
   useEffect(() => {
     if (board) {
@@ -111,33 +58,15 @@ export default function Board() {
     }
   }, [board]);
 
-  useEffect(() => {
-    if (boardId && principal) {
-      setBoardLoading(true);
-
-      onFetchBoard(boardId)
-        .then(() => onFetchCurrentMember(boardId, principal.username))
-        .finally(() => setBoardLoading(false));
-    }
-  }, [boardId, onFetchBoard, onFetchCurrentMember, principal]);
-
-  useEffect(() => {
-    if (boardId) {
-      setMembersLoading(true);
-
-      onFetchMembers(boardId).finally(() => setMembersLoading(false));
-    }
-  }, [boardId, onFetchMembers]);
-
   return (
     <StackTemplate>
       <div className="h-full bg-white dark:bg-gray-600">
         <div className="xl:container mx-auto p-4">
           <div className="flex flex-col space-y-4">
             <div className="space-y-4">
-              {(boardLoading || boardError) && (
+              {(loading || error) && (
                 <div className="w-full relative">
-                  {boardError && (
+                  {error && (
                     <button
                       type="button"
                       className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
@@ -146,14 +75,18 @@ export default function Board() {
                         <ExclamationIcon className="h-6" />
                       </div>
                       <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
-                        {boardError}
+                        {error}
                       </div>
                     </button>
                   )}
-                  <BoardHeaderSkeleton error={boardError} />
+                  <BoardHeaderSkeleton
+                    error={
+                      error ? "Loading the board information failed." : null
+                    }
+                  />
                 </div>
               )}
-              {!boardLoading && !boardError && <BoardHeader board={board} />}
+              {!loading && !error && board && <BoardHeader board={board} />}
               <Tab.Group as="div" className="space-y-6">
                 <Tab.List className="flex rounded-xl space-x-2">
                   <Tab
@@ -241,7 +174,7 @@ export default function Board() {
                             boardId={boardId}
                             onSubmit={() => {
                               setShowCreateMemberModal(false);
-                              onFetchMembers(boardId);
+                              dispatch(fetchBoardMembers(boardId));
                             }}
                             onClose={() => setShowCreateMemberModal(false)}
                             isOpen={showCreateMemberModal}
@@ -252,16 +185,16 @@ export default function Board() {
                             onClick={() => setShowCreateMemberModal(true)}
                           >
                             <PlusIcon className="h-6 w-6" aria-hidden="true" />
-                            <div className="ml-2">Add member</div>
+                            <div className="ml-2">Create member</div>
                           </button>
                         </div>
                       )}
                       <div className="flex flex-col space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {(membersLoading || membersError) &&
+                          {(loading || error) &&
                             [...Array(4).keys()].map((key) => (
                               <div key={key} className="w-full relative">
-                                {membersError && (
+                                {error && (
                                   <button
                                     type="button"
                                     className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
@@ -270,15 +203,21 @@ export default function Board() {
                                       <ExclamationIcon className="h-6" />
                                     </div>
                                     <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
-                                      {membersError}
+                                      {error}
                                     </div>
                                   </button>
                                 )}
-                                <MemberThumbnailSkeleton error={membersError} />
+                                <MemberThumbnailSkeleton
+                                  error={
+                                    error
+                                      ? "Loading the board information failed."
+                                      : null
+                                  }
+                                />
                               </div>
                             ))}
-                          {!membersLoading &&
-                            !membersError &&
+                          {!loading &&
+                            !error &&
                             members.length > 0 &&
                             members.map((member) => (
                               <div className="flex" key={member.username}>
@@ -287,7 +226,9 @@ export default function Board() {
                                   <EditableMemberThumbnail
                                     boardId={boardId}
                                     member={member}
-                                    onSubmit={() => onFetchMembers(boardId)}
+                                    onSubmit={() =>
+                                      dispatch(fetchBoardMembers(boardId))
+                                    }
                                   />
                                 ) : (
                                   <MemberThumbnail member={member} />
@@ -295,13 +236,11 @@ export default function Board() {
                               </div>
                             ))}
                         </div>
-                        {!membersLoading &&
-                          !membersError &&
-                          members.length <= 0 && (
-                            <p className="text-center text-gray-800 dark:text-white">
-                              No members available.
-                            </p>
-                          )}
+                        {!loading && !error && members.length <= 0 && (
+                          <p className="text-center text-gray-800 dark:text-white">
+                            No members available.
+                          </p>
+                        )}
                       </div>
                     </div>
                   </Tab.Panel>
@@ -310,12 +249,12 @@ export default function Board() {
                       <ChangeBoardNameForm
                         boardId={boardId}
                         currentName={board?.name}
-                        onChange={() => onFetchBoard(boardId)}
+                        onChange={() => dispatch(fetchBoardInfo(boardId))}
                       />
                       <ChangeBoardDescriptionForm
                         boardId={boardId}
                         currentDescription={board?.description}
-                        onChange={() => onFetchBoard(boardId)}
+                        onChange={() => dispatch(fetchBoardInfo(boardId))}
                       />
                       <DeleteBoardForm
                         boardId={boardId}

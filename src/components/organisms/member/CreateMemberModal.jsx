@@ -133,7 +133,7 @@ export default function CreateMemberModal({
             <Dialog.Panel className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl space-y-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
               <div className="flex justify-between items-center">
                 <Dialog.Title as="h3" className="text-lg font-medium leading-6">
-                  Add member
+                  Create member
                 </Dialog.Title>
                 <button
                   type="button"

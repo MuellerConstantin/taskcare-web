@@ -46,3 +46,14 @@ export const fetchTasks = (boardId) => {
 export const deleteTask = (boardId, taskId) => {
   return api.delete(`/boards/${boardId}/tasks/${taskId}`);
 };
+
+/**
+ * Create a new task.
+ *
+ * @param {string} boardId Unique identifier of the board
+ * @param {{name: string, description: string|undefined, priority: number|undefined, expiresAt: string|undefined}} data Fields of the new task to be created
+ * @returns {Promise<AxiosResponse<void>>} Returns the API response
+ */
+export const createTask = (boardId, data) => {
+  return api.post(`/boards/${boardId}/tasks`, data);
+};

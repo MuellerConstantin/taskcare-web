@@ -1,10 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { DotsHorizontalIcon, ExclamationIcon } from "@heroicons/react/solid";
+import {
+  DotsHorizontalIcon,
+  ExclamationIcon,
+  PlusIcon,
+} from "@heroicons/react/solid";
+import CreateTaskModal from "./CreateTaskModal";
 import TaskDetailDrawer from "./TaskDetailDrawer";
-import { fetchTasks } from "../../../api/tasks";
+import { fetchBoardTasks } from "../../../store/slices/board";
 
 function TaskKanbanColumn({ tasks, onTaskInfo }) {
   const [, drop] = useDrop(() => ({
@@ -64,59 +69,53 @@ function TaskKanbanCard({ task, onInfo }) {
 }
 
 export default function TaskKanbanView({ boardId }) {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [selected, setSelected] = useState(null);
-  const [tasks, setTasks] = useState([]);
-  const [tasksLoading, setTasksLoading] = useState(false);
-  const [tasksError, setTasksError] = useState(null);
+  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
 
-  const onFetchTasks = useCallback(
-    async (id) => {
-      setTasksError(null);
-
-      try {
-        const tasksRes = await fetchTasks(id);
-        setTasks(tasksRes.data);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          navigate("/logout");
-        } else {
-          setTasksError("The board card's information could not be loaded.");
-        }
-
-        throw err;
-      }
-    },
-    [navigate]
+  const { tasks, loading, error } = useSelector(
+    (state) => state.board,
+    shallowEqual
   );
 
-  useEffect(() => {
-    if (boardId) {
-      setTasksLoading(true);
-
-      onFetchTasks(boardId).finally(() => setTasksLoading(false));
-    }
-  }, [boardId, onFetchTasks]);
-
   return (
-    <>
+    <div className="space-y-4">
       <TaskDetailDrawer
         isOpen={!!selected}
         onClose={(refresh) => {
           setSelected(null);
           if (refresh) {
-            onFetchTasks(boardId);
+            dispatch(fetchBoardTasks(boardId));
           }
         }}
         boardId={boardId}
         task={selected}
       />
+      <div className="flex justify-end">
+        <CreateTaskModal
+          boardId={boardId}
+          isOpen={showCreateTaskModal}
+          onSubmit={() => {
+            setShowCreateTaskModal(false);
+            dispatch(fetchBoardTasks(boardId));
+          }}
+          onClose={() => setShowCreateTaskModal(false)}
+        />
+        <button
+          type="button"
+          className="inline-flex items-center justify-center bg-transparent text-amber-500"
+          onClick={() => setShowCreateTaskModal(true)}
+        >
+          <PlusIcon className="h-6 w-6" aria-hidden="true" />
+          <div className="ml-2">Create task</div>
+        </button>
+      </div>
       <DndProvider backend={HTML5Backend}>
         <div className="flex flex-col space-y-4">
-          {(tasksLoading || tasksError) && (
+          {(loading || error) && (
             <div className="w-full relative">
-              {tasksError && (
+              {error && (
                 <button
                   type="button"
                   className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
@@ -125,7 +124,7 @@ export default function TaskKanbanView({ boardId }) {
                     <ExclamationIcon className="h-6" />
                   </div>
                   <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
-                    {tasksError}
+                    {error ? "Loading the board information failed." : null}
                   </div>
                 </button>
               )}
@@ -141,12 +140,12 @@ export default function TaskKanbanView({ boardId }) {
                   </div>
                   <div
                     className={`h-full space-y-2 overflow-y-scroll px-1 ${
-                      !tasksError && "animate-pulse"
+                      !error && "animate-pulse"
                     }`}
                   >
                     <div
                       className={`h-24 w-full rounded-md ${
-                        tasksError
+                        error
                           ? "bg-red-200 dark:bg-red-400"
                           : "bg-gray-200 dark:bg-gray-800"
                       }`}
@@ -164,19 +163,19 @@ export default function TaskKanbanView({ boardId }) {
                   </div>
                   <div
                     className={`h-full space-y-2 overflow-y-scroll px-1 ${
-                      !tasksError && "animate-pulse"
+                      !error && "animate-pulse"
                     }`}
                   >
                     <div
                       className={`h-24 w-full rounded-md ${
-                        tasksError
+                        error
                           ? "bg-red-200 dark:bg-red-400"
                           : "bg-gray-200 dark:bg-gray-800"
                       }`}
                     />
                     <div
                       className={`h-24 w-full rounded-md ${
-                        tasksError
+                        error
                           ? "bg-red-200 dark:bg-red-400"
                           : "bg-gray-200 dark:bg-gray-800"
                       }`}
@@ -194,26 +193,26 @@ export default function TaskKanbanView({ boardId }) {
                   </div>
                   <div
                     className={`h-full space-y-2 overflow-y-scroll px-1 ${
-                      !tasksError && "animate-pulse"
+                      !error && "animate-pulse"
                     }`}
                   >
                     <div
                       className={`h-24 w-full rounded-md ${
-                        tasksError
+                        error
                           ? "bg-red-200 dark:bg-red-400"
                           : "bg-gray-200 dark:bg-gray-800"
                       }`}
                     />
                     <div
                       className={`h-24 w-full rounded-md ${
-                        tasksError
+                        error
                           ? "bg-red-200 dark:bg-red-400"
                           : "bg-gray-200 dark:bg-gray-800"
                       }`}
                     />
                     <div
                       className={`h-24 w-full rounded-md ${
-                        tasksError
+                        error
                           ? "bg-red-200 dark:bg-red-400"
                           : "bg-gray-200 dark:bg-gray-800"
                       }`}
@@ -223,7 +222,7 @@ export default function TaskKanbanView({ boardId }) {
               </div>
             </div>
           )}
-          {!tasksLoading && !tasksError && (
+          {!loading && !error && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex flex-col space-y-2 bg-gray-100 dark:bg-gray-700 rounded-md p-2 h-96 md:h-screen">
                 <div className="mb-4 flex items-center space-x-2">
@@ -287,6 +286,6 @@ export default function TaskKanbanView({ boardId }) {
           )}
         </div>
       </DndProvider>
-    </>
+    </div>
   );
 }
