@@ -62,7 +62,7 @@ export default function CreateMemberModal({
     [navigate]
   );
 
-  const onAddUser = async (username) => {
+  const onCreate = async (username) => {
     setAddLoading(true);
     setAddError(null);
 
@@ -219,7 +219,7 @@ export default function CreateMemberModal({
                       <button
                         type="button"
                         disabled={loading || addLoading}
-                        onClick={() => onAddUser(user.username)}
+                        onClick={() => onCreate(user.username)}
                         className="inline-flex items-center justify-center bg-transparent text-green-500"
                       >
                         <PlusIcon className="h-4 w-4" aria-hidden="true" />

@@ -20,7 +20,7 @@ export default function EditableMemberThumbnail({ boardId, member, onSubmit }) {
           setShowRemoveModal(false);
           if (onSubmit) onSubmit();
         }}
-        onCancel={() => {
+        onClose={() => {
           setShowRemoveModal(false);
         }}
       />
