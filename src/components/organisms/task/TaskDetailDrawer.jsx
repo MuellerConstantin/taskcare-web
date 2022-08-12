@@ -6,12 +6,15 @@ import {
   ClockIcon,
   FlagIcon,
   BellIcon,
+  PencilIcon,
+  TrashIcon,
 } from "@heroicons/react/solid";
-import Button from "../../atoms/Button";
+import UpdateTaskModal from "./UpdateTaskModal";
 import DeleteTaskModal from "./DeleteTaskModal";
 
 export default function TaskDetailDrawer({ boardId, task, onClose, isOpen }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -30,7 +33,7 @@ export default function TaskDetailDrawer({ boardId, task, onClose, isOpen }) {
             leaveFrom="translate-x-0"
             leaveTo="-translate-x-full"
           >
-            <Dialog.Panel className="w-3/4 max-w-sm h-screen shadow-xl bg-white dark:bg-gray-600 text-gray-800 dark:text-white w-full h-full p-6 overflow-hidden rounded-r-2xl">
+            <Dialog.Panel className="w-3/4 max-w-sm h-screen shadow-xl bg-white dark:bg-gray-600 text-gray-800 dark:text-white w-full h-full p-4 overflow-hidden rounded-r-2xl">
               {task && (
                 <div className="flex flex-col h-full w-full justify-between space-y-8 overflow-y-auto">
                   <div className="space-y-4">
@@ -86,7 +89,24 @@ export default function TaskDetailDrawer({ boardId, task, onClose, isOpen }) {
                       <div className="italic">No description provided.</div>
                     )}
                   </div>
-                  <div className="space-y-4">
+                  <div className=" flex justify-between p-2">
+                    <UpdateTaskModal
+                      boardId={boardId}
+                      task={task}
+                      onSubmit={() => {
+                        setShowUpdateModal(false);
+                        onClose(true);
+                      }}
+                      onClose={() => setShowUpdateModal(false)}
+                      isOpen={showUpdateModal}
+                    />
+                    <button
+                      type="button"
+                      className="inline-flex items-center justify-center bg-transparent text-amber-500"
+                      onClick={() => setShowUpdateModal(true)}
+                    >
+                      <PencilIcon className="h-6 w-6" aria-label="Update" />
+                    </button>
                     <DeleteTaskModal
                       boardId={boardId}
                       taskId={task?.id}
@@ -97,14 +117,13 @@ export default function TaskDetailDrawer({ boardId, task, onClose, isOpen }) {
                       onClose={() => setShowDeleteModal(false)}
                       isOpen={showDeleteModal}
                     />
-                    <Button
+                    <button
                       type="button"
-                      disabled={!task}
-                      className="w-full bg-red-500 focus:!outline-red-500"
+                      className="inline-flex items-center justify-center bg-transparent text-amber-500"
                       onClick={() => setShowDeleteModal(true)}
                     >
-                      Delete
-                    </Button>
+                      <TrashIcon className="h-6 w-6" aria-label="Delete" />
+                    </button>
                   </div>
                 </div>
               )}
