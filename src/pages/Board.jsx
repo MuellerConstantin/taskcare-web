@@ -25,8 +25,9 @@ import {
   fetchBoardInfo,
   fetchBoardMembers,
 } from "../store/slices/board";
+import { StompProvider } from "../contexts/stomp";
 
-export default function Board() {
+function Board() {
   const { boardId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -45,7 +46,7 @@ export default function Board() {
   }, [boardId, dispatch]);
 
   useEffect(() => {
-    if (error?.response?.status === 401) {
+    if (error?.status === 401) {
       navigate("/logout");
     }
   }, [error, navigate]);
@@ -203,7 +204,7 @@ export default function Board() {
                                       <ExclamationIcon className="h-6" />
                                     </div>
                                     <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
-                                      {error}
+                                      Loading the board information failed.
                                     </div>
                                   </button>
                                 )}
@@ -269,5 +270,13 @@ export default function Board() {
         </div>
       </div>
     </StackTemplate>
+  );
+}
+
+export default function BoardWrapper() {
+  return (
+    <StompProvider url={process.env.REACT_APP_TASKCARE_WS_URI}>
+      <Board />
+    </StompProvider>
   );
 }

@@ -11,7 +11,13 @@ const fetchBoardInfoAction = createAsyncThunk(
       const boardRes = await fetchBoard(boardId);
       return boardRes.data;
     } catch (err) {
-      return rejectWithValue(err);
+      // eslint-disable-next-line no-console
+      console.error(err);
+      return rejectWithValue(
+        err?.response
+          ? { ...err.response, request: undefined, config: undefined }
+          : { message: err.message }
+      );
     }
   }
 );
@@ -23,7 +29,13 @@ const fetchBoardMembersAction = createAsyncThunk(
       const membersRes = await fetchMembers(boardId);
       return membersRes.data;
     } catch (err) {
-      return rejectWithValue(err);
+      // eslint-disable-next-line no-console
+      console.error(err);
+      return rejectWithValue(
+        err?.response
+          ? { ...err.response, request: undefined, config: undefined }
+          : { message: err.message }
+      );
     }
   }
 );
@@ -41,7 +53,13 @@ const fetchBoardCurrentMemberAction = createAsyncThunk(
 
       return currentMemberRes.data;
     } catch (err) {
-      return rejectWithValue(err);
+      // eslint-disable-next-line no-console
+      console.error(err);
+      return rejectWithValue(
+        err?.response
+          ? { ...err.response, request: undefined, config: undefined }
+          : { message: err.message }
+      );
     }
   }
 );
@@ -53,7 +71,13 @@ const fetchBoardTasksAction = createAsyncThunk(
       const tasksRes = await fetchTasks(boardId);
       return tasksRes.data;
     } catch (err) {
-      return rejectWithValue(err);
+      // eslint-disable-next-line no-console
+      console.error(err);
+      return rejectWithValue(
+        err?.response
+          ? { ...err.response, request: undefined, config: undefined }
+          : { message: err.message }
+      );
     }
   }
 );
@@ -79,7 +103,13 @@ const fetchBoardAction = createAsyncThunk(
         tasksRes: tasksRes.data,
       };
     } catch (err) {
-      return rejectWithValue(err);
+      // eslint-disable-next-line no-console
+      console.error(err);
+      return rejectWithValue(
+        err?.response
+          ? { ...err.response, request: undefined, config: undefined }
+          : { message: err.message }
+      );
     }
   }
 );

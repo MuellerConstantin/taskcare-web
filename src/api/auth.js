@@ -13,6 +13,13 @@ import api from "./index";
  */
 
 /**
+ * @typedef {object} TicketDTO
+ * @property {string} ticket
+ * @property {number} expiresIn
+ * @property {string} principle
+ */
+
+/**
  * @typedef {object} PrincipalDTO
  * @property {string} username
  * @property {string} email
@@ -53,4 +60,13 @@ export const refreshToken = (token) => {
   return api.post("/auth/refresh", {
     refreshToken: token,
   });
+};
+
+/**
+ * Generates a ticket on the server side.
+ *
+ * @returns {Promise<AxiosResponse<TicketDTO>>} Returns the API response
+ */
+export const generateTicket = () => {
+  return api.post("/auth/ticket");
 };

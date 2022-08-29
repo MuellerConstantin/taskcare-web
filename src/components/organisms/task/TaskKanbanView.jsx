@@ -159,7 +159,7 @@ export default function TaskKanbanView({ boardId }) {
                     <ExclamationIcon className="h-6" />
                   </div>
                   <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
-                    {error ? "Loading the board information failed." : null}
+                    Loading the board information failed.
                   </div>
                 </button>
               )}
