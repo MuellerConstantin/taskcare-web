@@ -6,10 +6,20 @@ import { fetchTasks } from "../../api/tasks";
 
 const fetchBoardInfoAction = createAsyncThunk(
   "board/fetchBoardInfo",
-  async (boardId, { rejectWithValue }) => {
+  async (boardId, { rejectWithValue, getState }) => {
     try {
+      const state = getState();
+
       const boardRes = await fetchBoard(boardId);
-      return boardRes.data;
+      const currentMemberRes = await fetchMember(
+        boardId,
+        state.auth.principal.username
+      );
+
+      return {
+        boardRes: boardRes.data,
+        currentMemberRes: currentMemberRes.data,
+      };
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
@@ -40,30 +50,6 @@ const fetchBoardMembersAction = createAsyncThunk(
   }
 );
 
-const fetchBoardCurrentMemberAction = createAsyncThunk(
-  "board/fetchBoardCurrentMember",
-  async (boardId, { rejectWithValue, getState }) => {
-    try {
-      const state = getState();
-
-      const currentMemberRes = await fetchMember(
-        boardId,
-        state.auth.principal.username
-      );
-
-      return currentMemberRes.data;
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error(err);
-      return rejectWithValue(
-        err?.response
-          ? { ...err.response, request: undefined, config: undefined }
-          : { message: err.message }
-      );
-    }
-  }
-);
-
 const fetchBoardTasksAction = createAsyncThunk(
   "board/fetchBoardTasks",
   async (boardId, { rejectWithValue }) => {
@@ -82,45 +68,29 @@ const fetchBoardTasksAction = createAsyncThunk(
   }
 );
 
-const fetchBoardAction = createAsyncThunk(
-  "board/fetchBoard",
-  async (boardId, { rejectWithValue, getState }) => {
-    try {
-      const state = getState();
+const initialMembersState = {
+  membersLoading: false,
+  membersError: null,
+  members: [],
+};
 
-      const boardRes = await fetchBoard(boardId);
-      const membersRes = await fetchMembers(boardId);
-      const currentMemberRes = await fetchMember(
-        boardId,
-        state.auth.principal.username
-      );
-      const tasksRes = await fetchTasks(boardId);
+const initialTasksState = {
+  tasksLoading: false,
+  tasksError: null,
+  tasks: [],
+};
 
-      return {
-        boardRes: boardRes.data,
-        membersRes: membersRes.data,
-        currentMemberRes: currentMemberRes.data,
-        tasksRes: tasksRes.data,
-      };
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error(err);
-      return rejectWithValue(
-        err?.response
-          ? { ...err.response, request: undefined, config: undefined }
-          : { message: err.message }
-      );
-    }
-  }
-);
+const initialInfoState = {
+  infoLoading: false,
+  infoError: null,
+  board: null,
+  currentMember: null,
+};
 
 const initialState = {
-  loading: false,
-  error: null,
-  board: null,
-  members: [],
-  tasks: [],
-  currentMember: null,
+  ...initialInfoState,
+  ...initialMembersState,
+  ...initialTasksState,
 };
 
 const authSlice = createSlice({
@@ -128,87 +98,49 @@ const authSlice = createSlice({
   initialState,
   extraReducers: (builder) => {
     builder.addCase(fetchBoardInfoAction.pending, (state) => {
-      state.loading = true;
-      state.error = null;
+      state.infoLoading = true;
+      state.infoError = null;
     });
 
     builder.addCase(fetchBoardInfoAction.rejected, (state, { payload }) => {
-      state.loading = false;
-      state.error = payload;
+      state.infoLoading = false;
+      state.infoError = payload;
     });
 
     builder.addCase(fetchBoardInfoAction.fulfilled, (state, { payload }) => {
-      state.loading = false;
-      state.board = payload;
+      state.infoLoading = false;
+      state.board = payload.boardRes;
+      state.currentMember = payload.currentMemberRes;
     });
 
     builder.addCase(fetchBoardMembersAction.pending, (state) => {
-      state.loading = true;
-      state.error = null;
+      state.membersLoading = true;
+      state.membersError = null;
     });
 
     builder.addCase(fetchBoardMembersAction.rejected, (state, { payload }) => {
-      state.loading = false;
-      state.error = payload;
+      state.membersLoading = false;
+      state.membersError = payload;
     });
 
     builder.addCase(fetchBoardMembersAction.fulfilled, (state, { payload }) => {
-      state.loading = false;
+      state.membersLoading = false;
       state.members = payload;
     });
 
-    builder.addCase(fetchBoardCurrentMemberAction.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-
-    builder.addCase(
-      fetchBoardCurrentMemberAction.rejected,
-      (state, { payload }) => {
-        state.loading = false;
-        state.error = payload;
-      }
-    );
-
-    builder.addCase(
-      fetchBoardCurrentMemberAction.fulfilled,
-      (state, { payload }) => {
-        state.loading = false;
-        state.currentMember = payload;
-      }
-    );
-
     builder.addCase(fetchBoardTasksAction.pending, (state) => {
-      state.loading = true;
-      state.error = null;
+      state.tasksLoading = true;
+      state.tasksError = null;
     });
 
     builder.addCase(fetchBoardTasksAction.rejected, (state, { payload }) => {
-      state.loading = false;
-      state.error = payload;
+      state.tasksLoading = false;
+      state.tasksError = payload;
     });
 
     builder.addCase(fetchBoardTasksAction.fulfilled, (state, { payload }) => {
-      state.loading = false;
+      state.tasksLoading = false;
       state.tasks = payload;
-    });
-
-    builder.addCase(fetchBoardAction.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-
-    builder.addCase(fetchBoardAction.rejected, (state, { payload }) => {
-      state.loading = false;
-      state.error = payload;
-    });
-
-    builder.addCase(fetchBoardAction.fulfilled, (state, { payload }) => {
-      state.loading = false;
-      state.board = payload.boardRes;
-      state.members = payload.membersRes;
-      state.currentMember = payload.currentMemberRes;
-      state.tasks = payload.tasksRes;
     });
   },
 });
@@ -216,6 +148,4 @@ const authSlice = createSlice({
 export default authSlice;
 export { fetchBoardInfoAction as fetchBoardInfo };
 export { fetchBoardMembersAction as fetchBoardMembers };
-export { fetchBoardCurrentMemberAction as fetchBoardCurrentMember };
 export { fetchBoardTasksAction as fetchBoardTasks };
-export { fetchBoardAction as fetchBoard };

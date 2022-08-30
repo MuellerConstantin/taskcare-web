@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import {
@@ -11,6 +12,7 @@ import CreateTaskModal from "./CreateTaskModal";
 import TaskDetailDrawer from "./TaskDetailDrawer";
 import { fetchBoardTasks } from "../../../store/slices/board";
 import { updateTask } from "../../../api/tasks";
+import { useStomp } from "../../../contexts/stomp";
 
 function TaskKanbanColumn({ boardId, status, tasks, onTaskInfo, onTaskMove }) {
   const [, drop] = useDrop(() => ({
@@ -80,15 +82,39 @@ function TaskKanbanCard({ task, onInfo }) {
 }
 
 export default function TaskKanbanView({ boardId }) {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [selected, setSelected] = useState(null);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
 
-  const { tasks, loading, error } = useSelector(
+  const { tasks, tasksLoading, tasksError } = useSelector(
     (state) => state.board,
     shallowEqual
   );
+
+  const { connecting: stompConnecting, error: stompError, client } = useStomp();
+
+  const error = useMemo(() => {
+    if (!tasksError && !stompError) {
+      return null;
+    }
+    if (tasksError) {
+      return tasksError;
+    }
+    return stompError;
+  }, [tasksError, stompError]);
+
+  const loading = useMemo(
+    () => tasksLoading || stompConnecting,
+    [tasksLoading, stompConnecting]
+  );
+
+  useEffect(() => {
+    if (tasksError?.status === 401) {
+      navigate("/logout");
+    }
+  }, [tasksError, navigate]);
 
   const openedTasks = useMemo(
     () =>
@@ -113,6 +139,22 @@ export default function TaskKanbanView({ boardId }) {
         .sort((a, b) => a.createdAt - b.createdAt) || [],
     [tasks]
   );
+
+  useEffect(() => {
+    if (client && boardId) {
+      client.subscribe(`/topic/board.${boardId}.task-created`, () => {
+        dispatch(fetchBoardTasks(boardId));
+      });
+
+      client.subscribe(`/topic/board.${boardId}.task-updated`, () => {
+        dispatch(fetchBoardTasks(boardId));
+      });
+
+      client.subscribe(`/topic/board.${boardId}.task-deleted`, () => {
+        dispatch(fetchBoardTasks(boardId));
+      });
+    }
+  }, [client, boardId, dispatch]);
 
   return (
     <div className="space-y-4">
@@ -159,7 +201,7 @@ export default function TaskKanbanView({ boardId }) {
                     <ExclamationIcon className="h-6" />
                   </div>
                   <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
-                    Loading the board information failed.
+                    Loading the board tasks failed.
                   </div>
                 </button>
               )}

@@ -21,11 +21,11 @@ import CreateMemberModal from "../components/organisms/member/CreateMemberModal"
 import StackTemplate from "../components/templates/StackTemplate";
 import TaskKanbanView from "../components/organisms/task/TaskKanbanView";
 import {
-  fetchBoard,
   fetchBoardInfo,
+  fetchBoardTasks,
   fetchBoardMembers,
 } from "../store/slices/board";
-import { StompProvider } from "../contexts/stomp";
+import { StompProvider, useStomp } from "../contexts/stomp";
 
 function Board() {
   const { boardId } = useParams();
@@ -34,22 +34,31 @@ function Board() {
 
   const [showCreateMemberModal, setShowCreateMemberModal] = useState(false);
 
-  const { board, currentMember, members, loading, error } = useSelector(
-    (state) => state.board,
-    shallowEqual
-  );
+  const {
+    board,
+    currentMember,
+    members,
+    infoLoading,
+    infoError,
+    membersLoading,
+    membersError,
+  } = useSelector((state) => state.board, shallowEqual);
+
+  const { client } = useStomp();
 
   useEffect(() => {
     if (boardId) {
-      dispatch(fetchBoard(boardId));
+      dispatch(fetchBoardInfo(boardId));
+      dispatch(fetchBoardTasks(boardId));
+      dispatch(fetchBoardMembers(boardId));
     }
   }, [boardId, dispatch]);
 
   useEffect(() => {
-    if (error?.status === 401) {
+    if (infoError?.status === 401 || membersError?.status === 401) {
       navigate("/logout");
     }
-  }, [error, navigate]);
+  }, [infoError, membersError, navigate]);
 
   useEffect(() => {
     if (board) {
@@ -59,15 +68,27 @@ function Board() {
     }
   }, [board]);
 
+  useEffect(() => {
+    if (client && boardId) {
+      client.subscribe(`/topic/board.${boardId}.board-updated`, () => {
+        dispatch(fetchBoardInfo(boardId));
+      });
+
+      client.subscribe(`/topic/board.${boardId}.board-deleted`, () => {
+        navigate("/overview");
+      });
+    }
+  }, [client, boardId, dispatch, navigate]);
+
   return (
     <StackTemplate>
       <div className="h-full bg-white dark:bg-gray-600">
         <div className="xl:container mx-auto p-4">
           <div className="flex flex-col space-y-4">
             <div className="space-y-4">
-              {(loading || error) && (
+              {(infoLoading || infoError) && (
                 <div className="w-full relative">
-                  {error && (
+                  {infoError && (
                     <button
                       type="button"
                       className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
@@ -76,18 +97,16 @@ function Board() {
                         <ExclamationIcon className="h-6" />
                       </div>
                       <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
-                        {error}
+                        Loading the board information failed.
                       </div>
                     </button>
                   )}
-                  <BoardHeaderSkeleton
-                    error={
-                      error ? "Loading the board information failed." : null
-                    }
-                  />
+                  <BoardHeaderSkeleton error={infoError} />
                 </div>
               )}
-              {!loading && !error && board && <BoardHeader board={board} />}
+              {!infoLoading && !infoError && board && (
+                <BoardHeader board={board} />
+              )}
               <Tab.Group as="div" className="space-y-6">
                 <Tab.List className="flex rounded-xl space-x-2">
                   <Tab
@@ -192,10 +211,10 @@ function Board() {
                       )}
                       <div className="flex flex-col space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {(loading || error) &&
+                          {(membersLoading || membersError) &&
                             [...Array(4).keys()].map((key) => (
                               <div key={key} className="w-full relative">
-                                {error && (
+                                {membersError && (
                                   <button
                                     type="button"
                                     className="group absolute top-2 left-2 flex items-start space-x-2 text-red-500"
@@ -204,21 +223,15 @@ function Board() {
                                       <ExclamationIcon className="h-6" />
                                     </div>
                                     <div className="invisible group-hover:visible group-focus:visible bg-gray-100 dark:bg-gray-700 rounded-md shadow-md text-xs p-2 opacity-80 max-w-xs line-clamp-4">
-                                      Loading the board information failed.
+                                      Loading the board members failed.
                                     </div>
                                   </button>
                                 )}
-                                <MemberThumbnailSkeleton
-                                  error={
-                                    error
-                                      ? "Loading the board information failed."
-                                      : null
-                                  }
-                                />
+                                <MemberThumbnailSkeleton error={membersError} />
                               </div>
                             ))}
-                          {!loading &&
-                            !error &&
+                          {!membersLoading &&
+                            !membersError &&
                             members.length > 0 &&
                             members.map((member) => (
                               <div className="flex" key={member.username}>
@@ -237,11 +250,13 @@ function Board() {
                               </div>
                             ))}
                         </div>
-                        {!loading && !error && members.length <= 0 && (
-                          <p className="text-center text-gray-800 dark:text-white">
-                            No members available.
-                          </p>
-                        )}
+                        {!membersLoading &&
+                          !membersError &&
+                          members.length <= 0 && (
+                            <p className="text-center text-gray-800 dark:text-white">
+                              No members available.
+                            </p>
+                          )}
                       </div>
                     </div>
                   </Tab.Panel>
