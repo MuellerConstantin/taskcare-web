@@ -13,6 +13,8 @@ import storage from "redux-persist/lib/storage";
 import authSlice from "./slices/auth";
 import themeSlice from "./slices/theme";
 import boardSlice from "./slices/board";
+import tasksSlice from "./slices/tasks";
+import membersSlice from "./slices/members";
 
 const persistConfig = {
   key: "taskcare",
@@ -25,6 +27,8 @@ const rootReducer = combineReducers({
   auth: authSlice.reducer,
   theme: themeSlice.reducer,
   board: boardSlice.reducer,
+  tasks: tasksSlice.reducer,
+  members: membersSlice.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

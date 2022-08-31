@@ -1,4 +1,5 @@
 import { useState, Fragment } from "react";
+import { useSelector, shallowEqual } from "react-redux";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   XIcon,
@@ -15,6 +16,8 @@ import DeleteTaskModal from "./DeleteTaskModal";
 export default function TaskDetailDrawer({ boardId, task, onClose, isOpen }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+
+  const { currentMember } = useSelector((state) => state.board, shallowEqual);
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -102,8 +105,9 @@ export default function TaskDetailDrawer({ boardId, task, onClose, isOpen }) {
                     />
                     <button
                       type="button"
-                      className="inline-flex items-center justify-center bg-transparent text-amber-500"
+                      className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50"
                       onClick={() => setShowUpdateModal(true)}
+                      disabled={currentMember.role === "VISITOR"}
                     >
                       <PencilIcon className="h-6 w-6" aria-label="Update" />
                     </button>
@@ -119,8 +123,12 @@ export default function TaskDetailDrawer({ boardId, task, onClose, isOpen }) {
                     />
                     <button
                       type="button"
-                      className="inline-flex items-center justify-center bg-transparent text-amber-500"
+                      className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50"
                       onClick={() => setShowDeleteModal(true)}
+                      disabled={
+                        currentMember.role === "USER" ||
+                        currentMember.role === "VISITOR"
+                      }
                     >
                       <TrashIcon className="h-6 w-6" aria-label="Delete" />
                     </button>

@@ -10,7 +10,7 @@ import {
 } from "@heroicons/react/solid";
 import CreateTaskModal from "./CreateTaskModal";
 import TaskDetailDrawer from "./TaskDetailDrawer";
-import { fetchBoardTasks } from "../../../store/slices/board";
+import { fetchTasks } from "../../../store/slices/tasks";
 import { updateTask } from "../../../api/tasks";
 import { useStomp } from "../../../contexts/stomp";
 
@@ -39,9 +39,12 @@ function TaskKanbanColumn({ boardId, status, tasks, onTaskInfo, onTaskMove }) {
 }
 
 function TaskKanbanCard({ task, onInfo }) {
+  const { currentMember } = useSelector((state) => state.board, shallowEqual);
+
   const [, drag, dragPreview] = useDrag(() => ({
     type: "TaskKanbanCard",
     item: task,
+    canDrag: () => currentMember.role !== "VISITOR",
   }));
 
   return (
@@ -81,17 +84,23 @@ function TaskKanbanCard({ task, onInfo }) {
   );
 }
 
-export default function TaskKanbanView({ boardId }) {
+export default function TaskKanbanView() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [selected, setSelected] = useState(null);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
 
-  const { tasks, tasksLoading, tasksError } = useSelector(
+  const { board, currentMember } = useSelector(
     (state) => state.board,
     shallowEqual
   );
+
+  const {
+    tasks,
+    loading: tasksLoading,
+    error: tasksError,
+  } = useSelector((state) => state.tasks, shallowEqual);
 
   const { connecting: stompConnecting, error: stompError, client } = useStomp();
 
@@ -141,53 +150,50 @@ export default function TaskKanbanView({ boardId }) {
   );
 
   useEffect(() => {
-    if (client && boardId) {
-      client.subscribe(`/topic/board.${boardId}.task-created`, () => {
-        dispatch(fetchBoardTasks(boardId));
+    if (client && board) {
+      // Listens for newly created tasks
+      client.subscribe(`/topic/board.${board.id}.task-created`, () => {
+        dispatch(fetchTasks(board.id));
       });
 
-      client.subscribe(`/topic/board.${boardId}.task-updated`, () => {
-        dispatch(fetchBoardTasks(boardId));
+      // Listens for task updates
+      client.subscribe(`/topic/board.${board.id}.task-updated`, () => {
+        dispatch(fetchTasks(board.id));
       });
 
-      client.subscribe(`/topic/board.${boardId}.task-deleted`, () => {
-        dispatch(fetchBoardTasks(boardId));
+      // Listens for deleted tasks
+      client.subscribe(`/topic/board.${board.id}.task-deleted`, () => {
+        dispatch(fetchTasks(board.id));
       });
     }
-  }, [client, boardId, dispatch]);
+  }, [client, board, dispatch]);
 
   return (
     <div className="space-y-4">
-      <TaskDetailDrawer
-        isOpen={!!selected}
-        onClose={(refresh) => {
-          setSelected(null);
-          if (refresh) {
-            dispatch(fetchBoardTasks(boardId));
-          }
-        }}
-        boardId={boardId}
-        task={selected}
-      />
-      <div className="flex justify-end">
-        <CreateTaskModal
-          boardId={boardId}
-          isOpen={showCreateTaskModal}
-          onSubmit={() => {
-            setShowCreateTaskModal(false);
-            dispatch(fetchBoardTasks(boardId));
-          }}
-          onClose={() => setShowCreateTaskModal(false)}
-        />
-        <button
-          type="button"
-          className="inline-flex items-center justify-center bg-transparent text-amber-500"
-          onClick={() => setShowCreateTaskModal(true)}
-        >
-          <PlusIcon className="h-6 w-6" aria-hidden="true" />
-          <div className="ml-2">Create task</div>
-        </button>
-      </div>
+      {!loading && !error && (
+        <div className="flex justify-end">
+          <CreateTaskModal
+            boardId={board.id}
+            isOpen={showCreateTaskModal}
+            onSubmit={() => {
+              setShowCreateTaskModal(false);
+              dispatch(fetchTasks(board.id));
+            }}
+            onClose={() => setShowCreateTaskModal(false)}
+          />
+          <button
+            type="button"
+            className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50"
+            onClick={() => setShowCreateTaskModal(true)}
+            disabled={
+              currentMember.role === "USER" || currentMember.role === "VISITOR"
+            }
+          >
+            <PlusIcon className="h-6 w-6" aria-hidden="true" />
+            <div className="ml-2">Create task</div>
+          </button>
+        </div>
+      )}
       <DndProvider backend={HTML5Backend}>
         <div className="flex flex-col space-y-4">
           {(loading || error) && (
@@ -301,6 +307,17 @@ export default function TaskKanbanView({ boardId }) {
           )}
           {!loading && !error && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <TaskDetailDrawer
+                isOpen={!!selected}
+                onClose={(refresh) => {
+                  setSelected(null);
+                  if (refresh) {
+                    dispatch(fetchTasks(board.id));
+                  }
+                }}
+                boardId={board.id}
+                task={selected}
+              />
               <div className="flex flex-col space-y-2 bg-gray-100 dark:bg-gray-700 rounded-md p-2 h-96 md:h-screen">
                 <div className="mb-4 flex items-center space-x-2">
                   <div className="bg-gray-200 dark:bg-gray-800 rounded-md p-1 text-gray-800 dark:text-white text-xs">
@@ -312,11 +329,11 @@ export default function TaskKanbanView({ boardId }) {
                 </div>
                 {openedTasks && (
                   <TaskKanbanColumn
-                    boardId={boardId}
+                    boardId={board.id}
                     status="OPENED"
                     tasks={openedTasks}
                     onTaskInfo={(task) => setSelected(task)}
-                    onTaskMove={() => dispatch(fetchBoardTasks(boardId))}
+                    onTaskMove={() => dispatch(fetchTasks(board.id))}
                   />
                 )}
               </div>
@@ -331,11 +348,11 @@ export default function TaskKanbanView({ boardId }) {
                 </div>
                 {inProgressTasks && (
                   <TaskKanbanColumn
-                    boardId={boardId}
+                    boardId={board.id}
                     status="IN_PROGRESS"
                     tasks={inProgressTasks}
                     onTaskInfo={(task) => setSelected(task)}
-                    onTaskMove={() => dispatch(fetchBoardTasks(boardId))}
+                    onTaskMove={() => dispatch(fetchTasks(board.id))}
                   />
                 )}
               </div>
@@ -350,11 +367,11 @@ export default function TaskKanbanView({ boardId }) {
                 </div>
                 {finishedTasks && (
                   <TaskKanbanColumn
-                    boardId={boardId}
+                    boardId={board.id}
                     status="FINISHED"
                     tasks={finishedTasks}
                     onTaskInfo={(task) => setSelected(task)}
-                    onTaskMove={() => dispatch(fetchBoardTasks(boardId))}
+                    onTaskMove={() => dispatch(fetchTasks(board.id))}
                   />
                 )}
               </div>
