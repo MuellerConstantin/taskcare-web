@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { useDrag } from "react-dnd";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
 import { Disclosure } from "@headlessui/react";
 import {
   ChevronUpIcon,
@@ -137,7 +142,12 @@ export default function TaskKanbanCard({ boardId, task }) {
                 </div>
                 <div>
                   {task.description ? (
-                    <span>{task.description}</span>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeKatex, rehypeRaw]}
+                    >
+                      {task.description}
+                    </ReactMarkdown>
                   ) : (
                     <span className="italic">No description provided.</span>
                   )}
