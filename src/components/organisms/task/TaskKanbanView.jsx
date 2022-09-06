@@ -1,20 +1,19 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import {
-  DotsHorizontalIcon,
-  ExclamationIcon,
-  PlusIcon,
-} from "@heroicons/react/solid";
+import { TouchBackend } from "react-dnd-touch-backend";
+import { ExclamationIcon, PlusIcon } from "@heroicons/react/solid";
 import CreateTaskModal from "./CreateTaskModal";
-import TaskDetailDrawer from "./TaskDetailDrawer";
+import TaskCanbanCard from "./TaskKanbanCard";
 import { fetchTasks } from "../../../store/slices/tasks";
 import { updateTask } from "../../../api/tasks";
 import { useStomp } from "../../../contexts/stomp";
 
-function TaskKanbanColumn({ boardId, status, tasks, onTaskInfo, onTaskMove }) {
+const isTouchDevice = () => "ontouchstart" in window;
+
+function TaskKanbanColumn({ boardId, status, tasks, onTaskMove }) {
   const [, drop] = useDrop(() => ({
     accept: "TaskKanbanCard",
     drop: async (task) => {
@@ -32,54 +31,8 @@ function TaskKanbanColumn({ boardId, status, tasks, onTaskInfo, onTaskMove }) {
     <div ref={drop} className="h-full space-y-2 overflow-y-scroll px-1">
       {tasks &&
         tasks.map((task) => (
-          <TaskKanbanCard key={task.id} task={task} onInfo={onTaskInfo} />
+          <TaskCanbanCard key={task.id} boardId={boardId} task={task} />
         ))}
-    </div>
-  );
-}
-
-function TaskKanbanCard({ task, onInfo }) {
-  const { currentMember } = useSelector((state) => state.board, shallowEqual);
-
-  const [, drag, dragPreview] = useDrag(() => ({
-    type: "TaskKanbanCard",
-    item: task,
-    canDrag: () => currentMember.role !== "VISITOR",
-  }));
-
-  return (
-    <div ref={dragPreview}>
-      <div
-        ref={drag}
-        className="bg-white text-gray-800 dark:text-white dark:bg-gray-800 rounded-md p-2 space-y-2"
-      >
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <h2 className="font-semibold truncate">{task.name}</h2>
-            {task.priority && (
-              <div className="bg-gray-200 dark:bg-gray-700 rounded-md p-1 text-amber-500 text-xs">
-                {task.priority}
-              </div>
-            )}
-          </div>
-          <button
-            type="button"
-            className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white focus:outline-none"
-            onClick={() => {
-              if (onInfo) onInfo(task);
-            }}
-          >
-            <DotsHorizontalIcon className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
-        {task.description && (
-          <div className="text-sm line-clamp-3">{task.description}</div>
-        )}
-        <div className="text-xs">
-          <span className="text-gray-400">Added by&nbsp;</span>
-          {task.createdBy}
-        </div>
-      </div>
     </div>
   );
 }
@@ -88,7 +41,6 @@ export default function TaskKanbanView() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [selected, setSelected] = useState(null);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
 
   const { board, currentMember } = useSelector(
@@ -194,7 +146,7 @@ export default function TaskKanbanView() {
           </button>
         </div>
       )}
-      <DndProvider backend={HTML5Backend}>
+      <DndProvider backend={isTouchDevice() ? TouchBackend : HTML5Backend}>
         <div className="flex flex-col space-y-4">
           {(loading || error) && (
             <div className="w-full relative">
@@ -307,17 +259,6 @@ export default function TaskKanbanView() {
           )}
           {!loading && !error && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <TaskDetailDrawer
-                isOpen={!!selected}
-                onClose={(refresh) => {
-                  setSelected(null);
-                  if (refresh) {
-                    dispatch(fetchTasks(board.id));
-                  }
-                }}
-                boardId={board.id}
-                task={selected}
-              />
               <div className="flex flex-col space-y-2 bg-gray-100 dark:bg-gray-700 rounded-md p-2 h-96 md:h-screen">
                 <div className="mb-4 flex items-center space-x-2">
                   <div className="bg-gray-200 dark:bg-gray-800 rounded-md p-1 text-gray-800 dark:text-white text-xs">
@@ -332,7 +273,6 @@ export default function TaskKanbanView() {
                     boardId={board.id}
                     status="OPENED"
                     tasks={openedTasks}
-                    onTaskInfo={(task) => setSelected(task)}
                     onTaskMove={() => dispatch(fetchTasks(board.id))}
                   />
                 )}
@@ -351,7 +291,6 @@ export default function TaskKanbanView() {
                     boardId={board.id}
                     status="IN_PROGRESS"
                     tasks={inProgressTasks}
-                    onTaskInfo={(task) => setSelected(task)}
                     onTaskMove={() => dispatch(fetchTasks(board.id))}
                   />
                 )}
@@ -370,7 +309,6 @@ export default function TaskKanbanView() {
                     boardId={board.id}
                     status="FINISHED"
                     tasks={finishedTasks}
-                    onTaskInfo={(task) => setSelected(task)}
                     onTaskMove={() => dispatch(fetchTasks(board.id))}
                   />
                 )}
