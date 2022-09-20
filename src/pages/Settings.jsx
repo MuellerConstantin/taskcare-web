@@ -48,7 +48,7 @@ export default function Settings() {
   return (
     <StackTemplate>
       <div className="h-full bg-white dark:bg-gray-600">
-        <div className="xl:container mx-auto p-4">
+        <div className="2xl:container mx-auto p-4">
           <Tab.Group
             as="div"
             className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8"

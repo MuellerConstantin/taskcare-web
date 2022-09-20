@@ -91,9 +91,20 @@ export default function TaskKanbanCard({ boardId, task }) {
                 {!open && (
                   <div className="space-y-1">
                     {task.description && (
-                      <div className="text-sm text-left line-clamp-3">
-                        {task.description}
-                      </div>
+                      <ReactMarkdown
+                        className="text-sm text-left"
+                        remarkPlugins={[remarkGfm, remarkMath]}
+                        rehypePlugins={[rehypeKatex, rehypeRaw]}
+                      >
+                        {`${task.description
+                          .split(/(?:\r\n|\r|\n)/)
+                          .slice(0, 4)
+                          .join("\n")}${
+                          task.description.split(/(?:\r\n|\r|\n)/).length > 4
+                            ? "..."
+                            : ""
+                        }`}
+                      </ReactMarkdown>
                     )}
                     <div className="text-xs text-left">
                       <span className="text-gray-400">Added by&nbsp;</span>

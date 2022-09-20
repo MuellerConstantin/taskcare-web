@@ -56,7 +56,7 @@ export default function Overview() {
   return (
     <StackTemplate>
       <div className="h-full bg-white dark:bg-gray-600">
-        <div className="xl:container mx-auto p-4">
+        <div className="2xl:container mx-auto p-4">
           <div className="flex flex-col space-y-4">
             <div className="space-y-2">
               <div className="flex justify-between">
