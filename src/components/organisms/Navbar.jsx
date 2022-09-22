@@ -1,8 +1,9 @@
-import { Fragment } from "react";
-import { Popover, Transition, Switch } from "@headlessui/react";
+import { Fragment, useState } from "react";
+import { Popover, Switch } from "@headlessui/react";
 import { DotsVerticalIcon, LogoutIcon } from "@heroicons/react/solid";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { usePopper } from "react-popper";
 import Avatar from "../atoms/Avatar";
 import Button from "../atoms/Button";
 import themeSlice from "../../store/slices/theme";
@@ -13,6 +14,30 @@ import LogoTextDark from "../../assets/images/logo-text-dark.svg";
 
 export default function Navbar() {
   const dispatch = useDispatch();
+
+  const [popupButtonElement, setPopupButtonElement] = useState();
+  const [popupDialogElement, setPopupDialogElement] = useState();
+  const { styles, attributes } = usePopper(
+    popupButtonElement,
+    popupDialogElement,
+    {
+      placement: "bottom-end",
+      modifiers: [
+        {
+          name: "flip",
+          options: {
+            fallbackPlacements: [
+              "bottom-start",
+              "top-end",
+              "top-start",
+              "left",
+              "right",
+            ],
+          },
+        },
+      ],
+    }
+  );
 
   const principal = useSelector((state) => state.auth.principal);
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -65,7 +90,10 @@ export default function Navbar() {
             <Popover className="relative">
               {() => (
                 <>
-                  <Popover.Button className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white focus:outline-none">
+                  <Popover.Button
+                    ref={setPopupButtonElement}
+                    className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white focus:outline-none"
+                  >
                     {principal ? (
                       <div className="bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white p-2 rounded-full">
                         <div className="h-5 md:h-6 aspect-square rounded-md">
@@ -79,106 +107,101 @@ export default function Navbar() {
                       />
                     )}
                   </Popover.Button>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-200"
-                    enterFrom="opacity-0 translate-y-1"
-                    enterTo="opacity-100 translate-y-0"
-                    leave="transition ease-in duration-150"
-                    leaveFrom="opacity-100 translate-y-0"
-                    leaveTo="opacity-0 translate-y-1"
+                  <Popover.Panel
+                    ref={setPopupDialogElement}
+                    className="shadow-md border dark:border-gray-900 rounded-md z-10 w-screen max-w-xs sm:max-w-sm bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
+                    style={styles.popper}
+                    {...attributes.popper}
                   >
-                    <Popover.Panel className="absolute shadow-md border dark:border-gray-900 rounded-md z-10 mt-3 w-screen max-w-xs sm:max-w-sm right-0 bg-white dark:bg-gray-600 text-gray-800 dark:text-white">
-                      {principal ? (
-                        <div className="p-4 bg-gray-100 dark:bg-gray-800 flex space-x-4 items-center justify-between">
-                          <div className="flex space-x-4 items-center overflow-hidden">
-                            <div className="bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white p-2 rounded-full">
-                              <div className="h-10 aspect-square rounded-md">
-                                <Avatar value={principal.username} />
+                    {principal ? (
+                      <div className="p-4 bg-gray-100 dark:bg-gray-800 flex space-x-4 items-center justify-between">
+                        <div className="flex space-x-4 items-center overflow-hidden">
+                          <div className="bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white p-2 rounded-full">
+                            <div className="h-10 aspect-square rounded-md">
+                              <Avatar value={principal.username} />
+                            </div>
+                          </div>
+                          <div className="space-y-1 overflow-hidden">
+                            {(principal.firstName || principal.lastName) && (
+                              <div className="truncate">
+                                {principal.firstName && (
+                                  <span>{principal.firstName}&nbsp;</span>
+                                )}
+                                {principal.lastName && principal.lastName}
                               </div>
-                            </div>
-                            <div className="space-y-1 overflow-hidden">
-                              {(principal.firstName || principal.lastName) && (
-                                <div className="truncate">
-                                  {principal.firstName && (
-                                    <span>{principal.firstName}&nbsp;</span>
-                                  )}
-                                  {principal.lastName && principal.lastName}
-                                </div>
-                              )}
-                              <div
-                                className={`truncate ${
-                                  (principal.firstName || principal.lastName) &&
-                                  "text-sm font-light"
-                                }`}
-                              >
-                                {principal.username}
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <Link
-                              to="/logout"
-                              className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
-                            >
-                              <LogoutIcon
-                                className="h-6 w-6"
-                                aria-hidden="true"
-                              />
-                            </Link>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex md:hidden flex-col">
-                          <div className="p-4 bg-gray-100 dark:bg-gray-800 flex space-x-4 items-center justify-between">
-                            <Link to="/login" className="block grow">
-                              <Button className="w-full bg-green-500 focus:outline-green-500">
-                                Login
-                              </Button>
-                            </Link>
-                            <Link to="/register" className="bock grow">
-                              <Button className="w-full bg-green-500 focus:outline-green-500">
-                                Register
-                              </Button>
-                            </Link>
-                          </div>
-                        </div>
-                      )}
-                      <div className="p-2 text-gray-800 dark:text-white flex flex-col space-y-2">
-                        {principal && (
-                          <Link to="/settings">
-                            <div className="flex justify-left items-center p-2 hover:bg-gray-100 hover:cursor-pointer hover:dark:bg-gray-700 rounded">
-                              <div className="text-sm">Settings</div>
-                            </div>
-                          </Link>
-                        )}
-                        <div className="flex justify-between items-center p-2 rounded">
-                          <div className="text-sm">Dark Mode</div>
-                          <div>
-                            <Switch
-                              checked={darkMode}
-                              onChange={onThemeToggle}
-                              className={`relative inline-flex flex-shrink-0 h-[24px] w-[44px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75 ${
-                                darkMode
-                                  ? "bg-green-500"
-                                  : "bg-gray-100 dark:bg-gray-800"
+                            )}
+                            <div
+                              className={`truncate ${
+                                (principal.firstName || principal.lastName) &&
+                                "text-sm font-light"
                               }`}
                             >
-                              <span className="sr-only">Toggle dark mode</span>
-                              <span
-                                aria-hidden="true"
-                                className={`pointer-events-none inline-block h-[20px] w-[20px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200 ${
-                                  darkMode
-                                    ? "translate-x-[20px]"
-                                    : "translate-x-0"
-                                }`}
-                              />
-                            </Switch>
+                              {principal.username}
+                            </div>
                           </div>
                         </div>
+                        <div>
+                          <Link
+                            to="/logout"
+                            className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+                          >
+                            <LogoutIcon
+                              className="h-6 w-6"
+                              aria-hidden="true"
+                            />
+                          </Link>
+                        </div>
                       </div>
-                    </Popover.Panel>
-                  </Transition>
+                    ) : (
+                      <div className="flex md:hidden flex-col">
+                        <div className="p-4 bg-gray-100 dark:bg-gray-800 flex space-x-4 items-center justify-between">
+                          <Link to="/login" className="block grow">
+                            <Button className="w-full bg-green-500 focus:outline-green-500">
+                              Login
+                            </Button>
+                          </Link>
+                          <Link to="/register" className="bock grow">
+                            <Button className="w-full bg-green-500 focus:outline-green-500">
+                              Register
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+                    <div className="p-2 text-gray-800 dark:text-white flex flex-col space-y-2">
+                      {principal && (
+                        <Link to="/settings">
+                          <div className="flex justify-left items-center p-2 hover:bg-gray-100 hover:cursor-pointer hover:dark:bg-gray-700 rounded">
+                            <div className="text-sm">Settings</div>
+                          </div>
+                        </Link>
+                      )}
+                      <div className="flex justify-between items-center p-2 rounded">
+                        <div className="text-sm">Dark Mode</div>
+                        <div>
+                          <Switch
+                            checked={darkMode}
+                            onChange={onThemeToggle}
+                            className={`relative inline-flex flex-shrink-0 h-[24px] w-[44px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75 ${
+                              darkMode
+                                ? "bg-green-500"
+                                : "bg-gray-100 dark:bg-gray-800"
+                            }`}
+                          >
+                            <span className="sr-only">Toggle dark mode</span>
+                            <span
+                              aria-hidden="true"
+                              className={`pointer-events-none inline-block h-[20px] w-[20px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200 ${
+                                darkMode
+                                  ? "translate-x-[20px]"
+                                  : "translate-x-0"
+                              }`}
+                            />
+                          </Switch>
+                        </div>
+                      </div>
+                    </div>
+                  </Popover.Panel>
                 </>
               )}
             </Popover>
