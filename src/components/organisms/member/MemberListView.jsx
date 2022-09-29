@@ -36,7 +36,7 @@ export default function MemberListView() {
         />
         <button
           type="button"
-          className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50"
+          className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50 hover:brightness-110"
           onClick={() => setShowCreateModal(true)}
           disabled={currentMember?.role !== "ADMINISTRATOR"}
         >

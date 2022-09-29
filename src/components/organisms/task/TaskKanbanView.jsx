@@ -14,15 +14,25 @@ import { useStomp } from "../../../contexts/stomp";
 const isTouchDevice = () => "ontouchstart" in window;
 
 function TaskKanbanColumn({ boardId, status, tasks, onTaskMove }) {
+  const navigate = useNavigate();
+
   const [, drop] = useDrop(() => ({
     accept: "TaskKanbanCard",
     drop: async (task) => {
       if (task.status !== status) {
-        await updateTask(boardId, task.id, {
-          status,
-        });
+        try {
+          await updateTask(boardId, task.id, {
+            status,
+          });
 
-        onTaskMove(task.id, status);
+          onTaskMove(task.id, status);
+        } catch (err) {
+          if (err.response && err.response.status === 401) {
+            navigate("/logout");
+          }
+
+          throw err;
+        }
       }
     },
   }));
@@ -135,7 +145,7 @@ export default function TaskKanbanView() {
           />
           <button
             type="button"
-            className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50"
+            className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50 hover:brightness-110"
             onClick={() => setShowCreateTaskModal(true)}
             disabled={
               currentMember.role === "USER" || currentMember.role === "VISITOR"
@@ -258,7 +268,7 @@ export default function TaskKanbanView() {
             </div>
           )}
           {!loading && !error && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="flex flex-col space-y-2 bg-gray-100 dark:bg-gray-700 rounded-md p-2 h-96 md:h-screen">
                 <div className="mb-4 flex items-center space-x-2">
                   <div className="bg-gray-200 dark:bg-gray-800 rounded-md p-1 text-gray-800 dark:text-white text-xs">

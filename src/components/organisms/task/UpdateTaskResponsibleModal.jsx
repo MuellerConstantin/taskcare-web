@@ -5,17 +5,17 @@ import { XIcon, SelectorIcon, CheckIcon } from "@heroicons/react/solid";
 import * as yup from "yup";
 import { Formik } from "formik";
 import Button from "../../atoms/Button";
-import { updateMember } from "../../../api/members";
-
-const roles = ["ADMINISTRATOR", "MAINTAINER", "USER", "VISITOR"];
+import { updateTask } from "../../../api/tasks";
 
 const schema = yup.object().shape({
-  role: yup.string().oneOf(roles),
+  responsible: yup.string(),
 });
 
-export default function UpdateMemberModal({
+export default function UpdateTaskResponsibleModal({
   boardId,
-  member,
+  taskId,
+  members,
+  currentResponsible,
   onSubmit,
   onClose,
   isOpen,
@@ -30,11 +30,11 @@ export default function UpdateMemberModal({
     setError(null);
 
     const update = {
-      role: values.role === "" ? null : values.role,
+      responsible: values.responsible === "" ? null : values.responsible,
     };
 
     try {
-      await updateMember(boardId, member.username, update);
+      await updateTask(boardId, taskId, update);
       onSubmit();
     } catch (err) {
       if (err.response && err.response.status === 422) {
@@ -43,10 +43,6 @@ export default function UpdateMemberModal({
         );
       } else if (err.response && err.response.status === 401) {
         navigate("/logout");
-      } else if (err.response && err.response.status === 409) {
-        setError(
-          "After updating the member, the board would no longer be administrable."
-        );
       } else {
         setError("An unexpected error occurred, please retry!");
       }
@@ -100,7 +96,7 @@ export default function UpdateMemberModal({
             <Dialog.Panel className="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl space-y-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
               <div className="flex justify-between items-center">
                 <Dialog.Title as="h3" className="text-lg font-medium leading-6">
-                  Update member
+                  Update responsible
                 </Dialog.Title>
                 <button
                   type="button"
@@ -113,7 +109,9 @@ export default function UpdateMemberModal({
               </div>
               {error && <p className="text-center text-red-500">{error}</p>}
               <Formik
-                initialValues={{ role: member.role || "Select role" }}
+                initialValues={{
+                  responsible: currentResponsible || "Select responsible",
+                }}
                 validationSchema={schema}
                 onSubmit={onSumitModal}
               >
@@ -126,13 +124,15 @@ export default function UpdateMemberModal({
                     <div>
                       <Listbox
                         name="role"
-                        value={props.values.role}
-                        onChange={(role) => props.setFieldValue("role", role)}
+                        value={props.values.responsible}
+                        onChange={(responsible) =>
+                          props.setFieldValue("responsible", responsible)
+                        }
                       >
                         <div className="relative mt-1">
                           <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white dark:bg-gray-600 py-2 pl-3 pr-10 text-left shadow-md sm:text-sm">
                             <span className="block truncate">
-                              {props.values.role}
+                              {props.values.responsible}
                             </span>
                             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                               <SelectorIcon
@@ -148,9 +148,9 @@ export default function UpdateMemberModal({
                             leaveTo="opacity-0"
                           >
                             <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-600 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                              {roles.map((role) => (
+                              {members.map((member) => (
                                 <Listbox.Option
-                                  key={role}
+                                  key={member.username}
                                   className={({ active }) =>
                                     `relative cursor-default select-none py-2 pl-10 pr-4 ${
                                       active
@@ -158,7 +158,7 @@ export default function UpdateMemberModal({
                                         : "text-gray-800 dark:text-white"
                                     }`
                                   }
-                                  value={role}
+                                  value={member.username}
                                 >
                                   {({ selected }) => (
                                     <>
@@ -169,7 +169,7 @@ export default function UpdateMemberModal({
                                             : "font-normal"
                                         }`}
                                       >
-                                        {role}
+                                        {member.username}
                                       </span>
                                       {selected ? (
                                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-green-500">

@@ -19,6 +19,7 @@ import Link from "../../atoms/Link";
 import Avatar from "../../atoms/Avatar";
 import UpdateTaskModal from "./UpdateTaskModal";
 import DeleteTaskModal from "./DeleteTaskModal";
+import ChangeTaskResponsibleForm from "./ChangeTaskResponsibleForm";
 import { fetchTasks } from "../../../store/slices/tasks";
 
 const getTimeDifference = (timestamp) => {
@@ -55,6 +56,7 @@ export default function TaskKanbanCard({ boardId, task }) {
   const dispatch = useDispatch();
 
   const { currentMember } = useSelector((state) => state.board, shallowEqual);
+  const { members } = useSelector((state) => state.members, shallowEqual);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -110,6 +112,14 @@ export default function TaskKanbanCard({ boardId, task }) {
                       <span className="text-gray-400">Added by&nbsp;</span>
                       {task.createdBy}
                     </div>
+                    {task.responsible && (
+                      <div className="text-xs text-left">
+                        <span className="text-gray-400">
+                          Responsible is&nbsp;
+                        </span>
+                        {task.responsible}
+                      </div>
+                    )}
                   </div>
                 )}
               </Disclosure.Button>
@@ -177,12 +187,21 @@ export default function TaskKanbanCard({ boardId, task }) {
                   />
                   <button
                     type="button"
-                    className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50"
+                    className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50 shrink-0"
                     onClick={() => setShowUpdateModal(true)}
                     disabled={currentMember.role === "VISITOR"}
                   >
                     <PencilIcon className="h-5 w-5" aria-label="Update" />
                   </button>
+                  <div className="mx-2">
+                    <ChangeTaskResponsibleForm
+                      boardId={boardId}
+                      taskId={task?.id}
+                      currentResponsible={task?.responsible}
+                      members={members}
+                      onChange={() => dispatch(fetchTasks(boardId))}
+                    />
+                  </div>
                   <DeleteTaskModal
                     boardId={boardId}
                     taskId={task?.id}
@@ -195,7 +214,7 @@ export default function TaskKanbanCard({ boardId, task }) {
                   />
                   <button
                     type="button"
-                    className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50"
+                    className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50 shrink-0"
                     onClick={() => setShowDeleteModal(true)}
                     disabled={
                       currentMember.role === "USER" ||

@@ -73,7 +73,7 @@ export default function Overview() {
                 />
                 <button
                   type="button"
-                  className="inline-flex items-center justify-center bg-transparent text-amber-500"
+                  className="inline-flex items-center justify-center bg-transparent text-amber-500 disabled:opacity-50 hover:brightness-110"
                   onClick={() => setShowCreateBoardModal(true)}
                 >
                   <PlusIcon className="h-6 w-6" aria-hidden="true" />
