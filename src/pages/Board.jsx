@@ -18,11 +18,10 @@ function Board() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {
-    board,
-    currentMember,
-    error: boardError,
-  } = useSelector((state) => state.board, shallowEqual);
+  const { board, error: boardError } = useSelector(
+    (state) => state.board,
+    shallowEqual
+  );
 
   const { error: tasksError } = useSelector(
     (state) => state.members,
@@ -146,7 +145,6 @@ function Board() {
                             : "border-b-4 border-transparent"
                         }`
                     }
-                    disabled={currentMember?.role !== "ADMINISTRATOR"}
                   >
                     {({ selected }) => (
                       <div
