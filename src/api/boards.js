@@ -26,11 +26,12 @@ import api from "./index";
  *
  * @param {string} username Name of user to fetch boards for
  * @param {number} page Zero based index of the page to load
+ * @param {string=} filter Optional RSQL based query filter
  * @returns {Promise<AxiosResponse<BoardPageDTO>>} Returns the API response
  */
-export const fetchBoardsByMembership = (username, page) => {
+export const fetchBoardsByMembership = (username, page, filter) => {
   return api.get(`/users/${username}/boards`, {
-    params: { page },
+    params: { page, filter },
   });
 };
 
