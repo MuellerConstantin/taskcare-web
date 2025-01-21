@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Footer as FlowbiteFooter } from "flowbite-react";
 
 const customFooterTheme = {
@@ -9,11 +10,13 @@ const customFooterTheme = {
 }
 
 export default function Footer() {
-  const navigation = [
-    { name: "About", path: "/about" },
-    { name: "Privacy Policy", path: "/privacy-policy" },
-    { name: "Imprint", path: "/imprint" },
-  ];
+  const navigation = useMemo(() => {
+    return [
+      { name: "About", path: "/about" },
+      { name: "Privacy Policy", path: "/privacy-policy" },
+      { name: "Imprint", path: "/imprint" },
+    ];
+  }, []);
 
   return (
     <div className="bg-gray-50 dark:bg-gray-800">

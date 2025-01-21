@@ -1,4 +1,5 @@
 import { Lato } from "next/font/google";
+import { Flowbite } from "flowbite-react";
 
 import "./globals.css";
 
@@ -14,14 +15,16 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="de" className="dark">
+    <html lang="de">
       <head>
         <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
       </head>
       <body
         className={`${lato.variable} antialiased bg-white dark:bg-gray-900`}
       >
-        {children}
+        <Flowbite>
+          {children}
+        </Flowbite>
       </body>
     </html>
   );

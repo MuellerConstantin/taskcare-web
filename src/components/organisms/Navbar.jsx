@@ -1,11 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { Navbar as FlowbiteNavbar, useThemeMode } from "flowbite-react";
 import { mdiMenu, mdiThemeLightDark } from "@mdi/js";
- 
+
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
 const customNavbarTheme = {
@@ -27,10 +28,12 @@ const customNavbarTheme = {
 export default function Navbar({ currentPath }) {
   const {toggleMode} = useThemeMode();
 
-  const navigation = [
-    { name: "Home", path: "/", isCurrent: currentPath === "/" },
-    { name: "About", path: "/about", isCurrent: currentPath === "/about" },
-  ];
+  const navigation = useMemo(() => {
+    return [
+      { name: "Home", path: "/", isCurrent: currentPath === "/" },
+      { name: "About", path: "/about", isCurrent: currentPath === "/about" },
+    ];
+  }, [currentPath]);
 
   return (
     <div className="bg-gray-50 dark:bg-gray-800">
