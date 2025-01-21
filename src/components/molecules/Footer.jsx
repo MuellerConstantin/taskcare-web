@@ -1,85 +1,43 @@
-import Link from "../atoms/Link";
+"use client";
 
-import Logo from "../../assets/images/logo.svg";
+import { Footer as FlowbiteFooter } from "flowbite-react";
+
+const customFooterTheme = {
+  "root": {
+    "base": "w-full px-2 py-3 sm:px-4 bg-gray-50 dark:bg-gray-800 md:flex md:items-center md:justify-between",
+  },
+}
 
 export default function Footer() {
+  const navigation = [
+    { name: "About", path: "/about" },
+    { name: "Privacy Policy", path: "/privacy-policy" },
+    { name: "Imprint", path: "/imprint" },
+  ];
+
   return (
-    <div className="text-center lg:text-left bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white">
-      <div className="xl:container mx-auto px-4 py-10 flex">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 justify-center">
-          <div className="col-span-2 md:col-auto">
-            <h6 className="mb-4 space-x-2 flex items-center justify-center md:justify-start">
-              <img className="h-4 w-auto" src={Logo} alt="Logo" />
-              <div className="uppercase font-semibold">TaskCare</div>
-            </h6>
-            <p className="text-sm text-left brightness-75">
-              TaskCare is an interactive collaboration platform for organizing
-              tasks in teams. From creating and assigning to monitoring,
-              TaskCare offers everything for collaborative and, above all,
-              structured work on projects. Try it!
-            </p>
+    <div className="bg-gray-50 dark:bg-gray-800">
+      <FlowbiteFooter theme={customFooterTheme} className="max-w-screen-2xl mx-auto">
+        <div className="w-full text-center">
+          <div className="w-full justify-between sm:flex sm:items-center sm:justify-between">
+            <FlowbiteFooter.Brand
+              href="/"
+              src="/images/logo.svg"
+              alt="TaskCare Logo"
+              name="TaskCare"
+            />
+            <FlowbiteFooter.LinkGroup>
+              {navigation.map((item) => (
+                <FlowbiteFooter.Link key={item.name} href={item.path}>
+                  {item.name}
+                </FlowbiteFooter.Link>
+              ))}
+            </FlowbiteFooter.LinkGroup>
           </div>
-          <div className="flex flex-col space-y-2">
-            <h6 className="uppercase font-semibold">Getting Started</h6>
-            <div>
-              <Link className="text-sm" to="/">
-                Home
-              </Link>
-            </div>
-            <div>
-              <Link className="text-sm" to="/login">
-                Login
-              </Link>
-            </div>
-            <div>
-              <Link className="text-sm" to="/register">
-                Register
-              </Link>
-            </div>
-          </div>
-          <div className="flex flex-col space-y-2">
-            <h6 className="uppercase font-semibold">Support</h6>
-            <div>
-              <Link className="text-sm" to="/contact-us">
-                Contact Us
-              </Link>
-            </div>
-            <div>
-              <Link className="text-sm" to="/faq">
-                FAQ
-              </Link>
-            </div>
-          </div>
-          <div className="flex flex-col space-y-2">
-            <h6 className="uppercase font-semibold">Our Company</h6>
-            <div>
-              <Link className="text-sm" to="/about-us">
-                About Us
-              </Link>
-            </div>
-            <div>
-              <Link className="text-sm" to="/terms-of-use">
-                Terms of Use
-              </Link>
-            </div>
-            <div>
-              <Link className="text-sm" to="/privacy-policy">
-                Privacy Policy
-              </Link>
-            </div>
-          </div>
+          <FlowbiteFooter.Divider />
+          <FlowbiteFooter.Copyright href="https://github.com/MuellerConstantin" by="Constantin Müller" year={new Date().getFullYear()} />
         </div>
-      </div>
-      <div className="text-center p-6 bg-gray-200 dark:bg-gray-900">
-        <span>© 2022</span>
-        &nbsp;
-        <a
-          className="font-semibold hover:brightness-110 hover:underline"
-          href="https://github.com/0x1c1b"
-        >
-          0x1C1B
-        </a>
-      </div>
+      </FlowbiteFooter>
     </div>
   );
 }

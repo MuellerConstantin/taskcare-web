@@ -1,213 +1,80 @@
-import { Fragment, useState } from "react";
-import { Popover, Switch } from "@headlessui/react";
-import { DotsVerticalIcon, LogoutIcon } from "@heroicons/react/solid";
-import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
-import { usePopper } from "react-popper";
-import Avatar from "../atoms/Avatar";
-import Button from "../atoms/Button";
-import themeSlice from "../../store/slices/theme";
+"use client";
 
-import Logo from "../../assets/images/logo.svg";
-import LogoTextLight from "../../assets/images/logo-text-light.svg";
-import LogoTextDark from "../../assets/images/logo-text-dark.svg";
+import Link from "next/link";
+import Image from "next/image";
+import { Navbar as FlowbiteNavbar, useThemeMode } from "flowbite-react";
+import Icon from '@mdi/react';
+import { mdiMenu, mdiThemeLightDark } from '@mdi/js';
 
-export default function Navbar() {
-  const dispatch = useDispatch();
-
-  const [popupButtonElement, setPopupButtonElement] = useState();
-  const [popupDialogElement, setPopupDialogElement] = useState();
-  const { styles, attributes } = usePopper(
-    popupButtonElement,
-    popupDialogElement,
-    {
-      placement: "bottom-end",
-      modifiers: [
-        {
-          name: "flip",
-          options: {
-            fallbackPlacements: [
-              "bottom-start",
-              "top-end",
-              "top-start",
-              "left",
-              "right",
-            ],
-          },
-        },
-      ],
+const customNavbarTheme = {
+  "root": {
+    "base": "bg-gray-50 px-2 py-3 dark:border-gray-700 dark:bg-gray-800 sm:px-4",
+  },
+  "link": {
+    "base": "block py-2 pl-3 pr-4 md:p-0 text-md font-medium",
+    "active": {
+      "on": "bg-amber-500 text-white dark:text-white md:bg-transparent md:text-amber-500 font-semibold",
+      "off": "border-b border-gray-100 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:border-0 md:hover:bg-transparent md:hover:text-amber-500 md:dark:hover:bg-transparent md:dark:hover:text-white"
     }
-  );
+  },
+  "toggle": {
+    "base": "inline-flex items-center rounded-lg p-0 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700 md:hidden",
+  }
+}
 
-  const principal = useSelector((state) => state.auth.principal);
-  const darkMode = useSelector((state) => state.theme.darkMode);
+export default function Navbar({ currentPath }) {
+  const {toggleMode} = useThemeMode();
 
-  const onThemeToggle = (value) => {
-    dispatch(themeSlice.actions.setDarkMode(value));
-  };
+  const navigation = [
+    { name: "Home", path: "/", isCurrent: currentPath === "/" },
+    { name: "About", path: "/about", isCurrent: currentPath === "/about" },
+  ];
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-800">
-      <div className="px-4">
-        <div className="relative flex items-center justify-between h-16">
-          <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-            <Link to={principal ? "/overview" : "/"}>
-              <div className="flex-shrink-0 flex items-center">
-                <img
-                  className="block lg:hidden h-8 w-auto"
-                  src={Logo}
-                  alt="Logo"
-                />
-                <img
-                  className="hidden lg:block lg:dark:hidden h-8 w-auto"
-                  src={LogoTextDark}
-                  alt="Logo"
-                />
-                <img
-                  className="hidden lg:dark:block h-8 w-auto"
-                  src={LogoTextLight}
-                  alt="Logo"
-                />
-              </div>
-            </Link>
-          </div>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 space-x-4">
-            {!principal && (
-              <div className="hidden md:flex bg-gray-100 dark:bg-gray-800 space-x-4 items-center justify-between">
-                <Link
-                  to="/login"
-                  className="text-green-500 hover:brightness-110"
-                >
-                  Login
-                </Link>
-                <Link to="/register">
-                  <Button className="w-full bg-green-500 focus:outline-green-500">
-                    Register
-                  </Button>
-                </Link>
-              </div>
-            )}
-            <Popover className="relative">
-              {() => (
-                <>
-                  <Popover.Button
-                    ref={setPopupButtonElement}
-                    className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white focus:outline-none"
-                  >
-                    {principal ? (
-                      <div className="bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white p-2 rounded-full">
-                        <div className="h-5 md:h-6 aspect-square rounded-md">
-                          <Avatar value={principal.username} />
-                        </div>
-                      </div>
-                    ) : (
-                      <DotsVerticalIcon
-                        className="h-6 w-6"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </Popover.Button>
-                  <Popover.Panel
-                    ref={setPopupDialogElement}
-                    className="shadow-md border dark:border-gray-900 rounded-md z-10 w-screen max-w-xs sm:max-w-sm bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
-                    style={styles.popper}
-                    {...attributes.popper}
-                  >
-                    {principal ? (
-                      <div className="p-4 bg-gray-100 dark:bg-gray-800 flex space-x-4 items-center justify-between">
-                        <div className="flex space-x-4 items-center overflow-hidden">
-                          <div className="bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white p-2 rounded-full">
-                            <div className="h-10 aspect-square rounded-md">
-                              <Avatar value={principal.username} />
-                            </div>
-                          </div>
-                          <div className="space-y-1 overflow-hidden">
-                            {(principal.firstName || principal.lastName) && (
-                              <div className="truncate">
-                                {principal.firstName && (
-                                  <span>{principal.firstName}&nbsp;</span>
-                                )}
-                                {principal.lastName && principal.lastName}
-                              </div>
-                            )}
-                            <div
-                              className={`truncate ${
-                                (principal.firstName || principal.lastName) &&
-                                "text-sm font-light"
-                              }`}
-                            >
-                              {principal.username}
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <Link
-                            to="/logout"
-                            className="p-1 rounded-full text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
-                          >
-                            <LogoutIcon
-                              className="h-6 w-6"
-                              aria-hidden="true"
-                            />
-                          </Link>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex md:hidden flex-col">
-                        <div className="p-4 bg-gray-100 dark:bg-gray-800 flex space-x-4 items-center justify-between">
-                          <Link to="/login" className="block grow">
-                            <Button className="w-full bg-green-500 focus:outline-green-500">
-                              Login
-                            </Button>
-                          </Link>
-                          <Link to="/register" className="bock grow">
-                            <Button className="w-full bg-green-500 focus:outline-green-500">
-                              Register
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-                    )}
-                    <div className="p-2 text-gray-800 dark:text-white flex flex-col space-y-2">
-                      {principal && (
-                        <Link to="/settings">
-                          <div className="flex justify-left items-center p-2 hover:bg-gray-100 hover:cursor-pointer hover:dark:bg-gray-700 rounded">
-                            <div className="text-sm">Settings</div>
-                          </div>
-                        </Link>
-                      )}
-                      <div className="flex justify-between items-center p-2 rounded">
-                        <div className="text-sm">Dark Mode</div>
-                        <div>
-                          <Switch
-                            checked={darkMode}
-                            onChange={onThemeToggle}
-                            className={`relative inline-flex flex-shrink-0 h-[24px] w-[44px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75 ${
-                              darkMode
-                                ? "bg-green-500"
-                                : "bg-gray-100 dark:bg-gray-800"
-                            }`}
-                          >
-                            <span className="sr-only">Toggle dark mode</span>
-                            <span
-                              aria-hidden="true"
-                              className={`pointer-events-none inline-block h-[20px] w-[20px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200 ${
-                                darkMode
-                                  ? "translate-x-[20px]"
-                                  : "translate-x-0"
-                              }`}
-                            />
-                          </Switch>
-                        </div>
-                      </div>
-                    </div>
-                  </Popover.Panel>
-                </>
-              )}
-            </Popover>
-          </div>
+    <div className="bg-gray-50 dark:bg-gray-800">
+      <FlowbiteNavbar theme={customNavbarTheme} fluid rounded className="max-w-screen-2xl mx-auto">
+        <FlowbiteNavbar.Toggle
+          barIcon={() => (
+            <Icon path={mdiMenu}
+              title="Menu Toggle"
+              size={1}
+            />
+          )}
+        />
+        <FlowbiteNavbar.Brand as={Link} href="/">
+          <Image
+            src="/images/logo.svg"
+            width={32}
+            height={32}
+            className="mr-3 h-6 sm:h-9"
+            alt="TaskCare Logo"
+          />
+          <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">TaskCare</span>
+        </FlowbiteNavbar.Brand>
+        <div className="flex md:order-2 space-x-4">
+          <button
+            className="inline-flex items-center rounded-lg p-0 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700"
+            onClick={toggleMode}
+          >
+            <Icon path={mdiThemeLightDark}
+              title="Theme Toggle"
+              size={1}
+            />
+          </button>
         </div>
-      </div>
+        <FlowbiteNavbar.Collapse>
+          {navigation.map((item) => (
+            <FlowbiteNavbar.Link
+              key={item.name}
+              as={Link}
+              href={item.path}
+              active={item.isCurrent}
+            >
+              {item.name}
+            </FlowbiteNavbar.Link>
+          ))}
+        </FlowbiteNavbar.Collapse>
+      </FlowbiteNavbar>
     </div>
   );
 }
