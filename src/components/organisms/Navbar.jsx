@@ -1,10 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { Navbar as FlowbiteNavbar, useThemeMode } from "flowbite-react";
-import Icon from '@mdi/react';
-import { mdiMenu, mdiThemeLightDark } from '@mdi/js';
+import { mdiMenu, mdiThemeLightDark } from "@mdi/js";
+ 
+const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
 const customNavbarTheme = {
   "root": {

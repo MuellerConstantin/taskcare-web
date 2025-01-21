@@ -1,5 +1,3 @@
-"use client";
-
 import Navbar from "@/components/organisms/Navbar";
 import Footer from "@/components/molecules/Footer";
 

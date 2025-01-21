@@ -1,5 +1,4 @@
 import { Lato } from "next/font/google";
-import { ThemeModeScript } from "flowbite-react";
 
 import "./globals.css";
 
@@ -18,7 +17,6 @@ export default function RootLayout({ children }) {
     <html lang="de" className="dark">
       <head>
         <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
-        <ThemeModeScript />
       </head>
       <body
         className={`${lato.variable} antialiased bg-white dark:bg-gray-900`}
