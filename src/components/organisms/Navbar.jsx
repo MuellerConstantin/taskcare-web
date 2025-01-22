@@ -4,8 +4,9 @@ import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import { Navbar as FlowbiteNavbar } from "flowbite-react";
-import { mdiMenu, mdiThemeLightDark } from "@mdi/js";
+import { Navbar as FlowbiteNavbar, Dropdown } from "flowbite-react";
+import { mdiMenu, mdiDotsVertical } from "@mdi/js";
+import ToggleSwitch from "@/components/atoms/ToggleSwitch";
 import useTheme from "@/hooks/useTheme";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
@@ -27,7 +28,7 @@ const customNavbarTheme = {
 }
 
 export default function Navbar({ currentPath }) {
-  const {toggleTheme} = useTheme();
+  const {darkMode, toggleTheme} = useTheme();
 
   const navigation = useMemo(() => {
     return [
@@ -58,15 +59,27 @@ export default function Navbar({ currentPath }) {
           <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">TaskCare</span>
         </FlowbiteNavbar.Brand>
         <div className="flex md:order-2 space-x-4">
-          <button
-            className="inline-flex items-center rounded-lg p-0 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700"
-            onClick={toggleTheme}
+          <Dropdown
+            placement="left-end"
+            dismissOnClick={false}
+            renderTrigger={() => (
+              <button
+                className="inline-flex items-center rounded-lg p-0 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700"
+              >
+                <Icon path={mdiDotsVertical}
+                  title="Theme Toggle"
+                  size={1}
+                />
+              </button>
+            )}
           >
-            <Icon path={mdiThemeLightDark}
-              title="Theme Toggle"
-              size={1}
-            />
-          </button>
+            <Dropdown.Item>
+              <div className="flex items-center space-x-4">
+                <span>Dark Mode</span>
+                <ToggleSwitch checked={darkMode} onChange={toggleTheme} />
+              </div>
+            </Dropdown.Item>
+          </Dropdown>
         </div>
         <FlowbiteNavbar.Collapse>
           {navigation.map((item) => (
