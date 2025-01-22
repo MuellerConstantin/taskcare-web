@@ -4,8 +4,9 @@ import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import { Navbar as FlowbiteNavbar, useThemeMode } from "flowbite-react";
+import { Navbar as FlowbiteNavbar } from "flowbite-react";
 import { mdiMenu, mdiThemeLightDark } from "@mdi/js";
+import useTheme from "@/hooks/useTheme";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -26,7 +27,7 @@ const customNavbarTheme = {
 }
 
 export default function Navbar({ currentPath }) {
-  const {toggleMode} = useThemeMode();
+  const {toggleTheme} = useTheme();
 
   const navigation = useMemo(() => {
     return [
@@ -59,7 +60,7 @@ export default function Navbar({ currentPath }) {
         <div className="flex md:order-2 space-x-4">
           <button
             className="inline-flex items-center rounded-lg p-0 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700"
-            onClick={toggleMode}
+            onClick={toggleTheme}
           >
             <Icon path={mdiThemeLightDark}
               title="Theme Toggle"

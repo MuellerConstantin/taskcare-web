@@ -1,5 +1,4 @@
 import { Lato } from "next/font/google";
-import { Flowbite } from "flowbite-react";
 import { StoreProvider } from "@/store";
 
 import "./globals.css";
@@ -23,11 +22,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${lato.variable} antialiased bg-white dark:bg-gray-900`}
       >
-        <Flowbite>
-          <StoreProvider>
-            {children}
-          </StoreProvider>
-        </Flowbite>
+        <StoreProvider>
+          {children}
+        </StoreProvider>
       </body>
     </html>
   );
