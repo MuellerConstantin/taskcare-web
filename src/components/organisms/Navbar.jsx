@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import useSWR from "swr";
 import { Navbar as FlowbiteNavbar, Dropdown, Avatar } from "flowbite-react";
@@ -203,13 +203,15 @@ function NavbarMenu() {
   );
 }
 
-export default function Navbar({ currentPath }) {
+export default function Navbar() {
+  const pathname = usePathname();
+
   const navigation = useMemo(() => {
     return [
-      { name: "Home", path: "/", isCurrent: currentPath === "/" },
-      { name: "About", path: "/about", isCurrent: currentPath === "/about" },
+      { name: "Home", path: "/home", isCurrent: pathname === "/home" },
+      { name: "About", path: "/about", isCurrent: pathname === "/about" },
     ];
-  }, [currentPath]);
+  }, [pathname]);
 
   return (
     <div className="bg-gray-50 dark:bg-gray-800">
