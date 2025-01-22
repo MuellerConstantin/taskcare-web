@@ -7,11 +7,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import useSWR from "swr";
-import { Navbar as FlowbiteNavbar, Dropdown } from "flowbite-react";
+import { Navbar as FlowbiteNavbar, Dropdown, Avatar } from "flowbite-react";
 import { mdiMenu, mdiDotsVertical, mdiAccount, mdiLogout } from "@mdi/js";
 import authSlice from "@/store/slices/auth";
 import ToggleSwitch from "@/components/atoms/ToggleSwitch";
-import Avatar from "@/components/atoms/Avatar";
 import useTheme from "@/hooks/useTheme";
 import useApi from "@/hooks/useApi";
 
@@ -63,34 +62,32 @@ function NavbarAvatar({principalName, ...props}) {
 
   if(loading) {
     return (
-      <button className="animate-pulse h-8 aspect-square rounded-full bg-gray-200 dark:bg-gray-900 flex justify-center items-center" {...props}>
-        <Icon path={mdiAccount}
-          title="Account"
-          size={1}
-          className="text-gray-100 dark:text-gray-800"
-        />
-        <span className="sr-only">Loading...</span>
-      </button>
+      <div className="animate-pulse">
+        <Avatar size="sm" rounded />
+      </div>
     );
   } else {
     if (data) {
       return (
-        <button className="h-8 overflow-hidden aspect-square rounded-full bg-gray-200 dark:bg-gray-900 flex justify-center items-center" {...props}>
-          <Image
-            src={data}
-            alt={principalName}
-            width={64}
-            height={64}
-            className="object-cover h-full w-full"
-            {...props}
-          />
-        </button>
+        <Avatar
+          size="sm"
+          className="bg-gray-200 dark:bg-gray-900 rounded-full"
+          rounded
+          img={({className, ...props}) => (
+            <Image
+              src={data}
+              alt={principalName}
+              width={64}
+              height={64}
+              className={`${className} object-cover`}
+              {...props}
+            />
+          )}
+        />
       )
     } else {
       return (
-        <button className="h-8 aspect-square rounded-full bg-gray-200 dark:bg-gray-900 p-1" {...props}>
-          <Avatar value={principalName} />
-        </button>
+        <Avatar size="sm" placeholderInitials={principalName.slice(0, 2).toUpperCase()} rounded />
       );
     }
   }
@@ -121,7 +118,9 @@ function NavbarMenu() {
       dismissOnClick={false}
       className="w-64"
       renderTrigger={() => (
-        <NavbarAvatar principalName={principalName} />
+        <button>
+          <NavbarAvatar principalName={principalName} />
+        </button>
       )}
     >
       <Dropdown.Header className="w-full flex pr-2">
