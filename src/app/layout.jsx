@@ -1,5 +1,6 @@
 import { Lato } from "next/font/google";
 import { Flowbite } from "flowbite-react";
+import { StoreProvider } from "@/store";
 
 import "./globals.css";
 
@@ -10,7 +11,7 @@ const lato = Lato({
 });
 
 export const metadata = {
-  title: "TaskCare | Home"
+  title: "TaskCare"
 };
 
 export default function RootLayout({ children }) {
@@ -23,7 +24,9 @@ export default function RootLayout({ children }) {
         className={`${lato.variable} antialiased bg-white dark:bg-gray-900`}
       >
         <Flowbite>
-          {children}
+          <StoreProvider>
+            {children}
+          </StoreProvider>
         </Flowbite>
       </body>
     </html>

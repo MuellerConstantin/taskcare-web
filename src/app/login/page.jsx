@@ -7,8 +7,10 @@ import StackTemplate from "@/components/templates/StackTemplate";
 import { Button, Spinner } from "flowbite-react";
 import { Formik } from "formik";
 import * as yup from "yup";
+import { useDispatch } from "react-redux";
+import authSlice from "@/store/slices/auth";
 import TextField from "@/components/atoms/TextField";
-import { generateToken } from "@/api/auth";
+import useApi from "@/hooks/useApi";
 
 const schema = yup.object().shape({
   username: yup.string().required("Is required"),
@@ -16,7 +18,9 @@ const schema = yup.object().shape({
 });
 
 export default function Login() {
+  const api = useApi();
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -26,7 +30,15 @@ export default function Login() {
     setError(null);
 
     try {
-      const tokenRes = await generateToken(values.username, values.password);
+      const tokenRes = await api.post("/auth/token", {
+        username: values.username,
+        password: values.password,
+      });
+
+      dispatch(authSlice.actions.setAuthentication({
+        accessToken: tokenRes.data.accessToken,
+        refreshToken: tokenRes.data.refreshToken
+      }));
 
       router.push("/");
     } catch (err) {
@@ -40,7 +52,7 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [api, dispatch, router]);
 
   return (
     <StackTemplate>
