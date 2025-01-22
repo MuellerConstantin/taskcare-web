@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import useSWR from "swr";
 import { Navbar as FlowbiteNavbar, Dropdown, Avatar } from "flowbite-react";
-import { mdiMenu, mdiDotsVertical, mdiAccount, mdiLogout } from "@mdi/js";
+import { mdiMenu, mdiDotsVertical, mdiApplicationCog, mdiLogout } from "@mdi/js";
 import authSlice from "@/store/slices/auth";
 import ToggleSwitch from "@/components/atoms/ToggleSwitch";
 import useTheme from "@/hooks/useTheme";
@@ -156,6 +156,14 @@ function NavbarMenu() {
           </div>
         </div>
       </Dropdown.Header>
+      {principalData?.data?.role === "ADMINISTRATOR" && (
+        <Dropdown.Item onClick={() =>router.push("/tmc")}>
+          <div className="flex items-center space-x-4 w-full justify-between">
+            <span>Management Console</span>
+            <Icon path={mdiApplicationCog} size={0.75} />
+          </div>
+        </Dropdown.Item>
+      )}
       <Dropdown.Item onClick={logout}>
         <div className="flex items-center space-x-4 w-full justify-between">
           <span>Logout</span>
