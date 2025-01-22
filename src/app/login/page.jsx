@@ -37,7 +37,8 @@ export default function Login() {
 
       dispatch(authSlice.actions.setAuthentication({
         accessToken: tokenRes.data.accessToken,
-        refreshToken: tokenRes.data.refreshToken
+        refreshToken: tokenRes.data.refreshToken,
+        principalName: tokenRes.data.principal
       }));
 
       router.push("/");

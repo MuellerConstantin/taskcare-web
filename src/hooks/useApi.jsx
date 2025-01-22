@@ -7,13 +7,23 @@ export default function useApi() {
   const refreshToken = useSelector((state) => state.auth.refreshToken);
 
   const api = useMemo(() => {
-    return axios.create({
+    const instance = axios.create({
       baseURL: process.env.NEXT_PUBLIC_TASKCARE_API_URL,
       timeout: 1000,
       headers: {
         Accept: "application/json"
       },
     });
+
+    instance.interceptors.response.use(
+      (res) => res,
+      (err) => {
+        console.error(err);
+        return Promise.reject(err);
+      }
+    );
+
+    return instance;
   }, []);
 
   useEffect(() => {

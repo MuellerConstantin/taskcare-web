@@ -1,13 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
+import useSWR from "swr";
 import { Navbar as FlowbiteNavbar, Dropdown } from "flowbite-react";
-import { mdiMenu, mdiDotsVertical } from "@mdi/js";
+import { mdiMenu, mdiDotsVertical, mdiAccount, mdiLogout } from "@mdi/js";
+import authSlice from "@/store/slices/auth";
 import ToggleSwitch from "@/components/atoms/ToggleSwitch";
+import Avatar from "@/components/atoms/Avatar";
 import useTheme from "@/hooks/useTheme";
+import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -27,9 +33,170 @@ const customNavbarTheme = {
   }
 }
 
-export default function Navbar({ currentPath }) {
-  const {darkMode, toggleTheme} = useTheme();
+function NavbarAvatar({principalName, ...props}) {
+  const api = useApi();
 
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const imageRes = await api.get("/user/me/profile-image", {
+          responseType: "arraybuffer"
+        });
+
+        setData(URL.createObjectURL(new Blob([imageRes.data], { type: imageRes.headers["content-type"] })));
+      } catch (err) {
+        setError("An unexpected error occurred, please retry!");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if(loading) {
+    return (
+      <button className="animate-pulse h-8 aspect-square rounded-full bg-gray-200 dark:bg-gray-900 flex justify-center items-center" {...props}>
+        <Icon path={mdiAccount}
+          title="Account"
+          size={1}
+          className="text-gray-100 dark:text-gray-800"
+        />
+        <span className="sr-only">Loading...</span>
+      </button>
+    );
+  } else {
+    if (data) {
+      return (
+        <button className="h-8 overflow-hidden aspect-square rounded-full bg-gray-200 dark:bg-gray-900 flex justify-center items-center" {...props}>
+          <Image
+            src={data}
+            alt={principalName}
+            width={64}
+            height={64}
+            className="object-cover h-full w-full"
+            {...props}
+          />
+        </button>
+      )
+    } else {
+      return (
+        <button className="h-8 aspect-square rounded-full bg-gray-200 dark:bg-gray-900 p-1" {...props}>
+          <Avatar value={principalName} />
+        </button>
+      );
+    }
+  }
+}
+
+function NavbarMenu() {
+  const api = useApi();
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const {darkMode, toggleTheme} = useTheme();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const principalName = useSelector((state) => state.auth.principalName);
+
+  const {
+    data: principalData,
+    error: principalError,
+    isLoading: principalIsLoading
+  } = useSWR(isAuthenticated ? "/user/me" : null, api);
+
+  const logout = useCallback(async () => {
+    dispatch(authSlice.actions.clearAuthentication());
+    router.push("/login");
+  }, [api]);
+
+  return isAuthenticated ? (
+    <Dropdown
+      placement="left-end"
+      dismissOnClick={false}
+      className="w-64"
+      renderTrigger={() => (
+        <NavbarAvatar principalName={principalName} />
+      )}
+    >
+      <Dropdown.Header className="w-full flex pr-2">
+        <div className="max-w-full flex items-center space-x-4">
+          <div className="shrink-0">
+            <NavbarAvatar principalName={principalName} />
+          </div>
+          <div className="overflow-hidden">
+            {principalIsLoading ? (
+              <div className="animate-pulse flex flex-col space-y-2">
+                <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-36" />
+                <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-36" />
+              </div>
+            ) : principalError ? (
+              <div className="flex flex-col space-y-2">
+                <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
+                <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
+              </div>
+            ) : (
+              <div className="flex grow space-y-1">
+                {principalData.data.displayName ? (
+                  <div className="grow overflow-hidden">
+                    <span className="block w-full truncate">{principalData.data.displayName}</span>
+                    <span className="block text-xs">@{principalData.data.username}</span>
+                  </div>
+                ) : (
+                  <div className="grow overflow-hidden">
+                    <span className="block w-full truncate">@{principalData.data.username}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </Dropdown.Header>
+      <Dropdown.Item onClick={logout}>
+        <div className="flex items-center space-x-4 w-full justify-between">
+          <span>Logout</span>
+          <Icon path={mdiLogout} size={0.75} />
+        </div>
+      </Dropdown.Item>
+      <Dropdown.Divider />
+      <Dropdown.Item>
+        <div className="flex items-center space-x-4 w-full justify-between">
+          <span>Dark Mode</span>
+          <ToggleSwitch checked={darkMode} onChange={toggleTheme} />
+        </div>
+      </Dropdown.Item>
+    </Dropdown>
+  ) : (
+    <Dropdown
+      placement="left-end"
+      dismissOnClick={false}
+      renderTrigger={() => (
+        <button
+          className="inline-flex items-center rounded-lg p-0 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700"
+        >
+          <Icon path={mdiDotsVertical}
+            title="Theme Toggle"
+            size={1}
+          />
+        </button>
+      )}
+    >
+      <Dropdown.Item>
+        <div className="flex items-center space-x-4">
+          <span>Dark Mode</span>
+          <ToggleSwitch checked={darkMode} onChange={toggleTheme} />
+        </div>
+      </Dropdown.Item>
+    </Dropdown>
+  );
+}
+
+export default function Navbar({ currentPath }) {
   const navigation = useMemo(() => {
     return [
       { name: "Home", path: "/", isCurrent: currentPath === "/" },
@@ -59,27 +226,7 @@ export default function Navbar({ currentPath }) {
           <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">TaskCare</span>
         </FlowbiteNavbar.Brand>
         <div className="flex md:order-2 space-x-4">
-          <Dropdown
-            placement="left-end"
-            dismissOnClick={false}
-            renderTrigger={() => (
-              <button
-                className="inline-flex items-center rounded-lg p-0 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700"
-              >
-                <Icon path={mdiDotsVertical}
-                  title="Theme Toggle"
-                  size={1}
-                />
-              </button>
-            )}
-          >
-            <Dropdown.Item>
-              <div className="flex items-center space-x-4">
-                <span>Dark Mode</span>
-                <ToggleSwitch checked={darkMode} onChange={toggleTheme} />
-              </div>
-            </Dropdown.Item>
-          </Dropdown>
+          <NavbarMenu />
         </div>
         <FlowbiteNavbar.Collapse>
           {navigation.map((item) => (

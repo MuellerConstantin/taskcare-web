@@ -6,25 +6,21 @@ const authSlice = createSlice({
     isAuthenticated: false,
     accessToken: null,
     refreshToken: null,
-    principal: null
+    principalName: null
   },
   reducers: {
     setAuthentication: (state, action) => {
       state.isAuthenticated = true;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
+      state.principalName = action.payload.principalName
     },
     clearAuthentication: (state) => {
       state.isAuthenticated = false;
       state.accessToken = null;
       state.refreshToken = null;
-    },
-    setPrincipal: (state, action) => {
-      state.principal = action.payload.principal;
-    },
-    clearPrincipal: (state) => {
-      state.principal = null;
-    },
+      state.principalName = null
+    }
   },
 });
 
