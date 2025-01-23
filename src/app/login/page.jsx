@@ -25,34 +25,32 @@ export default function Login() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = useCallback(async (values) => {
+  const login = useCallback(async (username, password) => {
     setLoading(true);
     setError(null);
 
-    try {
-      const tokenRes = await api.post("/auth/token", {
-        username: values.username,
-        password: values.password,
-      });
-
+    api.post("/auth/token", {
+      username,
+      password,
+    })
+    .then((res) => {
       dispatch(authSlice.actions.setAuthentication({
-        accessToken: tokenRes.data.accessToken,
-        refreshToken: tokenRes.data.refreshToken,
-        principalName: tokenRes.data.principal
+        accessToken: res.data.accessToken,
+        refreshToken: res.data.refreshToken,
+        principalName: res.data.principal
       }));
-
-      router.push("/");
-    } catch (err) {
+    })
+    .then(() => {router.push("/");})
+    .catch((err) => {
       if (err.response && err.response.status === 401) {
         setError("Either username or password are wrong!");
       } else {
         setError("An unexpected error occurred, please retry!");
       }
-
-      throw err;
-    } finally {
+    })
+    .finally(() => {
       setLoading(false);
-    }
+    });
   }, [api, dispatch, router]);
 
   return (
@@ -86,7 +84,7 @@ export default function Login() {
           <Formik
             initialValues={{ username: "", password: "" }}
             validationSchema={schema}
-            onSubmit={handleSubmit}
+            onSubmit={(values) => login(values.username, values.password)}
           >
             {(props) => (
               <form

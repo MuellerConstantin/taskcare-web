@@ -6,7 +6,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
-import useSWR from "swr";
 import { Navbar as FlowbiteNavbar, Dropdown, Avatar } from "flowbite-react";
 import { mdiMenu, mdiDotsVertical, mdiApplicationCog, mdiLogout } from "@mdi/js";
 import authSlice from "@/store/slices/auth";
@@ -37,28 +36,27 @@ function NavbarAvatar({principalName, ...props}) {
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
+
+  const fetchProfileImage = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    api.get("/user/me/profile-image", {responseType: "arraybuffer"})
+    .then((res) => {
+      setData(URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] })));
+    })
+    .catch((err) => {
+      setError("An unexpected error occurred, please retry!");
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }, [api]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const imageRes = await api.get("/user/me/profile-image", {
-          responseType: "arraybuffer"
-        });
-
-        setData(URL.createObjectURL(new Blob([imageRes.data], { type: imageRes.headers["content-type"] })));
-      } catch (err) {
-        setError("An unexpected error occurred, please retry!");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchData();
-  }, []);
+    fetchProfileImage();
+  }, [fetchProfileImage]);
 
   if(loading) {
     return (
@@ -101,16 +99,36 @@ function NavbarMenu() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const principalName = useSelector((state) => state.auth.principalName);
 
-  const {
-    data: principalData,
-    error: principalError,
-    isLoading: principalIsLoading
-  } = useSWR(isAuthenticated ? "/user/me" : null, api);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
 
   const logout = useCallback(async () => {
     dispatch(authSlice.actions.clearAuthentication());
     router.push("/login");
   }, [api]);
+
+  const fetchPrincipal = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    api.get("/user/me")
+    .then((res) => {
+      setData(res.data);
+    })
+    .catch((err) => {
+      setError("An unexpected error occurred, please retry!");
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }, [api]);
+
+  useEffect(() => {
+    if(isAuthenticated) {
+      fetchPrincipal();
+    }
+  }, [isAuthenticated, fetchPrincipal]);
 
   return isAuthenticated ? (
     <Dropdown
@@ -129,26 +147,26 @@ function NavbarMenu() {
             <NavbarAvatar principalName={principalName} />
           </div>
           <div className="overflow-hidden">
-            {principalIsLoading ? (
+            {loading ? (
               <div className="animate-pulse flex flex-col space-y-2">
                 <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-36" />
                 <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-36" />
               </div>
-            ) : principalError ? (
+            ) : error ? (
               <div className="flex flex-col space-y-2">
                 <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
                 <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
               </div>
             ) : (
               <div className="flex grow space-y-1">
-                {principalData.data.displayName ? (
+                {data.displayName ? (
                   <div className="grow overflow-hidden">
-                    <span className="block w-full truncate">{principalData.data.displayName}</span>
-                    <span className="block text-xs">@{principalData.data.username}</span>
+                    <span className="block w-full truncate">{data.displayName}</span>
+                    <span className="block text-xs">@{data.username}</span>
                   </div>
                 ) : (
                   <div className="grow overflow-hidden">
-                    <span className="block w-full truncate">@{principalData.data.username}</span>
+                    <span className="block w-full truncate">@{data.username}</span>
                   </div>
                 )}
               </div>
@@ -156,7 +174,7 @@ function NavbarMenu() {
           </div>
         </div>
       </Dropdown.Header>
-      {principalData?.data?.role === "ADMINISTRATOR" && (
+      {data?.role === "ADMINISTRATOR" && (
         <Dropdown.Item onClick={() =>router.push("/tmc")}>
           <div className="flex items-center space-x-4 w-full justify-between">
             <span>Management Console</span>
