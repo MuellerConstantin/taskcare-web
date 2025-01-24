@@ -15,6 +15,7 @@ import {
 } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 import storage from "redux-persist/lib/storage";
+import { injectStore } from "@/api";
 import themeSlice from "./slices/theme";
 import authSlice from "./slices/auth";
 
@@ -52,7 +53,8 @@ export function StoreProvider({ children }) {
   const storeRef = useRef(undefined);
 
   if (!storeRef.current) {
-    storeRef.current = makeStore()
+    storeRef.current = makeStore();
+    injectStore(storeRef.current[0]);
   }
 
   return (
