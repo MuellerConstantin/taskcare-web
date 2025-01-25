@@ -15,6 +15,23 @@ const api = axios.create({
   },
 });
 
+let isRefreshingAuth = false;
+let authRefreshSubscribers = [];
+
+const subscribeAuthRefresh = (callback) => {
+  authRefreshSubscribers.push(callback);
+};
+
+const onAuthRefreshed = (accessToken) => {
+  authRefreshSubscribers.forEach((callback) => callback(null, accessToken));
+  authRefreshSubscribers = [];
+};
+
+const onAuthRefreshFailed = (error) => {
+  authRefreshSubscribers.forEach((callback) => callback(error, null));
+  authRefreshSubscribers = [];
+};
+
 api.interceptors.request.use((config) => {
   const state = store.getState();
 
@@ -31,33 +48,47 @@ api.interceptors.response.use(
     const { response, config } = err;
 
     if (response && config.url !== "/auth/refresh") {
-      if (response.status === 401 && !config._retry) {
+      if (response.status === 401 && response.data?.error === "AuthenticationError" && !config._retry) {
         config._retry = true;
         const state = store.getState();
 
         if (state.auth.refreshToken) {
-          try {
-            const refreshRes = await api.post("/auth/refresh", {
-              refreshToken: state.auth.refreshToken,
-            });
+          if(!isRefreshingAuth) {
+            isRefreshingAuth = true;
 
-            store.dispatch(
-              authSlice.actions.setAuthentication({
-                accessToken: refreshRes.data.accessToken,
-                refreshToken: refreshRes.data.refreshToken,
-                principalName: refreshRes.data.principal
-              })
-            );
+            try {
+              const refreshRes = await api.post("/auth/refresh", {
+                refreshToken: state.auth.refreshToken,
+              });
+  
+              store.dispatch(
+                authSlice.actions.setAuthentication({
+                  accessToken: refreshRes.data.accessToken,
+                  refreshToken: refreshRes.data.refreshToken,
+                  principalName: refreshRes.data.principal
+                })
+              );
 
-            config.headers = {
-              ...config.headers,
-              Authorization: `Bearer ${refreshRes.data.accessToken}`,
-            };
-
-            return api(config);
-          } catch (refeshError) {
-            return Promise.reject(refeshError);
+              onAuthRefreshed(refreshRes.data.accessToken);
+              return api(config);
+            } catch (refeshError) {
+              onAuthRefreshFailed(refeshError);
+              return Promise.reject(refeshError);
+            } finally {
+              isRefreshingAuth = false;
+            }
           }
+
+          return new Promise((resolve, reject) => {
+            subscribeAuthRefresh((refreshError, accessToken) => {
+              if (refreshError) {
+                reject(refreshError);
+              } else {
+                config.headers.Authorization = `Bearer ${accessToken}`;
+                resolve(api(config));
+              }
+            });
+          });
         }
       }
     }
