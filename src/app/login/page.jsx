@@ -4,14 +4,23 @@ import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import StackTemplate from "@/components/templates/StackTemplate";
-import { Button, Spinner } from "flowbite-react";
+import { Button, Spinner, TextInput } from "flowbite-react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
 import { useSWRConfig } from "swr";
 import authSlice from "@/store/slices/auth";
-import TextField from "@/components/atoms/TextField";
 import useApi from "@/hooks/useApi";
+
+const customTextInputTheme = {
+  "field": {
+    "input": {
+      "colors": {
+        "gray": "border-gray-300 bg-gray-50 text-gray-900 focus:border-amber-500 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-500 dark:focus:ring-amber-500"
+      }
+    }
+  }
+};
 
 const schema = yup.object().shape({
   username: yup.string().required("Is required"),
@@ -111,7 +120,8 @@ export default function Login() {
                 noValidate
               >
                 <div>
-                  <TextField
+                  <TextInput
+                    theme={customTextInputTheme}
                     name="username"
                     type="text"
                     placeholder="Username"
@@ -119,12 +129,13 @@ export default function Login() {
                     onChange={props.handleChange}
                     onBlur={props.handleBlur}
                     value={props.values.username}
-                    error={props.errors.username}
-                    touched={props.errors.username && props.touched.username}
+                    color={props.errors.username && props.touched.username ? "failure" : "gray"}
+                    helperText={props.errors.username && props.touched.username ? props.errors.username : null}
                   />
                 </div>
                 <div>
-                  <TextField
+                  <TextInput
+                    theme={customTextInputTheme}
                     name="password"
                     type="password"
                     placeholder="Password"
@@ -132,8 +143,8 @@ export default function Login() {
                     onChange={props.handleChange}
                     onBlur={props.handleBlur}
                     value={props.values.password}
-                    error={props.errors.password}
-                    touched={props.errors.password && props.touched.password}
+                    color={props.errors.password && props.touched.password ? "failure" : "gray"}
+                    helperText={props.errors.password && props.touched.password ? props.errors.password : null}
                   />
                 </div>
                 <Button

@@ -7,9 +7,8 @@ import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import useSWR from "swr";
 import { useSelector } from "react-redux";
-import { Navbar as FlowbiteNavbar, Dropdown, Avatar } from "flowbite-react";
+import { Navbar as FlowbiteNavbar, Dropdown, Avatar, ToggleSwitch } from "flowbite-react";
 import { mdiMenu, mdiDotsVertical, mdiApplicationCog, mdiLogout } from "@mdi/js";
-import ToggleSwitch from "@/components/atoms/ToggleSwitch";
 import useTheme from "@/hooks/useTheme";
 import useApi from "@/hooks/useApi";
 
@@ -29,7 +28,18 @@ const customNavbarTheme = {
   "toggle": {
     "base": "inline-flex items-center rounded-lg p-0 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700 md:hidden",
   }
-}
+};
+
+const customToggleSwitchTheme = {
+  "toggle": {
+    "base": "relative rounded-full border after:absolute after:rounded-full after:bg-white after:transition-all group-focus:ring-4 group-focus:ring-amber-500/25",
+    "checked": {
+      "color": {
+        "amber": "border-amber-500 bg-amber-500"
+      }
+    }
+  }
+};
 
 function NavbarAvatar({principalName, ...props}) {
   const api = useApi();
@@ -151,10 +161,10 @@ function NavbarMenu() {
         </div>
       </Dropdown.Item>
       <Dropdown.Divider />
-      <Dropdown.Item>
+      <Dropdown.Item as="div">
         <div className="flex items-center space-x-4 w-full justify-between">
           <span>Dark Mode</span>
-          <ToggleSwitch checked={darkMode} onChange={toggleTheme} />
+          <ToggleSwitch theme={customToggleSwitchTheme} checked={darkMode} onChange={toggleTheme} color="amber" />
         </div>
       </Dropdown.Item>
     </Dropdown>
@@ -173,10 +183,10 @@ function NavbarMenu() {
         </button>
       )}
     >
-      <Dropdown.Item>
-        <div className="flex items-center space-x-4">
+      <Dropdown.Item as="div">
+        <div className="flex items-center space-x-4 w-full justify-between">
           <span>Dark Mode</span>
-          <ToggleSwitch checked={darkMode} onChange={toggleTheme} />
+          <ToggleSwitch theme={customToggleSwitchTheme} checked={darkMode} onChange={toggleTheme} color="amber" />
         </div>
       </Dropdown.Item>
     </Dropdown>
