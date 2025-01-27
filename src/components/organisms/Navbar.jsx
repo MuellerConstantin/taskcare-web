@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
+import useSWR from "swr";
 import { useSelector } from "react-redux";
 import { Navbar as FlowbiteNavbar, Dropdown, Avatar } from "flowbite-react";
 import { mdiMenu, mdiDotsVertical, mdiApplicationCog, mdiLogout } from "@mdi/js";
@@ -33,29 +34,12 @@ const customNavbarTheme = {
 function NavbarAvatar({principalName, ...props}) {
   const api = useApi();
 
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
-  const [, setError] = useState(null);
-
-  const fetchProfileImage = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    api.get("/user/me/profile-image", {responseType: "arraybuffer"})
-    .then((res) => {
-      setData(URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] })));
-    })
-    .catch((err) => {
-      setError("An unexpected error occurred, please retry!");
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-  }, [api]);
-
-  useEffect(() => {
-    fetchProfileImage();
-  }, [fetchProfileImage]);
+  const {
+    data,
+    isLoading: loading
+  } = useSWR("/user/me/profile-image",
+    (url) => api.get(url, {responseType: "arraybuffer"})
+      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
 
   if(loading) {
     return (
@@ -97,35 +81,16 @@ function NavbarMenu() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const principalName = useSelector((state) => state.auth.principalName);
 
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
+  const {
+    data,
+    error,
+    isLoading: loading
+  } = useSWR(isAuthenticated ? "/user/me" : null,
+    (url) => api.get(url).then((res) => res.data));
 
   const logout = useCallback(() => {
     router.push("/login?logout=true");
   }, [router]);
-
-  const fetchPrincipal = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    api.get("/user/me")
-    .then((res) => {
-      setData(res.data);
-    })
-    .catch((err) => {
-      setError("An unexpected error occurred, please retry!");
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-  }, [api]);
-
-  useEffect(() => {
-    if(isAuthenticated) {
-      fetchPrincipal();
-    }
-  }, [isAuthenticated, fetchPrincipal]);
 
   return isAuthenticated ? (
     <Dropdown

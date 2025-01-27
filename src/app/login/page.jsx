@@ -8,6 +8,7 @@ import { Button, Spinner } from "flowbite-react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
+import { useSWRConfig } from "swr";
 import authSlice from "@/store/slices/auth";
 import TextField from "@/components/atoms/TextField";
 import useApi from "@/hooks/useApi";
@@ -22,6 +23,7 @@ export default function Login() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
+  const { mutate } = useSWRConfig();
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -59,6 +61,8 @@ export default function Login() {
 
     if (logout === "true") {
       dispatch(authSlice.actions.clearAuthentication());
+      mutate("/user/me", null);
+      mutate("/user/me/profile-image", null);
     }
   }, [searchParams, dispatch]);
 

@@ -1,4 +1,5 @@
 import { Lato } from "next/font/google";
+import { SWRConfig } from "swr";
 import { StoreProvider } from "@/store";
 import { ApiLogoutInterceptor } from "@/hooks/useApi";
 
@@ -23,11 +24,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${lato.variable} antialiased bg-white dark:bg-gray-900`}
       >
-        <StoreProvider>
-          <ApiLogoutInterceptor>
-            {children}
-          </ApiLogoutInterceptor>
-        </StoreProvider>
+        <SWRConfig>
+          <StoreProvider>
+            <ApiLogoutInterceptor>
+              {children}
+            </ApiLogoutInterceptor>
+          </StoreProvider>
+        </SWRConfig>
       </body>
     </html>
   );
