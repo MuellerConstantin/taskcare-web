@@ -5,10 +5,9 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { Navbar as FlowbiteNavbar, Dropdown, Avatar } from "flowbite-react";
 import { mdiMenu, mdiDotsVertical, mdiApplicationCog, mdiLogout } from "@mdi/js";
-import authSlice from "@/store/slices/auth";
 import ToggleSwitch from "@/components/atoms/ToggleSwitch";
 import useTheme from "@/hooks/useTheme";
 import useApi from "@/hooks/useApi";
@@ -93,7 +92,6 @@ function NavbarAvatar({principalName, ...props}) {
 
 function NavbarMenu() {
   const api = useApi();
-  const dispatch = useDispatch();
   const router = useRouter();
   const {darkMode, toggleTheme} = useTheme();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -103,10 +101,9 @@ function NavbarMenu() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const logout = useCallback(async () => {
-    dispatch(authSlice.actions.clearAuthentication());
-    router.push("/login");
-  }, [api]);
+  const logout = useCallback(() => {
+    router.push("/login?logout=true");
+  }, [router]);
 
   const fetchPrincipal = useCallback(async () => {
     setLoading(true);

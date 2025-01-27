@@ -1,5 +1,6 @@
 import { Lato } from "next/font/google";
 import { StoreProvider } from "@/store";
+import { ApiLogoutInterceptor } from "@/hooks/useApi";
 
 import "./globals.css";
 
@@ -23,7 +24,9 @@ export default function RootLayout({ children }) {
         className={`${lato.variable} antialiased bg-white dark:bg-gray-900`}
       >
         <StoreProvider>
-          {children}
+          <ApiLogoutInterceptor>
+            {children}
+          </ApiLogoutInterceptor>
         </StoreProvider>
       </body>
     </html>

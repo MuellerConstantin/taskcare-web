@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import StackTemplate from "@/components/templates/StackTemplate";
 import { Button, Spinner } from "flowbite-react";
 import { Formik } from "formik";
@@ -20,6 +20,7 @@ const schema = yup.object().shape({
 export default function Login() {
   const api = useApi();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useDispatch();
 
   const [error, setError] = useState(null);
@@ -53,6 +54,14 @@ export default function Login() {
     });
   }, [api, dispatch, router]);
 
+  useEffect(() => {
+    const logout = searchParams.get("logout");
+
+    if (logout === "true") {
+      dispatch(authSlice.actions.clearAuthentication());
+    }
+  }, [searchParams, dispatch]);
+
   return (
     <StackTemplate>
       <div className="grow flex items-center justify-center px-4 py-12 relative isolate overflow-hidden">
@@ -80,7 +89,12 @@ export default function Login() {
               Login to continue
             </h3>
           </div>
-          {error && <p className="text-center text-red-500">{error}</p>}
+          {searchParams.get("logout") === "true" && (
+            <p className="text-center text-green-500">You have been logged out</p>
+          )}
+          {!error && (
+            <p className="text-center text-red-500">{error}</p>
+          )}
           <Formik
             initialValues={{ username: "", password: "" }}
             validationSchema={schema}
