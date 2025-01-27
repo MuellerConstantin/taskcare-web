@@ -1,9 +1,7 @@
-import StackTemplate from "@/components/templates/StackTemplate";
+"use client";
+
+import { redirect } from "next/navigation";
 
 export default function Tmc() {
-  return (
-    <StackTemplate>
-      
-    </StackTemplate>
-  );
+  redirect("/tmc/boards");
 }
