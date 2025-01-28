@@ -101,10 +101,10 @@ export default function Login() {
               Login to continue
             </h3>
           </div>
-          {searchParams.get("logout") === "true" && (
+          {!loading && !error && searchParams.get("logout") === "true" && (
             <p className="text-center text-green-500">You have been logged out</p>
           )}
-          {!error && (
+          {error && (
             <p className="text-center text-red-500">{error}</p>
           )}
           <Formik
