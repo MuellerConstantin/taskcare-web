@@ -102,7 +102,7 @@ export default function Login() {
             </h3>
           </div>
           {!loading && !error && searchParams.get("logout") === "true" && (
-            <p className="text-center text-green-500">You have been logged out</p>
+            <p className="text-center text-amber-500">You have been logged out</p>
           )}
           {error && (
             <p className="text-center text-red-500">{error}</p>

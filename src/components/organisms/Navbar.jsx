@@ -134,11 +134,11 @@ function NavbarMenu() {
                 {data.displayName ? (
                   <div className="grow overflow-hidden">
                     <span className="block w-full truncate">{data.displayName}</span>
-                    <span className="block text-xs">@{data.username}</span>
+                    <span className="block text-xs">{data.username}</span>
                   </div>
                 ) : (
                   <div className="grow overflow-hidden">
-                    <span className="block w-full truncate">@{data.username}</span>
+                    <span className="block w-full truncate">{data.username}</span>
                   </div>
                 )}
               </div>

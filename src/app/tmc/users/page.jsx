@@ -7,6 +7,7 @@ import useSWR from "swr";
 import { mdiAccountPlus, mdiAccountRemove, mdiAccountEdit, mdiAccountDetails } from "@mdi/js";
 import StackTemplate from "@/components/templates/StackTemplate";
 import Sidebar from "@/components/organisms/tmc/Sidebar";
+import UserInfoDialog from "@/components/organisms/tmc/UserInfoDialog";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
@@ -42,6 +43,7 @@ export default function TmcUsers() {
   const [page, setPage] = useState(1);
   const [perPage,] = useState(25);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
+  const [showUserInfoDialog, setShowUserInfoDialog] = useState(false);
 
   const {
     data,
@@ -107,6 +109,7 @@ export default function TmcUsers() {
                   color="light"
                   size="xs"
                   disabled={loading || error || selectedRows.length !== 1}
+                  onClick={() => setShowUserInfoDialog(true)}
                 >
                   <div className="flex items-center space-x-2 justify-center">
                     <Icon path={mdiAccountDetails} size={0.75} />
@@ -148,6 +151,11 @@ export default function TmcUsers() {
                 </Button>
               </Button.Group>
             </div>
+            <UserInfoDialog
+              show={showUserInfoDialog}
+              onClose={() => setShowUserInfoDialog(false)}
+              userId={selectedRows?.[0]?.id}
+            />
             <div className="relative overflow-x-auto w-full border border-gray-200 dark:border-gray-700">
               <Table theme={customTableTheme} hoverable>
                 <Table.Head>
