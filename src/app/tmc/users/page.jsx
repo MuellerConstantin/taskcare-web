@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Table, Pagination, Checkbox, Button } from "flowbite-react";
 import useSWR from "swr";
-import { mdiAccountPlus, mdiAccountRemove, mdiAccountEdit } from "@mdi/js";
+import { mdiAccountPlus, mdiAccountRemove, mdiAccountEdit, mdiAccountDetails } from "@mdi/js";
 import StackTemplate from "@/components/templates/StackTemplate";
 import Sidebar from "@/components/organisms/tmc/Sidebar";
 import api from "@/api";
@@ -108,6 +108,17 @@ export default function TmcUsers() {
                   theme={customButtonTheme}
                   color="light"
                   size="xs"
+                  disabled={loading || error || selectedRows.length !== 1}
+                >
+                  <div className="flex items-center space-x-2 justify-center">
+                    <Icon path={mdiAccountDetails} size={0.75} />
+                    <span>Info</span>
+                  </div>
+                </Button>
+                <Button
+                  theme={customButtonTheme}
+                  color="light"
+                  size="xs"
                   disabled={loading || error}
                 >
                   <div className="flex items-center space-x-2 justify-center">
@@ -151,6 +162,7 @@ export default function TmcUsers() {
                       color="amber"
                     />
                   </Table.HeadCell>
+                  <Table.HeadCell>ID</Table.HeadCell>
                   <Table.HeadCell>Username</Table.HeadCell>
                   <Table.HeadCell>Display Name</Table.HeadCell>
                   <Table.HeadCell>Identity Provider</Table.HeadCell>
@@ -167,6 +179,9 @@ export default function TmcUsers() {
                         />
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                        <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-36" />
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap">
                         <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-36" />
                       </Table.Cell>
                       <Table.Cell>
@@ -191,6 +206,9 @@ export default function TmcUsers() {
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                         <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
                       </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap">
+                        <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
+                      </Table.Cell>
                       <Table.Cell>
                         <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
                       </Table.Cell>
@@ -212,6 +230,11 @@ export default function TmcUsers() {
                         />
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                        <div className="relative">
+                          <span>{user.id}</span>
+                        </div>
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap">
                         {user.username}
                       </Table.Cell>
                       <Table.Cell>{user.displayName}</Table.Cell>
