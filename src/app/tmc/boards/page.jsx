@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Table, Pagination, Checkbox, Button, Clipboard } from "flowbite-react";
 import useSWR from "swr";
 import { mdiPencil, mdiDelete, mdiInformation } from "@mdi/js";
 import StackTemplate from "@/components/templates/StackTemplate";
 import Sidebar from "@/components/organisms/tmc/Sidebar";
-import api from "@/api";
+import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -37,13 +37,11 @@ const customButtonTheme = {
 };
 
 export default function TmcBoards() {
+  const api = useApi();
+
   const [page, setPage] = useState(1);
   const [perPage,] = useState(25);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
-
-  useEffect(() => {
-    setCheckedList(new Array(perPage).fill(false));
-  }, [perPage, page]);
 
   const {
     data,
@@ -73,7 +71,7 @@ export default function TmcBoards() {
                 <div className="flex space-x-1 items-center">
                   <span>Total:</span>
                   {loading ? (
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-12" />
+                    <div className="animate-pulse h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-12" />
                   ) : error ? (
                     <div className="h-2 bg-red-200 dark:bg-red-400 rounded-full w-12" />
                   ) : (
@@ -83,7 +81,7 @@ export default function TmcBoards() {
                 <div className="flex space-x-1 items-center">
                   <span>Showing:</span>
                   {loading ? (
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-12" />
+                    <div className="animate-pulse h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-12" />
                   ) : error ? (
                     <div className="h-2 bg-red-200 dark:bg-red-400 rounded-full w-12" />
                   ) : (
@@ -93,7 +91,7 @@ export default function TmcBoards() {
                 <div className="flex space-x-1 items-center">
                   <span>Selected:</span>
                   {loading ? (
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-12" />
+                    <div className="animate-pulse h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-12" />
                   ) : error ? (
                     <div className="h-2 bg-red-200 dark:bg-red-400 rounded-full w-12" />
                   ) : (
@@ -144,8 +142,7 @@ export default function TmcBoards() {
                 <Table.Head>
                   <Table.HeadCell className="p-4">
                     <Checkbox
-                      checked={checkedList[0]}
-                      onChange={() => setCheckedList((oldCheckedList) => new Array(checkedList.length).fill(!oldCheckedList[0]))}
+                      onChange={(event) => setCheckedList(new Array(checkedList.length).fill(event.target.checked))}
                       theme={customCheckboxTheme}
                       disabled={loading}
                       color="amber"
@@ -157,7 +154,7 @@ export default function TmcBoards() {
                 </Table.Head>
                 <Table.Body className="divide-y">
                   {loading ? Array.from(Array(10).keys()).map((key) =>
-                    <Table.Row key={key} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                    <Table.Row key={key} className="animate-pulse bg-white dark:border-gray-700 dark:bg-gray-800">
                       <Table.Cell className="p-4">
                         <Checkbox
                           theme={customCheckboxTheme}
@@ -194,12 +191,12 @@ export default function TmcBoards() {
                         <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
                       </Table.Cell>
                     </Table.Row>
-                  ) : data.content.map((board, index) => (
+                  ) : data?.content.map((board, index) => (
                     <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={board.id}>
                       <Table.Cell className="p-4">
                         <Checkbox
-                          checked={checkedList[index + 1]}
-                          onChange={() => setCheckedList((oldCheckedList) => [...oldCheckedList.slice(0, index + 1), !oldCheckedList[index + 1], ...oldCheckedList.slice(index + 2)])}
+                          checked={checkedList[index]}
+                          onChange={() => setCheckedList((oldCheckedList) => [...oldCheckedList.slice(0, index), !oldCheckedList[index], ...oldCheckedList.slice(index + 1)])}
                           theme={customCheckboxTheme}
                           color="amber"
                         />

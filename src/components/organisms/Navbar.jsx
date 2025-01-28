@@ -41,7 +41,7 @@ const customToggleSwitchTheme = {
   }
 };
 
-function NavbarAvatar({principalName, ...props}) {
+function NavbarAvatar({principalName}) {
   const api = useApi();
 
   const {
