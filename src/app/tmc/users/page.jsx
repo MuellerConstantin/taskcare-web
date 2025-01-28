@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Table, Pagination, Checkbox } from "flowbite-react";
+import { useState, useEffect, useMemo } from "react";
+import dynamic from "next/dynamic";
+import { Table, Pagination, Checkbox, Button } from "flowbite-react";
 import useSWR from "swr";
+import { mdiAccountPlus, mdiAccountRemove, mdiAccountEdit } from "@mdi/js";
 import StackTemplate from "@/components/templates/StackTemplate";
 import Sidebar from "@/components/organisms/tmc/Sidebar";
 import api from "@/api";
+
+const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
 const customTableTheme = {
   "root": {
@@ -26,6 +30,12 @@ const customCheckboxTheme = {
   }
 };
 
+const customButtonTheme = {
+  "color": {
+    "light": "border border-gray-300 bg-white text-gray-900 focus:ring-4 focus:ring-amber-300 enabled:hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:focus:ring-gray-700 dark:enabled:hover:border-gray-700 dark:enabled:hover:bg-gray-700",
+  }
+};
+
 export default function TmcUsers() {
   const [page, setPage] = useState(1);
   const [perPage,] = useState(25);
@@ -42,6 +52,12 @@ export default function TmcUsers() {
   } = useSWR(`/users?page=${page - 1}&perPage=${perPage}`,
     (url) => api.get(url).then((res) => res.data));
 
+  const selectedRows = useMemo(() => {
+    if(data) {
+      return data.content.filter((_, index) => checkedList[index]);
+    }
+  }, [checkedList, data]);
+
   return (
     <StackTemplate>
       <div className="grow flex flex-col flex">
@@ -49,7 +65,80 @@ export default function TmcUsers() {
           <div className="w-full md:w-1/3 lg:w-1/4 xl:w-1/5">
             <Sidebar />
           </div>
-          <div className="w-full md:w-2/3 lg:w-3/4 xl:w-4/5 p-4">
+          <div className="w-full md:w-2/3 lg:w-3/4 xl:w-4/5 p-4 flex flex-col space-y-4">
+            <div className="flex flex-col text-gray-900 dark:text-white space-y-1">
+              <h1 className="text-2xl font-semibold">Users</h1>
+              <hr />
+              <div className="flex space-x-2 text-xs">
+                <div className="flex space-x-1 items-center">
+                  <span>Total:</span>
+                  {loading ? (
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-12" />
+                  ) : error ? (
+                    <div className="h-2 bg-red-200 dark:bg-red-400 rounded-full w-12" />
+                  ) : (
+                    <span className="font-semibold">{data.info.totalElements}</span>
+                  )}
+                </div>
+                <div className="flex space-x-1 items-center">
+                  <span>Showing:</span>
+                  {loading ? (
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-12" />
+                  ) : error ? (
+                    <div className="h-2 bg-red-200 dark:bg-red-400 rounded-full w-12" />
+                  ) : (
+                    <span className="font-semibold">{data.content.length}</span>
+                  )}
+                </div>
+                <div className="flex space-x-1 items-center">
+                  <span>Selected:</span>
+                  {loading ? (
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-12" />
+                  ) : error ? (
+                    <div className="h-2 bg-red-200 dark:bg-red-400 rounded-full w-12" />
+                  ) : (
+                    <span className="font-semibold">{selectedRows.length}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex">
+              <Button.Group>
+                <Button
+                  theme={customButtonTheme}
+                  color="light"
+                  size="xs"
+                  disabled={loading || error}
+                >
+                  <div className="flex items-center space-x-2 justify-center">
+                    <Icon path={mdiAccountPlus} size={0.75} />
+                    <span>Add</span>
+                  </div>
+                </Button>
+                <Button
+                  theme={customButtonTheme}
+                  color="light"
+                  size="xs"
+                  disabled={loading || error || selectedRows.length !== 1}
+                >
+                  <div className="flex items-center space-x-2 justify-center">
+                    <Icon path={mdiAccountEdit} size={0.75} />
+                    <span>Edit</span>
+                  </div>
+                </Button>
+                <Button
+                  theme={customButtonTheme}
+                  color="light"
+                  size="xs"
+                  disabled={loading || error || selectedRows.length === 0}
+                >
+                  <div className="flex items-center space-x-2 justify-center">
+                    <Icon path={mdiAccountRemove} size={0.75} />
+                    <span>Remove</span>
+                  </div>
+                </Button>
+              </Button.Group>
+            </div>
             <div className="relative overflow-x-auto w-full border border-gray-200 dark:border-gray-700">
               <Table theme={customTableTheme} hoverable>
                 <Table.Head>
@@ -133,7 +222,7 @@ export default function TmcUsers() {
                 </Table.Body>
               </Table>
             </div>
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center">
               <Pagination
                 layout="table"
                 showIcons

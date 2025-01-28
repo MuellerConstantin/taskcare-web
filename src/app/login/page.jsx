@@ -70,8 +70,7 @@ export default function Login() {
 
     if (logout === "true") {
       dispatch(authSlice.actions.clearAuthentication());
-      mutate("/user/me", null);
-      mutate("/user/me/profile-image", null);
+      mutate(() => true, null);
     }
   }, [searchParams, dispatch]);
 
