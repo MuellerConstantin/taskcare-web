@@ -170,7 +170,7 @@ export default function UserAddDialog({show, onAdd, onClose}) {
                 disabled={!(props.isValid && props.dirty) || loading}
               >
                 {!loading && <span>Add User</span>}
-                {loading && <Spinner className="fill-white" />}
+                {loading && <Spinner size="sm" className="fill-white" />}
               </Button>
             </Modal.Footer>
           </form>

@@ -16,6 +16,7 @@ import StackTemplate from "@/components/templates/StackTemplate";
 import Sidebar from "@/components/organisms/tmc/Sidebar";
 import UserInfoDialog from "@/components/organisms/tmc/UserInfoDialog";
 import UserAddDialog from "@/components/organisms/tmc/UserAddDialog";
+import UserRemoveDialog from "@/components/organisms/tmc/UserRemoveDialog";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
@@ -187,6 +188,7 @@ export default function TmcUsers() {
 
   const [showUserInfoDialog, setShowUserInfoDialog] = useState(false);
   const [showUserAddDialog, setShowUserAddDialog] = useState(false);
+  const [showUserRemoveDialog, setShowUserRemoveDialog] = useState(false);
 
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
@@ -302,6 +304,7 @@ export default function TmcUsers() {
                   color="light"
                   size="xs"
                   disabled={loading || error || selectedRows.length === 0}
+                  onClick={() => setShowUserRemoveDialog(true)}
                 >
                   <div className="flex items-center space-x-2 justify-center">
                     <Icon path={mdiAccountRemove} size={0.75} />
@@ -320,6 +323,16 @@ export default function TmcUsers() {
               onClose={() => setShowUserAddDialog(false)}
               onAdd={() => {
                 setShowUserAddDialog(false);
+                mutate();
+              }}
+            />
+            <UserRemoveDialog
+              show={showUserRemoveDialog}
+              onClose={() => setShowUserRemoveDialog(false)}
+              userIds={selectedRows ? selectedRows.map((row) => row.id) : []}
+              onRemove={() => {
+                setShowUserRemoveDialog(false);
+                setCheckedList(new Array(data?.content?.length || 0).fill(false));
                 mutate();
               }}
             />

@@ -152,7 +152,7 @@ export default function Login() {
                   disabled={!(props.isValid && props.dirty) || loading}
                 >
                   {!loading && <span>Login</span>}
-                  {loading && <Spinner className="fill-white" />}
+                  {loading && <Spinner size="sm" className="fill-white" />}
                 </Button>
               </form>
             )}
