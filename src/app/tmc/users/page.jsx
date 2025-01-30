@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { Table, Pagination, Checkbox, Button, TextInput, Dropdown, Select } from "flowbite-react";
+import { Table, Pagination, Checkbox, Button, TextInput, Select } from "flowbite-react";
 import useSWR from "swr";
 import {
   mdiAccountPlus,
@@ -15,6 +15,7 @@ import {
 import StackTemplate from "@/components/templates/StackTemplate";
 import Sidebar from "@/components/organisms/tmc/Sidebar";
 import UserInfoDialog from "@/components/organisms/tmc/UserInfoDialog";
+import UserAddDialog from "@/components/organisms/tmc/UserAddDialog";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
@@ -153,6 +154,7 @@ function TmcUsersSearch({onSearch}) {
           theme={customSearchTextInputThemeMd}
           sizing="sm"
           placeholder="Search"
+          className="grow max-w-xs"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -182,7 +184,9 @@ export default function TmcUsers() {
   const [searchProperty, setSearchProperty] = useState(null);
   const [searchTerm, setSearchTerm] = useState(null);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
+
   const [showUserInfoDialog, setShowUserInfoDialog] = useState(false);
+  const [showUserAddDialog, setShowUserAddDialog] = useState(false);
 
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
@@ -195,7 +199,8 @@ export default function TmcUsers() {
   const {
     data,
     error,
-    isLoading: loading
+    isLoading: loading,
+    mutate
   } = useSWR(`/users?page=${page - 1}&perPage=${perPage}${searchQuery ? `&search=${searchQuery}` : ""}`,
     (url) => api.get(url).then((res) => res.data));
 
@@ -249,7 +254,7 @@ export default function TmcUsers() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-2 md:flex-row md:flex-wrap md:justify-between md:items-center">
+            <div className="flex flex-col gap-2 md:gap-x-12 md:flex-row md:flex-wrap md:justify-between md:items-center">
               <TmcUsersSearch
                 onSearch={(property, term) => {
                   setSearchProperty(property);
@@ -274,6 +279,7 @@ export default function TmcUsers() {
                   color="light"
                   size="xs"
                   disabled={loading || error}
+                  onClick={() => setShowUserAddDialog(true)}
                 >
                   <div className="flex items-center space-x-2 justify-center">
                     <Icon path={mdiAccountPlus} size={0.75} />
@@ -308,6 +314,14 @@ export default function TmcUsers() {
               show={showUserInfoDialog}
               onClose={() => setShowUserInfoDialog(false)}
               userId={selectedRows?.[0]?.id}
+            />
+            <UserAddDialog
+              show={showUserAddDialog}
+              onClose={() => setShowUserAddDialog(false)}
+              onAdd={() => {
+                setShowUserAddDialog(false);
+                mutate();
+              }}
             />
             <div className="relative overflow-x-auto w-full border border-gray-200 dark:border-gray-700">
               <Table theme={customTableTheme} hoverable>
