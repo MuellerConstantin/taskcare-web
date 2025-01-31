@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { Table, Pagination, Checkbox, Button } from "flowbite-react";
+import { Table, Pagination, Checkbox, Button, Select, TextInput } from "flowbite-react";
 import useSWR from "swr";
-import { mdiPencil, mdiDelete, mdiInformation } from "@mdi/js";
+import { mdiPencil, mdiDelete, mdiInformation, mdiMagnify } from "@mdi/js";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
@@ -34,18 +34,155 @@ const customButtonTheme = {
   }
 };
 
+const customSearchTextInputThemeMd = {
+  "field": {
+    "input": {
+      "colors": {
+        "gray": "border-gray-300 bg-gray-50 text-gray-900 focus:border-amber-500 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-500 dark:focus:ring-amber-500"
+      },
+      "withAddon": {
+        "off": "rounded-lg rounded-l-none rounded-r-none"
+      },
+    }
+  }
+};
+
+const customSearchTextInputThemeSm = {
+  "field": {
+    "input": {
+      "colors": {
+        "gray": "border-gray-300 bg-gray-50 text-gray-900 focus:border-amber-500 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-500 dark:focus:ring-amber-500"
+      },
+      "withAddon": {
+        "off": "rounded-lg rounded-r-none"
+      },
+    }
+  }
+};
+
+const customSearchButtonTheme = {
+  "color": {
+    "light": "border border-gray-300 bg-white text-gray-900 focus:ring-4 focus:ring-amber-300 enabled:hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:focus:ring-gray-700 dark:enabled:hover:border-gray-700 dark:enabled:hover:bg-gray-700",
+  },
+  "pill": {
+    "off": "rounded-lg rounded-l-none border-l-0",
+  },
+};
+
+const customSearchSelectTheme = {
+  "field": {
+    "select": {
+      "withAddon": {
+        "off": "rounded-lg rounded-r-none border-r-0",
+      },
+      "colors": {
+        gray: "border-gray-300 bg-gray-50 text-gray-900 focus:border-amber-500 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-500 dark:focus:ring-amber-500",
+      }
+    }
+  }
+};
+
+function TmcBoardsSearch({onSearch}) {
+  const [selectedProperty, setSelectedProperty] = useState("id");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  return (
+    <div className="grow">
+      <div className="p-2 border rounded space-y-2 block lg:hidden">
+        <Select
+          sizing="sm"
+          required
+          value={selectedProperty}
+          onChange={(e) => setSelectedProperty(e.target.value)}
+        >
+          <option value="id">ID</option>
+          <option value="name">Name</option>
+          <option value="description">Description</option>
+        </Select>
+        <div className="flex w-full">
+          <TextInput
+            theme={customSearchTextInputThemeSm}
+            sizing="sm"
+            placeholder="Search"
+            className="grow"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              onSearch(selectedProperty, e.target.value);
+            }}
+          />
+          <Button
+            theme={customSearchButtonTheme}
+            color="light"
+            size="xs"
+            onClick={() => onSearch(selectedProperty, searchTerm)}
+          >
+            <div className="flex items-center justify-center">
+              <Icon path={mdiMagnify} size={0.75} />
+            </div>
+          </Button>
+        </div>
+      </div>
+      <div className="hidden lg:flex">
+        <Select
+          theme={customSearchSelectTheme}
+          sizing="sm"
+          required
+          value={selectedProperty}
+          onChange={(e) => setSelectedProperty(e.target.value)}
+        >
+          <option value="id">ID</option>
+          <option value="name">Name</option>
+          <option value="description">Description</option>
+        </Select>
+        <TextInput
+          theme={customSearchTextInputThemeMd}
+          sizing="sm"
+          placeholder="Search"
+          className="grow max-w-xs"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            onSearch(selectedProperty, e.target.value);
+          }}
+        />
+        <Button
+          theme={customSearchButtonTheme}
+          color="light"
+          size="xs"
+          onClick={() => onSearch(selectedProperty, searchTerm)}
+        >
+          <div className="flex items-center justify-center">
+            <Icon path={mdiMagnify} size={0.75} />
+          </div>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function TmcBoards() {
   const api = useApi();
 
   const [page, setPage] = useState(1);
   const [perPage,] = useState(25);
+  const [searchProperty, setSearchProperty] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(null);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
+
+  const searchQuery = useMemo(() => {
+    if(searchProperty && searchTerm && searchTerm.length > 0) {
+      return encodeURIComponent(`${searchProperty}=like="%${searchTerm}%"`)
+    } else {
+      return null;
+    }
+  }, [searchProperty, searchTerm]);
 
   const {
     data,
     error,
     isLoading: loading
-  } = useSWR(`/boards?page=${page - 1}&perPage=${perPage}`,
+  } = useSWR(`/boards?page=${page - 1}&perPage=${perPage}${searchQuery ? `&search=${searchQuery}` : ""}`,
     (url) => api.get(url).then((res) => res.data));
 
   const selectedRows = useMemo(() => {
@@ -94,7 +231,13 @@ export default function TmcBoards() {
           </div>
         </div>
       </div>
-      <div className="flex">
+      <div className="flex flex-col gap-2 md:gap-x-12 md:flex-row md:flex-wrap md:justify-between md:items-center">
+        <TmcBoardsSearch
+          onSearch={(property, term) => {
+            setSearchProperty(property);
+            setSearchTerm(term);
+          }}
+        />
         <Button.Group>
           <Button
             theme={customButtonTheme}

@@ -188,7 +188,7 @@ export default function TmcUsers() {
 
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
-      return encodeURIComponent(`${searchProperty}=like=%${searchTerm}%`)
+      return encodeURIComponent(`${searchProperty}=like="%${searchTerm}%"`)
     } else {
       return null;
     }
