@@ -88,45 +88,45 @@ export default function UserInfoDialog({show, onClose, userId}) {
           {loading ? (
             <div className="space-y-1 animate-pulse">
               <div className="flex justify-between items-center space-x-1">
-                <span>Display Name:</span>
+                <span className="font-semibold">Display Name:</span>
                 <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-32" />
               </div>
               <div className="flex justify-between items-center space-x-1">
-                <span>Identity Provider:</span>
+                <span className="font-semibold">Identity Provider:</span>
                 <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-32" />
               </div>
               <div className="flex justify-between items-center space-x-1">
-                <span>System Role:</span>
+                <span className="font-semibold">System Role:</span>
                 <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-32" />
               </div>
             </div>
           ) : error ? (
             <div className="space-y-1">
               <div className="flex justify-between items-center space-x-1">
-                <span>Display Name:</span>
+                <span className="font-semibold">Display Name:</span>
                 <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
               </div>
               <div className="flex justify-between items-center space-x-1">
-                <span>Identity Provider:</span>
+                <span className="font-semibold">Identity Provider:</span>
                 <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
               </div>
               <div className="flex justify-between items-center space-x-1">
-                <span>System Role:</span>
+                <span className="font-semibold">System Role:</span>
                 <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
               </div>
             </div>
           ) : (
             <div className="space-y-1 text-sm">
               <div className="flex justify-between space-x-1">
-                <span>Display Name:</span>
+                <span className="font-semibold">Display Name:</span>
                 <span className="truncate">{data?.displayName || '-'}</span>
               </div>
               <div className="flex justify-between space-x-1">
-                <span>Identity Provider:</span>
+                <span className="font-semibold">Identity Provider:</span>
                 <span>{data?.identityProvider}</span>
               </div>
               <div className="flex justify-between space-x-1">
-                <span>System Role:</span>
+                <span className="font-semibold">System Role:</span>
                 <span>{data?.role}</span>
               </div>
             </div>

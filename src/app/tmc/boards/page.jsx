@@ -7,6 +7,7 @@ import useSWR from "swr";
 import { mdiPencil, mdiDelete, mdiInformation } from "@mdi/js";
 import StackTemplate from "@/components/templates/StackTemplate";
 import Sidebar from "@/components/organisms/tmc/Sidebar";
+import BoardInfoDialog from "@/components/organisms/tmc/BoardInfoDialog";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
@@ -43,6 +44,8 @@ export default function TmcBoards() {
   const [perPage,] = useState(25);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
 
+  const [showBoardInfoDialog, setShowBoardInfoDialog] = useState(false);
+
   const {
     data,
     error,
@@ -53,6 +56,8 @@ export default function TmcBoards() {
   const selectedRows = useMemo(() => {
     if(data) {
       return data.content.filter((_, index) => checkedList[index]);
+    } else {
+      return [];
     }
   }, [checkedList, data]);
 
@@ -107,6 +112,7 @@ export default function TmcBoards() {
                   color="light"
                   size="xs"
                   disabled={loading || error || selectedRows.length !== 1}
+                  onClick={() => setShowBoardInfoDialog(true)}
                 >
                   <div className="flex items-center space-x-2 justify-center">
                     <Icon path={mdiInformation} size={0.75} />
@@ -137,6 +143,11 @@ export default function TmcBoards() {
                 </Button>
               </Button.Group>
             </div>
+            <BoardInfoDialog
+              show={showBoardInfoDialog}
+              onClose={() => setShowBoardInfoDialog(false)}
+              boardId={selectedRows[0]?.id}
+            />
             <div className="relative overflow-x-auto w-full border border-gray-200 dark:border-gray-700">
               <Table theme={customTableTheme} hoverable>
                 <Table.Head>

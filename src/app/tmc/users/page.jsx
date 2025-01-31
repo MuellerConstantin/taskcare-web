@@ -210,6 +210,8 @@ export default function TmcUsers() {
   const selectedRows = useMemo(() => {
     if(data) {
       return data.content.filter((_, index) => checkedList[index]);
+    } else {
+      return [];
     }
   }, [checkedList, data]);
 
