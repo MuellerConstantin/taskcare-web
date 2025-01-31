@@ -8,10 +8,8 @@ import {
   mdiAccountPlus,
   mdiAccountRemove,
   mdiAccountEdit,
-  mdiAccountDetails,
   mdiMagnify
 } from "@mdi/js";
-import UserInfoDialog from "@/components/organisms/tmc/UserInfoDialog";
 import UserAddDialog from "@/components/organisms/tmc/UserAddDialog";
 import UserRemoveDialog from "@/components/organisms/tmc/UserRemoveDialog";
 import UserEditDialog from "@/components/organisms/tmc/UserEditDialog";
@@ -184,7 +182,6 @@ export default function TmcUsers() {
   const [searchTerm, setSearchTerm] = useState(null);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
 
-  const [showUserInfoDialog, setShowUserInfoDialog] = useState(false);
   const [showUserAddDialog, setShowUserAddDialog] = useState(false);
   const [showUserRemoveDialog, setShowUserRemoveDialog] = useState(false);
   const [showUserEditDialog, setShowUserEditDialog] = useState(false);
@@ -263,18 +260,6 @@ export default function TmcUsers() {
             theme={customButtonTheme}
             color="light"
             size="xs"
-            disabled={loading || error || selectedRows.length !== 1}
-            onClick={() => setShowUserInfoDialog(true)}
-          >
-            <div className="flex items-center space-x-2 justify-center">
-              <Icon path={mdiAccountDetails} size={0.75} />
-              <span>Info</span>
-            </div>
-          </Button>
-          <Button
-            theme={customButtonTheme}
-            color="light"
-            size="xs"
             disabled={loading || error}
             onClick={() => setShowUserAddDialog(true)}
           >
@@ -309,11 +294,6 @@ export default function TmcUsers() {
           </Button>
         </Button.Group>
       </div>
-      <UserInfoDialog
-        show={showUserInfoDialog}
-        onClose={() => setShowUserInfoDialog(false)}
-        userId={selectedRows?.[0]?.id}
-      />
       <UserAddDialog
         show={showUserAddDialog}
         onClose={() => setShowUserAddDialog(false)}
