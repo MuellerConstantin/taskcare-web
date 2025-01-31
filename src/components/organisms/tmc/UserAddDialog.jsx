@@ -72,7 +72,7 @@ export default function UserAddDialog({show, onAdd, onClose}) {
       >
         {(props) => (
           <form
-            className="space-y-4"
+            className="space-y-4 overflow-y-auto"
             onSubmit={props.handleSubmit}
             noValidate
           >

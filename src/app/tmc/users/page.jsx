@@ -9,14 +9,14 @@ import {
   mdiAccountRemove,
   mdiAccountEdit,
   mdiAccountDetails,
-  mdiMagnify,
-  mdiChevronDown
+  mdiMagnify
 } from "@mdi/js";
 import StackTemplate from "@/components/templates/StackTemplate";
 import Sidebar from "@/components/organisms/tmc/Sidebar";
 import UserInfoDialog from "@/components/organisms/tmc/UserInfoDialog";
 import UserAddDialog from "@/components/organisms/tmc/UserAddDialog";
 import UserRemoveDialog from "@/components/organisms/tmc/UserRemoveDialog";
+import UserEditDialog from "@/components/organisms/tmc/UserEditDialog";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
@@ -189,6 +189,7 @@ export default function TmcUsers() {
   const [showUserInfoDialog, setShowUserInfoDialog] = useState(false);
   const [showUserAddDialog, setShowUserAddDialog] = useState(false);
   const [showUserRemoveDialog, setShowUserRemoveDialog] = useState(false);
+  const [showUserEditDialog, setShowUserEditDialog] = useState(false);
 
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
@@ -293,6 +294,7 @@ export default function TmcUsers() {
                   color="light"
                   size="xs"
                   disabled={loading || error || selectedRows.length !== 1}
+                  onClick={() => setShowUserEditDialog(true)}
                 >
                   <div className="flex items-center space-x-2 justify-center">
                     <Icon path={mdiAccountEdit} size={0.75} />
@@ -323,8 +325,20 @@ export default function TmcUsers() {
               onClose={() => setShowUserAddDialog(false)}
               onAdd={() => {
                 setShowUserAddDialog(false);
+                setCheckedList(new Array(data?.content?.length || 0).fill(false));
                 mutate();
               }}
+            />
+            <UserEditDialog
+              show={showUserEditDialog}
+              onClose={() => setShowUserEditDialog(false)}
+              onEdit={() => {
+                setShowUserEditDialog(false);
+                setCheckedList(new Array(data?.content?.length || 0).fill(false));
+                mutate();
+              }}
+              userId={selectedRows?.[0]?.id}
+              importedUser={selectedRows?.[0]?.identityProvider !== "LOCAL"}
             />
             <UserRemoveDialog
               show={showUserRemoveDialog}
