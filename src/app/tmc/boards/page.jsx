@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Table, Pagination, Checkbox, Button, Select, TextInput } from "flowbite-react";
 import useSWR from "swr";
-import { mdiPencil, mdiDelete, mdiInformation, mdiMagnify } from "@mdi/js";
+import { mdiDelete, mdiInformation, mdiMagnify } from "@mdi/js";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
@@ -244,22 +244,11 @@ export default function TmcBoards() {
             color="light"
             size="xs"
             disabled={loading || error || selectedRows.length !== 1}
-            onClick={() => setShowBoardInfoDialog(true)}
+            href={`/tmc/boards/${selectedRows?.[0]?.id}`}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiInformation} size={0.75} />
               <span>Info</span>
-            </div>
-          </Button>
-          <Button
-            theme={customButtonTheme}
-            color="light"
-            size="xs"
-            disabled={loading || error || selectedRows.length !== 1}
-          >
-            <div className="flex items-center space-x-2 justify-center">
-              <Icon path={mdiPencil} size={0.75} />
-              <span>Edit</span>
             </div>
           </Button>
           <Button
