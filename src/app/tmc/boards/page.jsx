@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { Table, Pagination, Checkbox, Button, Select, TextInput } from "flowbite-react";
 import useSWR from "swr";
 import { mdiDelete, mdiInformation, mdiMagnify } from "@mdi/js";
+import BoardRemoveDialog from "@/components/organisms/tmc/board/BoardRemoveDialog";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
@@ -170,6 +171,8 @@ export default function TmcBoards() {
   const [searchTerm, setSearchTerm] = useState(null);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
 
+  const [showBoardRemoveDialog, setShowBoardRemoveDialog] = useState(false);
+
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
       return encodeURIComponent(`${searchProperty}=like="%${searchTerm}%"`)
@@ -181,7 +184,8 @@ export default function TmcBoards() {
   const {
     data,
     error,
-    isLoading: loading
+    isLoading: loading,
+    mutate
   } = useSWR(`/boards?page=${page - 1}&perPage=${perPage}${searchQuery ? `&search=${searchQuery}` : ""}`,
     (url) => api.get(url).then((res) => res.data));
 
@@ -256,6 +260,7 @@ export default function TmcBoards() {
             color="light"
             size="xs"
             disabled={loading || error || selectedRows.length === 0}
+            onClick={() => setShowBoardRemoveDialog(true)}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiDelete} size={0.75} />
@@ -264,6 +269,16 @@ export default function TmcBoards() {
           </Button>
         </Button.Group>
       </div>
+      <BoardRemoveDialog
+        show={showBoardRemoveDialog}
+        onClose={() => setShowBoardRemoveDialog(false)}
+        boardIds={selectedRows ? selectedRows.map((row) => row.id) : []}
+        onRemove={() => {
+          setShowBoardRemoveDialog(false);
+          setCheckedList(new Array(data?.content?.length || 0).fill(false));
+          mutate();
+        }}
+      />
       <div className="relative overflow-x-auto w-full border border-gray-200 dark:border-gray-700">
         <Table theme={customTableTheme} hoverable>
           <Table.Head>
