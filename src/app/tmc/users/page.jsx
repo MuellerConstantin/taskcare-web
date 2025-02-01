@@ -8,7 +8,8 @@ import {
   mdiAccountPlus,
   mdiAccountRemove,
   mdiAccountEdit,
-  mdiMagnify
+  mdiMagnify,
+  mdiAccountDetails
 } from "@mdi/js";
 import UserAddDialog from "@/components/organisms/tmc/user/UserAddDialog";
 import UserRemoveDialog from "@/components/organisms/tmc/user/UserRemoveDialog";
@@ -256,6 +257,18 @@ export default function TmcUsers() {
           }}
         />
         <Button.Group>
+          <Button
+            theme={customButtonTheme}
+            color="light"
+            size="xs"
+            disabled={loading || error || selectedRows.length !== 1}
+            href={`/tmc/users/${selectedRows?.[0]?.id}`}
+          >
+            <div className="flex items-center space-x-2 justify-center">
+              <Icon path={mdiAccountDetails} size={0.75} />
+              <span>Info</span>
+            </div>
+          </Button>
           <Button
             theme={customButtonTheme}
             color="light"

@@ -88,25 +88,61 @@ export default function TmcBoardInfo() {
     <div className="h-full w-full flex flex-col lg:flex-row space-y-4 lg:space-y-0">
       <div className="lg:grow lg:w-[20%] flex flex-col items-center lg:pr-4">
         <BoardInfoLogo boardName={data?.name} userId={boardId} />
-        <div className="mt-4 text-lg font-semibold truncate w-full text-center text-gray-900 dark:text-white">{data?.name}</div>
+        {loading ? (
+          <div className="animate-pulse h-3 bg-gray-200 rounded-full dark:bg-gray-800 w-1/2 mt-4" />
+        ) : error ? (
+          <div className="h-3 bg-red-200 dark:bg-red-400 rounded-full w-1/2 mt-4" />
+        ) : (
+          <div className="mt-4 text-lg font-semibold truncate w-full text-center text-gray-900 dark:text-white">{data?.name}</div>
+        )}
       </div>
       <div className="lg:grow lg:w-[80%] flex flex-col">
         <Accordion flush>
           <Accordion.Panel>
             <Accordion.Title theme={customAccordionTheme.title}>Overview</Accordion.Title>
             <Accordion.Content theme={customAccordionTheme.content}>
-              <div>
-                <span className="block text-gray-900 dark:text-white font-semibold">Name:</span>
-                <p className="mb-2 text-gray-500 dark:text-gray-400">
-                  {data?.name}
-                </p>
-              </div>
-              <div>
-                <span className="block text-gray-900 dark:text-white font-semibold">Description:</span>
-                <p className="mb-2 text-gray-500 dark:text-gray-400">
-                  {data?.description}
-                </p>
-              </div>
+              {loading ? (
+                <div>
+                  <div className="space-y-2">
+                    <span className="block text-gray-900 dark:text-white font-semibold">Name:</span>
+                    <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-32" />
+                  </div>
+                  <div className="space-y-2">
+                    <span className="block text-gray-900 dark:text-white font-semibold">Description:</span>
+                    <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-64" />
+                    <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-64" />
+                    <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-64" />
+                  </div>
+                </div>
+              ) : error ? (
+                <div>
+                  <div className="space-y-2">
+                    <span className="block text-gray-900 dark:text-white font-semibold">Name:</span>
+                    <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-32" />
+                  </div>
+                  <div className="space-y-2">
+                    <span className="block text-gray-900 dark:text-white font-semibold">Description:</span>
+                    <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-64" />
+                    <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-64" />
+                    <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-64" />
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div>
+                    <span className="block text-gray-900 dark:text-white font-semibold">Name:</span>
+                    <p className="mb-2 text-gray-500 dark:text-gray-400">
+                      {data?.name}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="block text-gray-900 dark:text-white font-semibold">Description:</span>
+                    <p className="mb-2 text-gray-500 dark:text-gray-400">
+                      {data?.description}
+                    </p>
+                  </div>
+                </div>
+              )}
             </Accordion.Content>
           </Accordion.Panel>
           <Accordion.Panel>
@@ -152,9 +188,12 @@ export default function TmcBoardInfo() {
                           </div>
                         </Table.Cell>
                         <Table.Cell className="whitespace-nowrap">
-                          <div className="line-clamp-3 min-w-[10rem] max-w-[20rem]">
+                          <a
+                            className="hover:underline hover:cursor-pointer hover:text-amber-500"
+                            href={`/tmc/users/${member.userId}`}
+                          >
                             {member.userId}
-                          </div>
+                          </a>
                         </Table.Cell>
                         <Table.Cell>
                           <div className="line-clamp-3 min-w-[10rem] max-w-[20rem]">
@@ -171,7 +210,7 @@ export default function TmcBoardInfo() {
                   layout="table"
                   showIcons
                   currentPage={page}
-                  totalPages={data?.info?.totalPages ? data.info.totalPages : 1}
+                  totalPages={memberData?.info?.totalPages ? memberData.info.totalPages : 1}
                   onPageChange={setPage}
                 />
               </div>

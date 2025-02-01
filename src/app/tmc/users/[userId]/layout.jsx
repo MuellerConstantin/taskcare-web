@@ -13,10 +13,10 @@ const customButtonTheme = {
 };
 
 export const metadata = {
-  title: "TaskCare | TMC - Board"
+  title: "TaskCare | TMC - User"
 };
 
-export default function TmcBoardLayout({ children }) {
+export default function TmcUserLayout({ children }) {
   return (
     <div className="h-full">
       <div className="flex items-center space-x-4">
@@ -24,14 +24,14 @@ export default function TmcBoardLayout({ children }) {
           theme={customButtonTheme}
           size="xs"
           color="light"
-          href="/tmc/boards"
+          href="/tmc/users"
         >
           <div className="flex items-center space-x-2">
             <Icon path={mdiChevronLeft} size={0.75} />
             <span>Back</span>
           </div>
         </Button>
-        <h1 className="text-xl font-semibold">Board Info</h1>
+        <h1 className="text-xl font-semibold">User Info</h1>
       </div>
       <hr className="my-4" />
       <div className="h-full">
