@@ -10,9 +10,9 @@ import {
   mdiAccountEdit,
   mdiMagnify
 } from "@mdi/js";
-import UserAddDialog from "@/components/organisms/tmc/UserAddDialog";
-import UserRemoveDialog from "@/components/organisms/tmc/UserRemoveDialog";
-import UserEditDialog from "@/components/organisms/tmc/UserEditDialog";
+import UserAddDialog from "@/components/organisms/tmc/user/UserAddDialog";
+import UserRemoveDialog from "@/components/organisms/tmc/user/UserRemoveDialog";
+import UserEditDialog from "@/components/organisms/tmc/user/UserEditDialog";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
