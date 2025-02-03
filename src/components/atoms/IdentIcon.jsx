@@ -11,6 +11,6 @@ export default function IdentIcon({ value }) {
   }, [value]);
 
   return (
-    <svg data-jdenticon-value={value} ref={icon} height="100%" width="100%" />
+    <svg data-jdenticon-value={value} ref={icon} height="100%" width="100%" preserveAspectRatio="xMidYMid slice" />
   );
 }

@@ -43,17 +43,16 @@ function BoardInfoLogo({boardName, boardId}) {
 
   if (data) {
     return (
-      <div className="rounded-full bg-gray-200 dark:bg-gray-800 w-32 h-32">
+      <div className="rounded-full bg-gray-200 dark:bg-gray-800 w-32 h-32 relative overflow-hidden">
         <Image
           src={data}
           alt={boardName}
-          width={64}
-          height={64}
-          className="object-cover"
-          {...props}
+          fill
+          objectFit="cover"
+          layout="fill"
         />
       </div>
-    )
+    );
   } else {
     return (
       <div className="rounded-full bg-gray-200 dark:bg-gray-800 w-32 h-32 overflow-hidden">
@@ -87,7 +86,7 @@ export default function TmcBoardInfo() {
   return (
     <div className="h-full w-full flex flex-col lg:flex-row space-y-4 lg:space-y-0">
       <div className="lg:grow lg:w-[20%] flex flex-col items-center lg:pr-4">
-        <BoardInfoLogo boardName={data?.name} userId={boardId} />
+        <BoardInfoLogo boardName={data?.name} boardId={boardId} />
         {loading ? (
           <div className="animate-pulse h-3 bg-gray-200 rounded-full dark:bg-gray-800 w-1/2 mt-4" />
         ) : error ? (
