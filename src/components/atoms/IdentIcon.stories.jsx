@@ -2,15 +2,20 @@ import IdentIcon from "./IdentIcon";
  
 const meta = {
   title: "Atoms/IdentIcon",
-  component: IdentIcon
+  component: (args) => <div className="w-32 h-32"><IdentIcon {...args} /></div>
 };
 
 export default meta;
 
-export function Default() {
-  return <IdentIcon value="test" />;
+export const Default = {
+  args: {
+    value: "55b8dec2",
+  }
 }
 
-export function Rounded() {
-  return <IdentIcon value="test" className="rounded-full" />;
+export const Rounded = {
+  args: {
+    value: "55b8dec2",
+    className: "rounded-full"
+  }
 }

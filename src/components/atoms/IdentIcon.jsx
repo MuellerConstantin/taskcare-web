@@ -11,8 +11,6 @@ export default function IdentIcon({ value, className, ...props }) {
   }, [value]);
 
   return (
-    <div className={`w-32 h-32 bg-gray-100 dark:bg-gray-800 ${className}`} {...props}>
-      <svg data-jdenticon-value={value} ref={icon} width="100%" height="auto" viewBox="0 0 100 100" />
-    </div>
+    <svg data-jdenticon-value={value} ref={icon} height="auto" width="auto" className={`w-full h-full bg-gray-100 dark:bg-gray-800 relative ${className}`} {...props} />
   );
 }
