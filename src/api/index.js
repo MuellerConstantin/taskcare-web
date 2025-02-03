@@ -33,6 +33,8 @@ const onAuthRefreshFailed = (error) => {
 };
 
 api.interceptors.request.use((config) => {
+  if(!store) return config;
+
   const state = store.getState();
 
   if (state.auth.accessToken && config.url !== "/auth/refresh") {
@@ -45,6 +47,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
+    if(!store) return Promise.reject(err);
+
     const { response, config } = err;
 
     if (response && config.url !== "/auth/refresh") {
