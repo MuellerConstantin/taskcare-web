@@ -26,7 +26,7 @@ const persistConfig = {
   whitelist: ["theme", "auth"],
 };
 
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   theme: themeSlice.reducer,
   auth: authSlice.reducer,
 });

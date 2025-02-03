@@ -1,7 +1,7 @@
 import BoardCardSkeleton from "./BoardCardSkeleton";
  
 const meta = {
-  title: "Molecules/BoardCardSkeleton",
+  title: "Molecules/Board/BoardCardSkeleton",
   component: BoardCardSkeleton,
 };
 
@@ -13,7 +13,7 @@ export const Default = {
   }
 }
 
-export const Errored = {
+export const Error = {
   args: {
     error: true,
   }

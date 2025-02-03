@@ -3,7 +3,7 @@ import { http, HttpResponse } from "msw";
 import MyBoardsGallery from "./MyBoardsGallery";
  
 const meta = {
-  title: "Organisms/MyBoardsGallery",
+  title: "Organisms/Board/MyBoardsGallery",
   component: (args) => (
     <SWRConfig value={{ dedupingInterval: 0 }}>
       <MyBoardsGallery {...args} />
@@ -63,7 +63,7 @@ export const Success = {
   args: {},
 }
 
-export const Errored = {
+export const Error = {
   args: {},
   parameters: {
     msw: {

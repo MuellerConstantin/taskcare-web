@@ -3,7 +3,7 @@ import { http, HttpResponse } from "msw";
 import BoardCard from "./BoardCard";
  
 const meta = {
-  title: "Molecules/BoardCard",
+  title: "Molecules/Board/BoardCard",
   component: (args) => (
     <SWRConfig value={{ dedupingInterval: 0 }}>
       <BoardCard {...args} />
@@ -74,7 +74,7 @@ export const ImageError = {
       handlers: [
         http.get(`${process.env.NEXT_PUBLIC_TASKCARE_API_URL}/boards/:boardId/logo-image`, async () => {
           return new HttpResponse(null, {
-            status: 5005
+            status: 500
           })
         }),
       ],
