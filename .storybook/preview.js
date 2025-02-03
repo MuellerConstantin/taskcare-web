@@ -1,6 +1,9 @@
 import { withThemeByClassName } from "@storybook/addon-themes";
+import { initialize, mswLoader } from "msw-storybook-addon";
 
 import "../src/app/globals.css";
+
+initialize();
 
 /** @type { import('@storybook/react').Preview } */
 const preview = {
@@ -12,6 +15,7 @@ const preview = {
       },
     },
   },
+  loaders: [mswLoader],
   decorators: [
     withThemeByClassName({
       themes: {
