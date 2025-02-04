@@ -65,7 +65,7 @@ export default function BoardRemoveDialog({show, onRemove, onClose, boardIds}) {
           disabled={loading}
           onClick={removeBoards}
         >
-          {!loading && <span>Remove User</span>}
+          {!loading && <span>Remove Board</span>}
           {loading && <Spinner size="sm" className="fill-white" />}
         </Button>
         <Button

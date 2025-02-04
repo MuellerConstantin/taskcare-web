@@ -2,10 +2,12 @@
 
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
+import { useSWRConfig } from "swr"
 import { Button } from "flowbite-react";
 import { mdiPlus } from "@mdi/js";
 import SearchBar from "@/components/molecules/SearchBar";
 import MyBoardsGallery from "@/components/organisms/board/MyBoardsGallery";
+import BoardAddDialog from "@/components/organisms/board/BoardAddDialog";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -16,6 +18,8 @@ const customButtonTheme = {
 };
 
 export default function Home() {
+  const { mutate } = useSWRConfig();
+
   const [searchProperty, setSearchProperty] = useState(null);
   const [searchTerm, setSearchTerm] = useState(null);
 
@@ -57,6 +61,14 @@ export default function Home() {
             </div>
           </Button>
         </div>
+        <BoardAddDialog
+          show={showBoardAddDialog}
+          onClose={() => setShowBoardAddDialog(false)}
+          onAdd={() => {
+            setShowBoardAddDialog(false);
+            mutate((key) => /^.*\/user\/me\/boards.*$/.test(key), null);
+          }}
+        />
         <MyBoardsGallery searchQuery={searchQuery} />
       </div>
     </div>
