@@ -13,7 +13,7 @@ const customPaginationTheme = {
   }
 };
 
-export default function MyBoardsGallery() {
+export default function MyBoardsGallery({searchQuery}) {
   const api = useApi();
 
   const [page, setPage] = useState(1);
@@ -23,7 +23,7 @@ export default function MyBoardsGallery() {
     data,
     error,
     isLoading: loading,
-  } = useSWR(`/user/me/boards?page=${page - 1}&perPage=${perPage}`,
+  } = useSWR(`/user/me/boards?page=${page - 1}&perPage=${perPage}${searchQuery ? `&search=${searchQuery}` : ""}`,
     (url) => api.get(url).then((res) => res.data));
 
   return (
