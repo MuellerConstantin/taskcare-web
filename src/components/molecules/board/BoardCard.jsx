@@ -10,6 +10,7 @@ const customCardTheme = {
 export default function BoardCard({board}) {
   return (
     <Card
+      href={`/boards/${board?.id}`}
       theme={customCardTheme}
       className="w-52 h-[15rem] flex flex-col overflow-hidden hover:cursor-pointer"
       renderImage={() => (

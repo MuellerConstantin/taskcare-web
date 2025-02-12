@@ -115,64 +115,64 @@ export default function TmcUserInfo() {
               {loading ? (
                 <div className="max-w-sm">
                   <div className="flex justify-between items-center">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Username:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Username:</span>
                     <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-32" />
                   </div>
                   <div className="flex justify-between  items-center">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Display Name:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Display Name:</span>
                     <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-32" />
                   </div>
                   <div className="flex justify-between  items-center">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Identity Provider:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Identity Provider:</span>
                     <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-32" />
                   </div>
                   <div className="flex justify-between  items-center">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Role:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Role:</span>
                     <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-32" />
                   </div>
                 </div>
               ) : error ? (
                 <div className="max-w-sm">
                   <div className="flex justify-between items-center">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Username:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Username:</span>
                     <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-32" />
                   </div>
                   <div className="flex justify-between  items-center">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Display Name:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Display Name:</span>
                     <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-32" />
                   </div>
                   <div className="flex justify-between  items-center">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Identity Provider:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Identity Provider:</span>
                     <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-32" />
                   </div>
                   <div className="flex justify-between  items-center">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Role:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Role:</span>
                     <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-32" />
                   </div>
                 </div>
               ) : (
                 <div className="max-w-sm">
                   <div className="flex justify-between">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Username:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Username:</span>
                     <p className="mb-2 text-gray-500 dark:text-gray-400">
                       {data?.username}
                     </p>
                   </div>
                   <div className="flex justify-between">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Display Name:</span>
-                    <p className="mb-2 text-gray-500 dark:text-gray-400">
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Display Name:</span>
+                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                       {data?.displayName || "-"}
                     </p>
                   </div>
                   <div className="flex justify-between">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Identity Provider:</span>
-                    <p className="mb-2 text-gray-500 dark:text-gray-400">
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Identity Provider:</span>
+                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                       {data?.identityProvider}
                     </p>
                   </div>
                   <div className="flex justify-between">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Role:</span>
-                    <p className="mb-2 text-gray-500 dark:text-gray-400">
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Role:</span>
+                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                       {data?.role}
                     </p>
                   </div>

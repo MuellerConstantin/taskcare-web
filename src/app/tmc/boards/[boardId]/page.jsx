@@ -103,11 +103,11 @@ export default function TmcBoardInfo() {
               {loading ? (
                 <div>
                   <div className="space-y-2">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Name:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Name:</span>
                     <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-32" />
                   </div>
                   <div className="space-y-2">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Description:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Description:</span>
                     <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-64" />
                     <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-64" />
                     <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-64" />
@@ -116,11 +116,11 @@ export default function TmcBoardInfo() {
               ) : error ? (
                 <div>
                   <div className="space-y-2">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Name:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Name:</span>
                     <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-32" />
                   </div>
                   <div className="space-y-2">
-                    <span className="block text-gray-900 dark:text-white font-semibold">Description:</span>
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Description:</span>
                     <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-64" />
                     <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-64" />
                     <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-64" />
@@ -129,14 +129,14 @@ export default function TmcBoardInfo() {
               ) : (
                 <div>
                   <div>
-                    <span className="block text-gray-900 dark:text-white font-semibold">Name:</span>
-                    <p className="mb-2 text-gray-500 dark:text-gray-400">
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Name:</span>
+                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                       {data?.name}
                     </p>
                   </div>
                   <div>
-                    <span className="block text-gray-900 dark:text-white font-semibold">Description:</span>
-                    <p className="mb-2 text-gray-500 dark:text-gray-400">
+                    <span className="block text-sm text-gray-900 dark:text-white font-semibold">Description:</span>
+                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                       {data?.description}
                     </p>
                   </div>

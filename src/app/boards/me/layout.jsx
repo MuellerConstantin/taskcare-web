@@ -2,10 +2,10 @@ import AuthGuard from "@/components/organisms/AuthGuard";
 import StackTemplate from "@/components/templates/StackTemplate";
 
 export const metadata = {
-  title: "TaskCare | Home"
+  title: "TaskCare | My Boards"
 };
 
-export default function HomeLayout({ children }) {
+export default function MyBoardsLayout({ children }) {
   return (
     <AuthGuard>
       <StackTemplate>

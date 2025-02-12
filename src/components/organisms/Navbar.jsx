@@ -197,23 +197,22 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const navigation = useMemo(() => {
-    return [
-      { name: "Home", path: "/home", isCurrent: pathname === "/home" },
-      { name: "About", path: "/about", isCurrent: pathname === "/about" },
-    ];
+    return [];
   }, [pathname]);
 
   return (
     <div className="bg-gray-50 dark:bg-gray-800">
       <FlowbiteNavbar theme={customNavbarTheme} fluid rounded className="max-w-screen-2xl mx-auto">
-        <FlowbiteNavbar.Toggle
-          barIcon={() => (
-            <Icon path={mdiMenu}
-              title="Menu Toggle"
-              size={1}
-            />
-          )}
-        />
+        {navigation?.length > 0 && (
+          <FlowbiteNavbar.Toggle
+            barIcon={() => (
+              <Icon path={mdiMenu}
+                title="Menu Toggle"
+                size={1}
+              />
+            )}
+          />
+        )}
         <FlowbiteNavbar.Brand as={Link} href="/">
           <Image
             src="/images/logo.svg"

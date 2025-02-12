@@ -17,7 +17,7 @@ const customButtonTheme = {
   }
 };
 
-export default function Home() {
+export default function MyBoards() {
   const { mutate } = useSWRConfig();
 
   const [searchProperty, setSearchProperty] = useState(null);
@@ -37,7 +37,7 @@ export default function Home() {
     <div className="grow flex flex-col">
       <div className="flex flex-col grow w-full max-w-screen-2xl mx-auto p-4 space-y-4">
         <div className="w-full space-y-2">
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Your Boards</h1>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">My Boards</h1>
           <hr />
         </div>
         <div className="flex flex-col gap-2 md:gap-x-12 md:flex-row md:flex-wrap md:justify-between md:items-center">
