@@ -1,6 +1,6 @@
 import AuthGuard from "@/components/organisms/AuthGuard";
 import StackTemplate from "@/components/templates/StackTemplate";
-import BoardNavbar from "@/components/molecules/board/BoardNavbar";
+import BoardNavbar from "@/components/organisms/board/BoardNavbar";
 
 export const metadata = {
   title: "TaskCare | Board"
