@@ -4,6 +4,10 @@ import useSWR from "swr";
 import useApi from "@/hooks/useApi";
 import { useMemo } from "react";
 import { useParams, usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
+import { mdiViewList, mdiCog, mdiViewDashboardVariant } from "@mdi/js";
+
+const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
 export default function BoardNavbar() {
   const pathname = usePathname();
@@ -19,9 +23,9 @@ export default function BoardNavbar() {
 
   const navigation = useMemo(() => {
     return [
-      {name: "Board", path: `/boards/${boardId}`, isCurrent: `/boards/${boardId}` === pathname},
-      {name: "Backlog", path: `/boards/${boardId}/backlog`, isCurrent: `/boards/${boardId}/backlog` === pathname},
-      {name: "Settings", path: `/boards/${boardId}/settings`, isCurrent: `/boards/${boardId}/settings` === pathname}
+      {name: "Board", icon: mdiViewDashboardVariant, path: `/boards/${boardId}`, isCurrent: `/boards/${boardId}` === pathname},
+      {name: "Backlog", icon: mdiViewList, path: `/boards/${boardId}/backlog`, isCurrent: `/boards/${boardId}/backlog` === pathname},
+      {name: "Settings", icon: mdiCog, path: `/boards/${boardId}/settings`, isCurrent: pathname.startsWith(`/boards/${boardId}/settings`)}
     ];
   }, [boardId, pathname]);
 
@@ -41,9 +45,12 @@ export default function BoardNavbar() {
           {navigation.map((item) => (
             <li key={item.name}>
               <a href={item.path} className="block w-fit group flex flex-col space-y-1">
-                <span className="px-2 py-1 text-gray-900 dark:text-white group-hover:bg-gray-200 dark:group-hover:bg-gray-700 text-sm rounded-md">
-                  {item.name}
-                </span>
+                <div className="flex items-center group-hover:bg-gray-200 dark:group-hover:bg-gray-700 rounded-md text-gray-900 dark:text-white px-2 py-1 space-x-2">
+                  <Icon path={item.icon} size={0.75} className="text-gray-500 dark:group-hover:text-white group-hover:text-gray-900" />
+                  <span className="block text-sm">
+                    {item.name}
+                  </span>
+                </div>
                 {item.isCurrent && (
                   <hr className="border-0 h-1 bg-amber-500"/>
                 )}
