@@ -74,21 +74,35 @@ export default function BoardNavbar() {
               <div className="w-10 h-3 mb-4 bg-red-200 dark:bg-red-400 rounded-md" />
             </li>
           )) : 
-            navigation.map((item) => {
-              return item.name == "Settings" && currentMemberRole != "ADMINISTRATOR" && currentMemberRole != "MAINTAINER" ? null : (
-                <li key={item.name}>
-                  <button onClick={() => router.push(item.path)} className="block w-fit group flex flex-col space-y-1">
-                    <div className="flex items-center group-hover:bg-gray-200 dark:group-hover:bg-gray-700 rounded-md text-gray-900 dark:text-white px-2 py-1 space-x-2">
-                      <Icon path={item.icon} size={0.75} className="text-gray-500 dark:group-hover:text-white group-hover:text-gray-900" />
-                      <span className="block text-sm">
-                        {item.name}
-                      </span>
-                    </div>
-                    <hr className={`${item.isCurrent ? "bg-amber-500" : "bg-transparent"} border-0 h-1`} />
-                  </button>
-                </li>
-              )
-            })
+            navigation.map((item) => (
+              <li key={item.name}>
+                <button
+                  onClick={() => router.push(item.path)}
+                  className="block w-fit group flex flex-col space-y-1"
+                  disabled={item.name == "Settings" && currentMemberRole != "ADMINISTRATOR" && currentMemberRole != "MAINTAINER"}
+                >
+                  <div
+                    className={`${item.name == "Settings" && currentMemberRole != "ADMINISTRATOR" && currentMemberRole != "MAINTAINER" ?
+                      "text-gray-400 dark:text-gray-500" :
+                      "group-hover:bg-gray-200 dark:group-hover:bg-gray-700 text-gray-900 dark:text-white"
+                    } flex items-center px-2 py-1 space-x-2 rounded-md`}
+                  >
+                    <Icon
+                      path={item.icon}
+                      size={0.75}
+                      className={`${item.name == "Settings" && currentMemberRole != "ADMINISTRATOR" && currentMemberRole != "MAINTAINER" ?
+                        "text-gray-400 dark:text-gray-500" :
+                        "text-gray-500 dark:group-hover:text-white group-hover:text-gray-900"
+                      }`}
+                    />
+                    <span className="block text-sm">
+                      {item.name}
+                    </span>
+                  </div>
+                  <hr className={`${item.isCurrent ? "bg-amber-500" : "bg-transparent"} border-0 h-1`} />
+                </button>
+              </li>
+            ))
           }
         </ul>
       </div>

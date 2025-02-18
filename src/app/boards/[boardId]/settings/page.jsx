@@ -5,5 +5,5 @@ import { redirect, useParams } from "next/navigation";
 export default function BoardSettings() {
   const { boardId } = useParams();
 
-  redirect(`/boards/${boardId}/settings/general`);
+  redirect(`/boards/${boardId}/settings/statuses`);
 }
