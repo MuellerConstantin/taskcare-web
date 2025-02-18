@@ -78,7 +78,7 @@ export default function Sidebar() {
           {navigation["content"].map((item) => (
             <FlowbiteSidebar.Item key={item.name} href={item.path} className={item.isCurrent ? "group bg-gray-200 dark:bg-gray-800" : "group"}>
               <div className="inline-flex items-center space-x-2">
-                <Icon path={item.icon} size={1} className="text-gray-500 dark:group-hover:text-white group-hover:text-gray-900" />
+                <Icon path={item.icon} size={0.75} className="text-gray-500 dark:group-hover:text-white group-hover:text-gray-900" />
                 <span>{item.name}</span>
               </div> 
             </FlowbiteSidebar.Item>
@@ -95,7 +95,7 @@ export default function Sidebar() {
               <div className="inline-flex items-center space-x-2">
                 <Icon
                   path={item.icon}
-                  size={1}
+                  size={0.75}
                   className={`${isAuthenticated && currentMemberRole === "ADMINISTRATOR" ?
                     "text-gray-500 dark:group-hover:text-white group-hover:text-gray-900" :
                     "text-gray-400 dark:text-gray-500"
