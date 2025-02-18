@@ -5,7 +5,7 @@ import { usePathname, useParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import dynamic from "next/dynamic";
 import { Sidebar as FlowbiteSidebar } from "flowbite-react";
-import { mdiAccountGroup, mdiViewDashboardVariant, mdiBulletinBoard, mdiTag } from "@mdi/js";
+import { mdiAccountGroup, mdiViewDashboardVariant, mdiBulletinBoard, mdiTag, mdiViewList } from "@mdi/js";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
 
@@ -57,7 +57,8 @@ export default function Sidebar() {
   const navigation = useMemo(() => {
     return {
       "content": [
-        { name: "Statuses", icon: mdiBulletinBoard, path: `/boards/${boardId}/settings/statuses`, isCurrent: pathname === `/boards/${boardId}/settings/statuses` },
+        { name: "Statuses", icon: mdiViewList, path: `/boards/${boardId}/settings/statuses`, isCurrent: pathname === `/boards/${boardId}/settings/statuses` },
+        { name: "Layout", icon: mdiBulletinBoard, path: `/boards/${boardId}/settings/layout`, isCurrent: pathname === `/boards/${boardId}/settings/layout` },
         { name: "Components", icon: mdiTag, path: `/boards/${boardId}/settings/components`, isCurrent: pathname === `/boards/${boardId}/settings/components` },
       ],
       "administration": [
