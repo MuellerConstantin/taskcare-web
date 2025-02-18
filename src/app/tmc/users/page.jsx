@@ -68,7 +68,7 @@ export default function TmcUsers() {
   const api = useApi();
 
   const [page, setPage] = useState(1);
-  const [perPage,] = useState(2);
+  const [perPage,] = useState(25);
   const [searchProperty, setSearchProperty] = useState(null);
   const [searchTerm, setSearchTerm] = useState(null);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
