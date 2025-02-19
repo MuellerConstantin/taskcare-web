@@ -2,12 +2,12 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { Pagination } from "flowbite-react";
+import { Pagination, Tooltip } from "flowbite-react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
 import dynamic from "next/dynamic";
-import { mdiDrag, mdiDelete } from "@mdi/js";
+import { mdiDrag, mdiDelete, mdiHelp } from "@mdi/js";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
 
@@ -58,7 +58,7 @@ function BoardStatus({status}) {
   );
 }
 
-function BoardColumn({status}) {
+function BoardColumn({status, onDelete}) {
   const [{ opacity }, dragRef] = useDrag(() => ({
     type: "BoardStatus",
     item: status,
@@ -76,7 +76,10 @@ function BoardColumn({status}) {
             {status.name}
           </span>
           <div className="flex space-x-2">
-            <button className="h-fit flex items-center justify-center">
+            <button
+              onClick={() => onDelete(status.id)}
+              className="h-fit flex items-center justify-center"
+            >
               <Icon path={mdiDelete} size={0.75} />
             </button>
             <Icon path={mdiDrag} size={0.75} />
@@ -90,7 +93,7 @@ function BoardColumn({status}) {
   );
 }
 
-function BoardLayout({columns: initialColumns}) {
+function BoardLayout({columns: initialColumns = []}) {
   const api = useApi();
   const { boardId } = useParams();
 
@@ -142,11 +145,11 @@ function BoardLayout({columns: initialColumns}) {
       {columns?.length > 0 ? (
         <div ref={dropRef} className="flex gap-4 overflow-x-auto h-full grow">
           {columns.map((column) => (
-            <BoardColumn key={column.id} status={column} />
+            <BoardColumn key={column.id} status={column} onDelete={(id) => updateLayout(columns.filter((col) => col.id !== id))} />
           ))}
         </div>
       ) : (
-        <div className="w-full h-full text-center border border-dashed border-gray-300 dark:border-gray-700 rounded-md p-4">
+        <div ref={dropRef} className="w-full h-full text-center border border-dashed border-gray-300 dark:border-gray-700 rounded-md p-4">
           It seems that no layout has been assigned to the board yet.
         </div>
       )}
@@ -189,9 +192,20 @@ function BoardSettingsLayout() {
   return (
     <div className="text-gray-900 dark:text-white space-y-4">
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">
-          Available Statuses
-        </h3>
+      <div className="flex items-center space-x-2">
+          <h3 className="text-lg font-semibold">
+            Available Statuses
+          </h3>
+          <Tooltip
+            content="Are you missing something? Statuses can be managed via the separate tab. The board layout can be put together using the listed statuses."
+            placement="bottom"
+            className="max-w-xs"
+          >
+            <button className="rounded-full bg-gray-100 dark:bg-gray-800 p-0.5">
+              <Icon path={mdiHelp} size={0.5} />
+            </button>
+          </Tooltip>
+        </div>
         {statusesLoading ? (
           <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from(Array(6).keys()).map((key) => (
@@ -249,9 +263,20 @@ function BoardSettingsLayout() {
         )}
       </div>
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">
-          Board Layout
-        </h3>
+        <div className="flex items-center space-x-2">
+          <h3 className="text-lg font-semibold">
+            Board Layout
+          </h3>
+          <Tooltip
+            content="Define the board layout by dragging and dropping new statuses into the layout or rearranging existing columns."
+            placement="bottom"
+            className="max-w-xs"
+          >
+            <button className="rounded-full bg-gray-100 dark:bg-gray-800 p-0.5">
+              <Icon path={mdiHelp} size={0.5} />
+            </button>
+          </Tooltip>
+        </div>
         <div className="flex flex-col grow h-full">
           {(boardLoading || columnsLoading) ? (
             <div className="flex gap-4 overflow-x-auto h-full grow">
