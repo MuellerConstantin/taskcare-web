@@ -192,19 +192,22 @@ function BoardSettingsLayout() {
   return (
     <div className="text-gray-900 dark:text-white space-y-4">
       <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-          <h3 className="text-lg font-semibold">
-            Available Statuses
-          </h3>
-          <Tooltip
-            content="Are you missing something? Statuses can be managed via the separate tab. The board layout can be put together using the listed statuses."
-            placement="bottom"
-            className="max-w-xs"
-          >
-            <button className="rounded-full bg-gray-100 dark:bg-gray-800 p-0.5">
-              <Icon path={mdiHelp} size={0.5} />
-            </button>
-          </Tooltip>
+        <div className="space-y-1">
+          <div className="flex items-center space-x-2">
+            <h3 className="text-xl font-semibold">
+              Available Statuses
+            </h3>
+            <Tooltip
+              content="Are you missing something? Statuses can be managed via the separate tab. The board layout can be put together using the listed statuses."
+              placement="bottom"
+              className="max-w-xs"
+            >
+              <button className="rounded-full bg-gray-100 dark:bg-gray-800 p-0.5">
+                <Icon path={mdiHelp} size={0.5} />
+              </button>
+            </Tooltip>
+          </div>
+          <hr />
         </div>
         {statusesLoading ? (
           <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -263,19 +266,22 @@ function BoardSettingsLayout() {
         )}
       </div>
       <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <h3 className="text-lg font-semibold">
-            Board Layout
-          </h3>
-          <Tooltip
-            content="Define the board layout by dragging and dropping new statuses into the layout or rearranging existing columns."
-            placement="bottom"
-            className="max-w-xs"
-          >
-            <button className="rounded-full bg-gray-100 dark:bg-gray-800 p-0.5">
-              <Icon path={mdiHelp} size={0.5} />
-            </button>
-          </Tooltip>
+        <div className="space-y-1">
+          <div className="flex items-center space-x-2">
+            <h3 className="text-lg font-semibold">
+              Board Layout
+            </h3>
+            <Tooltip
+              content="Define the board layout by dragging and dropping new statuses into the layout or rearranging existing columns."
+              placement="bottom"
+              className="max-w-xs"
+            >
+              <button className="rounded-full bg-gray-100 dark:bg-gray-800 p-0.5">
+                <Icon path={mdiHelp} size={0.5} />
+              </button>
+            </Tooltip>
+          </div>
+          <hr />
         </div>
         <div className="flex flex-col grow h-full">
           {(boardLoading || columnsLoading) ? (

@@ -64,7 +64,7 @@ export default function TmcBoards() {
   const [perPage,] = useState(25);
   const [searchProperty, setSearchProperty] = useState(null);
   const [searchTerm, setSearchTerm] = useState(null);
-  const [checkedList, setCheckedList] = useState(new Array(1).fill(false));
+  const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
 
   const [showBoardRemoveDialog, setShowBoardRemoveDialog] = useState(false);
 
@@ -95,7 +95,7 @@ export default function TmcBoards() {
   return (
     <>
       <div className="flex flex-col text-gray-900 dark:text-white space-y-1">
-        <h1 className="text-2xl font-semibold">Boards</h1>
+        <h1 className="text-xl font-semibold">Boards</h1>
         <hr />
         <div className="flex space-x-2 text-xs">
           <div className="flex space-x-1 items-center">

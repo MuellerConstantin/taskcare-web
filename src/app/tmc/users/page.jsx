@@ -104,7 +104,7 @@ export default function TmcUsers() {
   return (
     <>
       <div className="flex flex-col text-gray-900 dark:text-white space-y-1">
-        <h1 className="text-2xl font-semibold">Users</h1>
+        <h1 className="text-xl font-semibold">Users</h1>
         <hr />
         <div className="flex space-x-2 text-xs">
           <div className="flex space-x-1 items-center">
