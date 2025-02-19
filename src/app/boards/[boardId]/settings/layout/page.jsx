@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { Pagination } from "flowbite-react";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { TouchBackend } from "react-dnd-touch-backend";
 import dynamic from "next/dynamic";
 import { mdiDrag, mdiDelete } from "@mdi/js";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
+
+const isTouchDevice = () => window && "ontouchstart" in window;
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -31,7 +36,125 @@ const customPaginationTheme = {
   }
 };
 
-export default function BoardSettingsLayout() {
+function BoardStatus({status}) {
+  const [{ opacity }, dragRef] = useDrag(() => ({
+    type: "BoardStatus",
+    item: status,
+  }), []);
+
+  return (
+    <div
+      ref={dragRef}
+      style={{ opacity }}
+      className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 flex items-center space-x-2 cursor-grab"
+    >
+      <div className="flex grow items-center justify-between space-x-4 overflow-hidden">
+        <span className="truncate font-semibold">
+          {status.name}
+        </span>
+        <Icon path={mdiDrag} size={1} />
+      </div>
+    </div>
+  );
+}
+
+function BoardColumn({status}) {
+  const [{ opacity }, dragRef] = useDrag(() => ({
+    type: "BoardStatus",
+    item: status,
+  }), []);
+
+  return (
+    <div
+      ref={dragRef}
+      style={{ opacity }}
+      className="w-[20rem] min-w-[15rem] h-full flex bg-gray-100 dark:bg-gray-800 rounded-md cursor-grab"
+    >
+      <div className="flex flex-col text-gray-900 dark:text-white flex w-full items-start space-y-6">
+        <div className="flex w-full items-center justify-between space-x-4 p-2">
+          <span className="truncate text-sm font-semibold">
+            {status.name}
+          </span>
+          <div className="flex space-x-2">
+            <button className="h-fit flex items-center justify-center">
+              <Icon path={mdiDelete} size={0.75} />
+            </button>
+            <Icon path={mdiDrag} size={0.75} />
+          </div>
+        </div>
+        <div className="grow w-full px-4">
+          <div className="w-full h-full rounded-t-md bg-gray-200 dark:bg-gray-700" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BoardLayout({columns: initialColumns}) {
+  const api = useApi();
+  const { boardId } = useParams();
+
+  const containerRef = useRef(null);
+  const [columns, setColumns] = useState(initialColumns);
+
+  const updateLayout = useCallback((newColumns) => {
+    setColumns(newColumns);
+
+    api.patch(`/boards/${boardId}`, {
+      columns: newColumns.map((col) => col.id),
+    });
+  }, [boardId]);
+  
+  const [, dropRef] = useDrop(() => ({
+    accept: ["BoardStatus", "BoardColumn"],
+    drop: async (status, monitor) => {
+      const clientOffset = monitor.getClientOffset();
+
+      if (!containerRef.current || !clientOffset) return;
+
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const relativeX = clientOffset.x - containerRect.left;
+
+      let targetIndex = columns.length;
+      const columnWidth = containerRect.width / columns.length;
+
+      for (let index = 0; index < columns.length; index++) {
+        if (relativeX < columnWidth * (index + 1)) {
+          targetIndex = index;
+          break;
+        }
+      }
+
+      const filteredColumns = columns.filter((col) => col.id !== status.id);
+
+      const newColumns = [
+        ...filteredColumns.slice(0, targetIndex),
+        status,
+        ...filteredColumns.slice(targetIndex),
+      ];
+
+      updateLayout(newColumns);
+    },
+  }), [columns]);
+
+  return (
+    <div ref={containerRef} className="h-48">
+      {columns?.length > 0 ? (
+        <div ref={dropRef} className="flex gap-4 overflow-x-auto h-full grow">
+          {columns.map((column) => (
+            <BoardColumn key={column.id} status={column} />
+          ))}
+        </div>
+      ) : (
+        <div className="w-full h-full text-center border border-dashed border-gray-300 dark:border-gray-700 rounded-md p-4">
+          It seems that no layout has been assigned to the board yet.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BoardSettingsLayout() {
   const api = useApi();
   const { boardId } = useParams();
 
@@ -90,13 +213,8 @@ export default function BoardSettingsLayout() {
             {statusesData?.info.totalElements > 0 ? (
               <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {statusesData?.content.map((status) => (
-                  <li key={status.id} className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 flex items-center space-x-2 cursor-grab">
-                    <div className="flex grow items-center justify-between space-x-4 overflow-hidden">
-                      <span className="truncate font-semibold">
-                        {status.name}
-                      </span>
-                      <Icon path={mdiDrag} size={1} />
-                    </div>
+                  <li key={status.id}>
+                    <BoardStatus status={status} />
                   </li>
                 ))}
               </ul>
@@ -135,54 +253,35 @@ export default function BoardSettingsLayout() {
           Board Layout
         </h3>
         <div className="flex flex-col grow h-full">
-          <div className="flex gap-4 overflow-x-auto h-full grow">
-            {(boardLoading || columnsLoading) ? (
-              Array.from(Array(4).keys()).map((key) => (
+          {(boardLoading || columnsLoading) ? (
+            <div className="flex gap-4 overflow-x-auto h-full grow">
+              {Array.from(Array(4).keys()).map((key) => (
                 <div key={key}>
                   <div className="animate-pulse w-[20rem] h-32 flex bg-gray-100 dark:bg-gray-800 rounded-md" />
                 </div>
-              ))
-            ) : (boardError || columnsError) ? (
-              Array.from(Array(4).keys()).map((key) => (
+              ))}
+            </div>
+          ) : (boardError || columnsError) ? (
+            <div className="flex gap-4 overflow-x-auto h-full grow">
+              {Array.from(Array(4).keys()).map((key) => (
                 <div key={key}>
                   <div className="bg-red-200 dark:bg-red-400 w-[20rem] h-32 flex rounded-md" />
                 </div>
-              ))
-            ) : (
-              <>
-                {columnsData?.length > 0 ? (
-                  columnsData?.map((column) => (
-                    <div key={column.id}>
-                      <div className="w-[20rem] h-32 flex bg-gray-100 dark:bg-gray-800 rounded-md cursor-grab">
-                        <div className="flex flex-col text-gray-900 dark:text-white flex w-full items-start space-y-6">
-                          <div className="flex w-full items-center justify-between space-x-4 p-2">
-                            <span className="truncate text-sm font-semibold">
-                              {column.name}
-                            </span>
-                            <div className="flex space-x-2">
-                              <button className="h-fit flex items-center justify-center">
-                                <Icon path={mdiDelete} size={0.75} />
-                              </button>
-                              <Icon path={mdiDrag} size={0.75} />
-                            </div>
-                          </div>
-                          <div className="grow w-full px-4">
-                            <div className="w-full h-full rounded-t-md bg-gray-200 dark:bg-gray-700" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="w-full text-center">
-                    It seems that no layout has been assigned to the board yet.
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <BoardLayout columns={columnsData} />
+          )}
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BoardSettingsLayoutWrapper() {
+  return (
+    <DndProvider backend={isTouchDevice() ? TouchBackend : HTML5Backend}>
+      <BoardSettingsLayout />
+    </DndProvider>
   );
 }
