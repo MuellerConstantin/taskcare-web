@@ -7,7 +7,6 @@ import { Table, Pagination, Checkbox, Button } from "flowbite-react";
 import useSWR from "swr";
 import { mdiDelete, mdiPlus, mdiPencil } from "@mdi/js";
 import SearchBar from "@/components/molecules/SearchBar";
-import BoardRemoveDialog from "@/components/organisms/tmc/board/BoardRemoveDialog";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
@@ -67,8 +66,6 @@ export default function BoardSettingsStatuses() {
   const [searchProperty, setSearchProperty] = useState(null);
   const [searchTerm, setSearchTerm] = useState(null);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
-
-  const [showBoardRemoveDialog, setShowBoardRemoveDialog] = useState(false);
 
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
@@ -176,16 +173,6 @@ export default function BoardSettingsStatuses() {
           </Button>
         </Button.Group>
       </div>
-      <BoardRemoveDialog
-        show={showBoardRemoveDialog}
-        onClose={() => setShowBoardRemoveDialog(false)}
-        boardIds={selectedRows ? selectedRows.map((row) => row.id) : []}
-        onRemove={() => {
-          setShowBoardRemoveDialog(false);
-          setCheckedList(new Array(data?.content?.length || 0).fill(false));
-          mutate();
-        }}
-      />
       <div className="relative overflow-x-auto w-full border border-gray-200 dark:border-gray-700">
         <Table theme={customTableTheme} hoverable>
           <Table.Head>
