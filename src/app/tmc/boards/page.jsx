@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Table, Pagination, Checkbox, Button } from "flowbite-react";
 import useSWR from "swr";
@@ -92,6 +92,12 @@ export default function TmcBoards() {
     }
   }, [checkedList, data]);
 
+  useEffect(() => {
+    if(data?.content) {
+      setCheckedList(new Array(data.content.length).fill(false));
+    }
+  }, [data?.content?.length]);
+
   return (
     <>
       <div className="flex flex-col text-gray-900 dark:text-white space-y-1">
@@ -171,7 +177,6 @@ export default function TmcBoards() {
         boardIds={selectedRows ? selectedRows.map((row) => row.id) : []}
         onRemove={() => {
           setShowBoardRemoveDialog(false);
-          setCheckedList(new Array(data?.content?.length || 0).fill(false));
           mutate();
         }}
       />
@@ -233,7 +238,7 @@ export default function TmcBoards() {
               <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={board.id}>
                 <Table.Cell className="p-4">
                   <Checkbox
-                    checked={checkedList[index]}
+                    checked={!!checkedList[index]}
                     onChange={() => setCheckedList((oldCheckedList) => [...oldCheckedList.slice(0, index), !oldCheckedList[index], ...oldCheckedList.slice(index + 1)])}
                     theme={customCheckboxTheme}
                     color="amber"

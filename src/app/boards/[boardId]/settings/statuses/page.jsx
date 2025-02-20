@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { Table, Pagination, Checkbox, Button } from "flowbite-react";
@@ -90,6 +90,12 @@ export default function BoardSettingsStatuses() {
       return [];
     }
   }, [checkedList, data]);
+
+  useEffect(() => {
+    if(data?.content) {
+      setCheckedList(new Array(data.content.length).fill(false));
+    }
+  }, [data?.content?.length]);
 
   return (
     <>
@@ -231,7 +237,7 @@ export default function BoardSettingsStatuses() {
               <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={board.id}>
                 <Table.Cell className="p-4">
                   <Checkbox
-                    checked={checkedList[index]}
+                    checked={!!checkedList[index]}
                     onChange={() => setCheckedList((oldCheckedList) => [...oldCheckedList.slice(0, index), !oldCheckedList[index], ...oldCheckedList.slice(index + 1)])}
                     theme={customCheckboxTheme}
                     color="amber"

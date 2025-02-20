@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Table, Pagination, Checkbox, Button } from "flowbite-react";
 import useSWR from "swr";
@@ -100,6 +100,12 @@ export default function TmcUsers() {
       return [];
     }
   }, [checkedList, data]);
+
+  useEffect(() => {
+    if(data?.content) {
+      setCheckedList(new Array(data.content.length).fill(false));
+    }
+  }, [data?.content?.length]);
 
   return (
     <>
@@ -203,7 +209,6 @@ export default function TmcUsers() {
         onClose={() => setShowUserAddDialog(false)}
         onAdd={() => {
           setShowUserAddDialog(false);
-          setCheckedList(new Array(data?.content?.length || 0).fill(false));
           mutate();
         }}
       />
@@ -212,7 +217,6 @@ export default function TmcUsers() {
         onClose={() => setShowUserEditDialog(false)}
         onEdit={() => {
           setShowUserEditDialog(false);
-          setCheckedList(new Array(data?.content?.length || 0).fill(false));
           mutate();
         }}
         userId={selectedRows?.[0]?.id}
@@ -224,7 +228,6 @@ export default function TmcUsers() {
         userIds={selectedRows ? selectedRows.map((row) => row.id) : []}
         onRemove={() => {
           setShowUserRemoveDialog(false);
-          setCheckedList(new Array(data?.content?.length || 0).fill(false));
           mutate();
         }}
       />
@@ -300,7 +303,7 @@ export default function TmcUsers() {
               <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={user.id}>
                 <Table.Cell className="p-4">
                   <Checkbox
-                    checked={checkedList[index]}
+                    checked={!!checkedList[index]}
                     onChange={() => setCheckedList((oldCheckedList) => [...oldCheckedList.slice(0, index), !oldCheckedList[index], ...oldCheckedList.slice(index + 1)])}
                     theme={customCheckboxTheme}
                     color="amber"
