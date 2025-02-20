@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { Table, Pagination, Checkbox, Button } from "flowbite-react";
 import useSWR from "swr";
 import { mdiDelete, mdiPlus, mdiPencil } from "@mdi/js";
+import StatusAddDialog from "@/components/organisms/board/settings/StatusAddDialog";
+import StatusRemoveDialog from "@/components/organisms/board/settings/StatusRemoveDialog";
 import SearchBar from "@/components/molecules/SearchBar";
 import useApi from "@/hooks/useApi";
 
@@ -66,6 +68,9 @@ export default function BoardSettingsStatuses() {
   const [searchProperty, setSearchProperty] = useState(null);
   const [searchTerm, setSearchTerm] = useState(null);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
+
+  const [showStatusAddDialog, setShowStatusAddDialog] = useState(false);
+  const [showStatusRemoveDialog, setShowStatusRemoveDialog] = useState(false);
 
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
@@ -149,6 +154,7 @@ export default function BoardSettingsStatuses() {
             color="light"
             size="xs"
             disabled={loading || error}
+            onClick={() => setShowStatusAddDialog(true)}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiPlus} size={0.75} />
@@ -171,6 +177,7 @@ export default function BoardSettingsStatuses() {
             color="light"
             size="xs"
             disabled={loading || error || selectedRows.length === 0}
+            onClick={() => setShowStatusRemoveDialog(true)}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiDelete} size={0.75} />
@@ -179,6 +186,25 @@ export default function BoardSettingsStatuses() {
           </Button>
         </Button.Group>
       </div>
+      <StatusAddDialog
+        show={showStatusAddDialog}
+        boardId={boardId}
+        onClose={() => setShowStatusAddDialog(false)}
+        onAdd={() => {
+          setShowStatusAddDialog(false);
+          mutate();
+        }}
+      />
+      <StatusRemoveDialog
+        show={showStatusRemoveDialog}
+        boardId={boardId}
+        statusIds={selectedRows ? selectedRows.map((row) => row.id) : []}
+        onClose={() => setShowStatusRemoveDialog(false)}
+        onRemove={() => {
+          setShowStatusRemoveDialog(false);
+          mutate();
+        }}
+      />
       <div className="relative overflow-x-auto w-full border border-gray-200 dark:border-gray-700">
         <Table theme={customTableTheme} hoverable>
           <Table.Head>
