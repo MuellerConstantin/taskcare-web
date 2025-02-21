@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { Table, Pagination, Checkbox, Button } from "flowbite-react";
 import useSWR from "swr";
 import { mdiDelete, mdiPlus, mdiPencil, mdiInformation } from "@mdi/js";
+import MemberAddDialog from "@/components/organisms/board/settings/MemberAddDialog";
 import SearchBar from "@/components/molecules/SearchBar";
 import useApi from "@/hooks/useApi";
 
@@ -67,6 +68,8 @@ export default function BoardSettingsStatuses() {
   const [searchTerm, setSearchTerm] = useState(null);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
 
+  const [showMemberAddDialog, setShowMemberAddDialog] = useState(false);
+
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
       return encodeURIComponent(`${searchProperty}=like="%${searchTerm}%"`)
@@ -92,7 +95,7 @@ export default function BoardSettingsStatuses() {
     async (urls) => {
       return await Promise.all(urls.map(url => api.get(url).then(res => res.data)));
     }
-  );
+  , [data]);
 
   const members = useMemo(() => {
     if(data && usersData) {
@@ -183,6 +186,7 @@ export default function BoardSettingsStatuses() {
             color="light"
             size="xs"
             disabled={loading || usersLoading || error || usersError}
+            onClick={() => setShowMemberAddDialog(true)}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiPlus} size={0.75} />
@@ -213,6 +217,15 @@ export default function BoardSettingsStatuses() {
           </Button>
         </Button.Group>
       </div>
+      <MemberAddDialog
+        boardId={boardId}
+        show={showMemberAddDialog}
+        onClose={() => setShowMemberAddDialog(false)}
+        onAdd={() => {
+          setShowMemberAddDialog(false);
+          mutate();
+        }}
+      />
       <div className="relative overflow-x-auto w-full border border-gray-200 dark:border-gray-700">
         <Table theme={customTableTheme} hoverable>
           <Table.Head>
