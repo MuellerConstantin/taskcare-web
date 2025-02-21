@@ -8,6 +8,7 @@ import useSWR from "swr";
 import { mdiDelete, mdiPlus, mdiPencil } from "@mdi/js";
 import StatusAddDialog from "@/components/organisms/board/settings/StatusAddDialog";
 import StatusRemoveDialog from "@/components/organisms/board/settings/StatusRemoveDialog";
+import StatusEditDialog from "@/components/organisms/board/settings/StatusEditDialog";
 import SearchBar from "@/components/molecules/SearchBar";
 import useApi from "@/hooks/useApi";
 
@@ -71,6 +72,7 @@ export default function BoardSettingsStatuses() {
 
   const [showStatusAddDialog, setShowStatusAddDialog] = useState(false);
   const [showStatusRemoveDialog, setShowStatusRemoveDialog] = useState(false);
+  const [showStatusEditDialog, setShowStatusEditDialog] = useState(false);
 
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
@@ -166,6 +168,7 @@ export default function BoardSettingsStatuses() {
             color="light"
             size="xs"
             disabled={loading || error || selectedRows.length !== 1}
+            onClick={() => setShowStatusEditDialog(true)}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiPencil} size={0.75} />
@@ -202,6 +205,16 @@ export default function BoardSettingsStatuses() {
         onClose={() => setShowStatusRemoveDialog(false)}
         onRemove={() => {
           setShowStatusRemoveDialog(false);
+          mutate();
+        }}
+      />
+      <StatusEditDialog
+        show={showStatusEditDialog}
+        boardId={boardId}
+        statusId={selectedRows?.[0]?.id}
+        onClose={() => setShowStatusEditDialog(false)}
+        onEdit={() => {
+          setShowStatusEditDialog(false);
           mutate();
         }}
       />
