@@ -91,7 +91,7 @@ export default function Sidebar() {
             <FlowbiteSidebar.Item
               key={item.name}
               href={isAuthenticated && currentMemberRole === "ADMINISTRATOR" ? item.path : null}
-              className={`${isAuthenticated && currentMemberRole === "ADMINISTRATOR" ? "" : "hover:!bg-transparent"} group`}
+              className={`${isAuthenticated && currentMemberRole === "ADMINISTRATOR" ? item.isCurrent ? "bg-gray-200 dark:bg-gray-800" : "" : "hover:!bg-transparent"} group`}
             >
               <div className="inline-flex items-center space-x-2">
                 <Icon
@@ -102,7 +102,9 @@ export default function Sidebar() {
                     "text-gray-400 dark:text-gray-500"
                   }`}
                 />
-                <span className={isAuthenticated && currentMemberRole === "ADMINISTRATOR" ? "" : "text-gray-400 dark:text-gray-500"}>{item.name}</span>
+                <span className={isAuthenticated && currentMemberRole === "ADMINISTRATOR" ? "" : "text-gray-400 dark:text-gray-500"}>
+                  {item.name}
+                </span>
               </div> 
             </FlowbiteSidebar.Item>
           ))}
