@@ -6,6 +6,9 @@ import { useParams } from "next/navigation";
 import { Table, Pagination, Checkbox, Button } from "flowbite-react";
 import useSWR from "swr";
 import { mdiDelete, mdiPlus, mdiPencil } from "@mdi/js";
+import ComponentAddDialog from "@/components/organisms/board/settings/ComponentAddDialog";
+import ComponentRemoveDialog from "@/components/organisms/board/settings/ComponentRemoveDialog";
+import ComponentEditDialog from "@/components/organisms/board/settings/ComponentEditDialog";
 import SearchBar from "@/components/molecules/SearchBar";
 import useApi from "@/hooks/useApi";
 
@@ -66,6 +69,10 @@ export default function BoardSettingsComponents() {
   const [searchProperty, setSearchProperty] = useState(null);
   const [searchTerm, setSearchTerm] = useState(null);
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
+
+  const [showComponentAddDialog, setShowComponentAddDialog] = useState(false);
+  const [showComponentRemoveDialog, setShowComponentRemoveDialog] = useState(false);
+  const [showComponentEditDialog, setShowComponentEditDialog] = useState(false);
 
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
@@ -149,6 +156,7 @@ export default function BoardSettingsComponents() {
             color="light"
             size="xs"
             disabled={loading || error}
+            onClick={() => setShowComponentAddDialog(true)}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiPlus} size={0.75} />
@@ -160,6 +168,7 @@ export default function BoardSettingsComponents() {
             color="light"
             size="xs"
             disabled={loading || error || selectedRows.length !== 1}
+            onClick={() => setShowComponentEditDialog(true)}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiPencil} size={0.75} />
@@ -171,6 +180,7 @@ export default function BoardSettingsComponents() {
             color="light"
             size="xs"
             disabled={loading || error || selectedRows.length === 0}
+            onClick={() => setShowComponentRemoveDialog(true)}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiDelete} size={0.75} />
@@ -179,6 +189,35 @@ export default function BoardSettingsComponents() {
           </Button>
         </Button.Group>
       </div>
+      <ComponentAddDialog
+        show={showComponentAddDialog}
+        boardId={boardId}
+        onClose={() => setShowComponentAddDialog(false)}
+        onAdd={() => {
+          setShowComponentAddDialog(false);
+          mutate();
+        }}
+      />
+      <ComponentRemoveDialog
+        show={showComponentRemoveDialog}
+        boardId={boardId}
+        componentIds={selectedRows ? selectedRows.map((row) => row.id) : []}
+        onClose={() => setShowComponentRemoveDialog(false)}
+        onRemove={() => {
+          setShowComponentRemoveDialog(false);
+          mutate();
+        }}
+      />
+      <ComponentEditDialog
+        show={showComponentEditDialog}
+        boardId={boardId}
+        componentId={selectedRows?.[0]?.id}
+        onClose={() => setShowComponentEditDialog(false)}
+        onEdit={() => {
+          setShowComponentEditDialog(false);
+          mutate();
+        }}
+      />
       <div className="relative overflow-x-auto w-full border border-gray-200 dark:border-gray-700">
         <Table theme={customTableTheme} hoverable>
           <Table.Head>
