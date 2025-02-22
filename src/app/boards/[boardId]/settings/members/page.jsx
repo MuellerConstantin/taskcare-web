@@ -5,9 +5,10 @@ import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { Table, Pagination, Checkbox, Button } from "flowbite-react";
 import useSWR from "swr";
-import { mdiDelete, mdiPlus, mdiPencil, mdiInformation } from "@mdi/js";
+import { mdiDelete, mdiPlus, mdiPencil } from "@mdi/js";
 import MemberAddDialog from "@/components/organisms/board/settings/MemberAddDialog";
 import MemberRemoveDialog from "@/components/organisms/board/settings/MemberRemoveDialog";
+import MemberEditDialog from "@/components/organisms/board/settings/MemberEditDialog";
 import SearchBar from "@/components/molecules/SearchBar";
 import useApi from "@/hooks/useApi";
 
@@ -71,6 +72,7 @@ export default function BoardSettingsStatuses() {
 
   const [showMemberAddDialog, setShowMemberAddDialog] = useState(false);
   const [showMemberRemoveDialog, setShowMemberRemoveDialog] = useState(false);
+  const [showMemberEditDialog, setShowMemberEditDialog] = useState(false);
 
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
@@ -176,17 +178,6 @@ export default function BoardSettingsStatuses() {
             theme={customButtonTheme}
             color="light"
             size="xs"
-            disabled={loading || usersLoading || error || usersError || selectedRows.length !== 1}
-          >
-            <div className="flex items-center space-x-2 justify-center">
-              <Icon path={mdiInformation} size={0.75} />
-              <span>Info</span>
-            </div>
-          </Button>
-          <Button
-            theme={customButtonTheme}
-            color="light"
-            size="xs"
             disabled={loading || usersLoading || error || usersError}
             onClick={() => setShowMemberAddDialog(true)}
           >
@@ -200,6 +191,7 @@ export default function BoardSettingsStatuses() {
             color="light"
             size="xs"
             disabled={loading || usersLoading || error || usersError || selectedRows.length !== 1}
+            onClick={() => setShowMemberEditDialog(true)}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiPencil} size={0.75} />
@@ -226,6 +218,16 @@ export default function BoardSettingsStatuses() {
         onClose={() => setShowMemberAddDialog(false)}
         onAdd={() => {
           setShowMemberAddDialog(false);
+          mutate();
+        }}
+      />
+      <MemberEditDialog
+        boardId={boardId}
+        show={showMemberEditDialog}
+        memberId={selectedRows?.[0]?.id}
+        onClose={() => setShowMemberEditDialog(false)}
+        onEdit={() => {
+          setShowMemberEditDialog(false);
           mutate();
         }}
       />

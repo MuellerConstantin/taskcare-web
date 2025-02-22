@@ -236,8 +236,8 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
                 className="w-full"
                 disabled={!(props.isValid && props.dirty) || loading || editLoading}
               >
-                {!loading && <span>Add User</span>}
-                {loading && <Spinner size="sm" className="fill-white" />}
+                {!editLoading && <span>Edit User</span>}
+                {editLoading && <Spinner size="sm" className="fill-white" />}
               </Button>
             </Modal.Footer>
           </form>
