@@ -7,6 +7,7 @@ import { Table, Pagination, Checkbox, Button } from "flowbite-react";
 import useSWR from "swr";
 import { mdiDelete, mdiPlus, mdiPencil, mdiInformation } from "@mdi/js";
 import MemberAddDialog from "@/components/organisms/board/settings/MemberAddDialog";
+import MemberRemoveDialog from "@/components/organisms/board/settings/MemberRemoveDialog";
 import SearchBar from "@/components/molecules/SearchBar";
 import useApi from "@/hooks/useApi";
 
@@ -69,6 +70,7 @@ export default function BoardSettingsStatuses() {
   const [checkedList, setCheckedList] = useState(new Array(25).fill(false));
 
   const [showMemberAddDialog, setShowMemberAddDialog] = useState(false);
+  const [showMemberRemoveDialog, setShowMemberRemoveDialog] = useState(false);
 
   const searchQuery = useMemo(() => {
     if(searchProperty && searchTerm && searchTerm.length > 0) {
@@ -209,6 +211,7 @@ export default function BoardSettingsStatuses() {
             color="light"
             size="xs"
             disabled={loading || usersLoading || error || usersError || selectedRows.length === 0}
+            onClick={() => setShowMemberRemoveDialog(true)}
           >
             <div className="flex items-center space-x-2 justify-center">
               <Icon path={mdiDelete} size={0.75} />
@@ -223,6 +226,16 @@ export default function BoardSettingsStatuses() {
         onClose={() => setShowMemberAddDialog(false)}
         onAdd={() => {
           setShowMemberAddDialog(false);
+          mutate();
+        }}
+      />
+      <MemberRemoveDialog
+        boardId={boardId}
+        show={showMemberRemoveDialog}
+        memberIds={selectedRows ? selectedRows.map((row) => row.id) : []}
+        onClose={() => setShowMemberRemoveDialog(false)}
+        onRemove={() => {
+          setShowMemberRemoveDialog(false);
           mutate();
         }}
       />
