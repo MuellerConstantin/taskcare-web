@@ -20,7 +20,7 @@ export default function Footer() {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-800">
-      <FlowbiteFooter theme={customFooterTheme} className="max-w-screen-2xl mx-auto">
+      <FlowbiteFooter theme={customFooterTheme}>
         <div className="w-full text-center">
           <div className="w-full justify-between sm:flex sm:items-center sm:justify-between">
             <FlowbiteFooter.Brand

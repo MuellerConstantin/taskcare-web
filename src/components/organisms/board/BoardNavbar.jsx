@@ -54,7 +54,7 @@ export default function BoardNavbar() {
 
   return (
     <div className="bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
-      <div className="max-w-screen-2xl mx-auto px-2 pt-3 sm:px-4 space-y-4">
+      <div className="px-2 pt-3 sm:px-4 space-y-4">
         {loading ? (
           <div className="animate-pulse h-4 bg-gray-200 rounded-full dark:bg-gray-800 w-64" />
         ) : error ? (

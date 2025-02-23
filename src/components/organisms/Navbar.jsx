@@ -202,7 +202,7 @@ export default function Navbar() {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-800">
-      <FlowbiteNavbar theme={customNavbarTheme} fluid rounded className="max-w-screen-2xl mx-auto">
+      <FlowbiteNavbar theme={customNavbarTheme} fluid rounded>
         {navigation?.length > 0 && (
           <FlowbiteNavbar.Toggle
             barIcon={() => (
