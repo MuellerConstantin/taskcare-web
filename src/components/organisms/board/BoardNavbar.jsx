@@ -3,11 +3,24 @@
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
 import { useMemo } from "react";
+import { Breadcrumb } from "flowbite-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { mdiViewList, mdiCog, mdiViewDashboardVariant } from "@mdi/js";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
+
+const customBreadcrumbTheme = {
+  "item": {
+    "base": "group flex items-center overflow-hidden",
+    "chevron": "h-4 w-4 text-gray-400 group-first:hidden",
+    "href": {
+      "off": "flex items-center text-sm font-medium text-gray-500 dark:text-gray-400 rounded-md px-2 py-1 overflow-hidden",
+      "on": "flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md px-2 py-1 overflow-hidden"
+    },
+    "icon": "mr-2 h-4 w-4"
+  }
+};
 
 export default function BoardNavbar() {
   const router = useRouter();
@@ -60,9 +73,16 @@ export default function BoardNavbar() {
         ) : error ? (
           <div className="bg-red-200 dark:bg-red-400 h-4 bg-gray-200 rounded-full dark:bg-gray-800 w-64" />
         ) : (
-          <h1 className="md:text-xl font-semibold truncate text-gray-900 dark:text-white">
-            {data?.name}
-          </h1>
+          <Breadcrumb theme={customBreadcrumbTheme}>
+            <Breadcrumb.Item href="/" theme={customBreadcrumbTheme["item"]}>
+              Home
+            </Breadcrumb.Item>
+            <Breadcrumb.Item href="#" theme={customBreadcrumbTheme["item"]}>
+              <div className="truncate">
+                {data?.name}
+              </div>
+            </Breadcrumb.Item>
+          </Breadcrumb>
         )}
         <ul className="overflow-x-auto flex space-x-2">
           {currentMemberLoading || currentUserLoading ? Array.from(Array(3).keys()).map((key) => (
