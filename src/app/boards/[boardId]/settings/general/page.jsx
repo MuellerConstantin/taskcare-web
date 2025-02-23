@@ -1,15 +1,20 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { TextInput, Textarea, Button, Label, Spinner } from "flowbite-react";
+import { mdiPencil } from "@mdi/js";
 import useSWR from "swr";
 import { Formik } from "formik";
 import * as yup from "yup";
 import BoardRemoveDialog from "@/components/organisms/board/BoardRemoveDialog";
+import BoardChangeLogoDialog from "@/components/organisms/board/BoardChangeLogoDialog";
 import IdentIcon from "@/components/atoms/IdentIcon";
 import useApi from "@/hooks/useApi";
+
+const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
 const customButtonTheme = {
   "color": {
@@ -41,28 +46,65 @@ const schema = yup.object().shape({
 function BoardInfoLogo({boardName, boardId}) {
   const api = useApi();
 
+  const [showChangeLogoDialog, setShowChangeLogoDialog] = useState(false);
+
   const {
-    data
+    data,
+    mutate
   } = useSWR(boardId ? `/boards/${boardId}/logo-image` : null,
     (url) => api.get(url, {responseType: "arraybuffer"})
       .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
 
   if (data) {
     return (
-      <div className="rounded-full bg-gray-200 dark:bg-gray-800 w-32 h-32 relative overflow-hidden">
-        <Image
-          src={data}
-          alt={boardName}
-          fill
-          objectFit="cover"
-          layout="fill"
+      <div className="relative">
+        <BoardChangeLogoDialog
+          show={showChangeLogoDialog}
+          boardId={boardId}
+          onClose={() => setShowChangeLogoDialog(false)}
+          onChange={() => {
+            setShowChangeLogoDialog(false);
+            mutate();
+          }}
         />
+        <div className="rounded-full bg-gray-200 dark:bg-gray-800 w-32 h-32 relative overflow-hidden">
+          <Image
+            src={data}
+            alt={boardName}
+            fill
+            objectFit="cover"
+            layout="fill"
+          />
+        </div>
+        <button
+          className="absolute bottom-0 right-0 w-8 h-8 p-0 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center"
+          onClick={() => setShowChangeLogoDialog(true)}
+        >
+          <Icon path={mdiPencil} size={0.75} className="text-gray-500 dark:text-gray-400" />
+        </button>
       </div>
     );
   } else {
     return (
-      <div className="rounded-full bg-gray-200 dark:bg-gray-800 w-32 h-32 overflow-hidden">
-        <IdentIcon value={boardName} />
+      <div className="relative">
+        <BoardChangeLogoDialog
+          show={showChangeLogoDialog}
+          boardId={boardId}
+          onClose={() => setShowChangeLogoDialog(false)}
+          onChange={() => {
+            setShowChangeLogoDialog(false);
+            mutate();
+          }}
+        />
+        <div className="rounded-full bg-gray-200 dark:bg-gray-800 w-32 h-32 overflow-hidden">
+          <IdentIcon value={boardName} />
+        </div>
+        <button
+          className="absolute bottom-0 right-0 w-8 h-8 p-0 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center"
+          onClick={() => setShowChangeLogoDialog(true)}
+        >
+          <Icon path={mdiPencil} size={0.75} className="text-gray-500 dark:text-gray-400" />
+        </button>
       </div>
     );
   }

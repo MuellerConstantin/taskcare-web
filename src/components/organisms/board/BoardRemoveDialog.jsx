@@ -27,7 +27,6 @@ export default function BoardRemoveDialog({show, boardId, onRemove, onClose}) {
     api.delete(`/boards/${boardId}`)
       .then(onRemove)
       .catch((err) => {
-        console.log(err);
         setError("An unexpected error occurred, please retry!");
       })
       .finally(() => {
