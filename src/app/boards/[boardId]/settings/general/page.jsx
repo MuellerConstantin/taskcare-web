@@ -2,11 +2,12 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { TextInput, Textarea, Button, Label, Spinner } from "flowbite-react";
 import useSWR from "swr";
 import { Formik } from "formik";
 import * as yup from "yup";
+import BoardRemoveDialog from "@/components/organisms/board/BoardRemoveDialog";
 import IdentIcon from "@/components/atoms/IdentIcon";
 import useApi from "@/hooks/useApi";
 
@@ -69,9 +70,12 @@ function BoardInfoLogo({boardName, boardId}) {
 
 export default function BoardSettingsGeneral() {
   const { boardId } = useParams();
+  const router = useRouter();
   const api = useApi();
 
   const formikRef = useRef(null);
+
+  const [showRemoveBoardDialog, setShowRemoveBoardDialog] = useState(false);
 
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState(null);
@@ -125,9 +129,9 @@ export default function BoardSettingsGeneral() {
   }, [data]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex flex-col">
       <div className="space-y-1">
-        <h3 className="text-xl font-semibold">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
           General
         </h3>
         <hr />
@@ -231,6 +235,40 @@ export default function BoardSettingsGeneral() {
               )}
             </Formik>
           )}
+        </div>
+      </div>
+      <BoardRemoveDialog
+        show={showRemoveBoardDialog}
+        onClose={() => setShowRemoveBoardDialog(false)}
+        onRemove={() => {
+          router.push("/");
+        }}
+        boardId={boardId}
+      />
+      <div className="space-y-1">
+        <h3 className="text-xl text-red-500 font-semibold">
+          Danger Zone
+        </h3>
+        <hr />
+      </div>
+      <div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h5 className="text font-semibold text-gray-900 dark:text-white">Delete Board</h5>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              This action cannot be undone. This will permanently delete the board and all its data, including
+              tasks and statuses as well as assigned memberships.
+            </p>
+          </div>
+          <div className="shrink-0">
+            <Button
+              theme={customButtonTheme}
+              className="w-fit bg-red-500 dark:bg-red-500 hover:!bg-red-600 dark:hover:!bg-red-600 disabled:hover:!bg-red-500 outline-none focus:ring-0"
+              onClick={() => setShowRemoveBoardDialog(true)}
+            >
+              Delete Board
+            </Button>
+          </div>
         </div>
       </div>
     </div>
