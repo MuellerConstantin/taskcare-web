@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Button, Spinner, TextInput, Textarea, Modal } from "flowbite-react";
+import { Button, Spinner, TextInput, Textarea, Modal, Label, Select } from "flowbite-react";
 import { Formik } from "formik";
 import useSWR from "swr";
 import * as yup from "yup";
@@ -29,7 +29,8 @@ const customTextAreaTheme = {
 
 const schema = yup.object().shape({
   name: yup.string(),
-  description: yup.string()
+  description: yup.string(),
+  category: yup.string().oneOf(["TO_DO", "IN_PROGRESS", "DONE"]),
 });
 
 export default function StatusEditDialog({show, boardId, statusId, onEdit, onClose}) {
@@ -45,13 +46,14 @@ export default function StatusEditDialog({show, boardId, statusId, onEdit, onClo
   } = useSWR(boardId && statusId ? `/boards/${boardId}/statuses/${statusId}` : null,
     (url) => api.get(url).then((res) => res.data));
 
-  const editStatus = useCallback(async ({ name, description }, {setFieldError}) => {
+  const editStatus = useCallback(async ({ name, description, category }, {setFieldError}) => {
     setEditLoading(true);
     setEditError(null);
 
     api.patch(`/boards/${boardId}/statuses/${statusId}`, {
       name: name && name.length > 0 ? name : undefined,
       description: description && description.length > 0 ? description : undefined,
+      category: category && category.length > 0 ? category : undefined
     })
     .then(onEdit)
     .catch((err) => {
@@ -72,7 +74,7 @@ export default function StatusEditDialog({show, boardId, statusId, onEdit, onClo
     <Modal size="md" show={show} onClose={onClose}>
       <Modal.Header>Edit Status</Modal.Header>
       <Formik
-        initialValues={{ name: "", description: "" }}
+        initialValues={{ name: "", description: "", category: data?.category || "" }}
         validationSchema={schema}
         onSubmit={(values, { setFieldError }) => editStatus(values, { setFieldError })}
       >
@@ -114,6 +116,29 @@ export default function StatusEditDialog({show, boardId, statusId, onEdit, onClo
                     color={props.errors.description && props.touched.description ? "failure" : "gray"}
                     helperText={props.errors.description && props.touched.description ? props.errors.description : null}
                   />
+                </div>
+                <div>
+                  <div className="mb-2 block">
+                    <Label htmlFor="status-add-category" value="Select category" />
+                  </div>
+                  <Select
+                    id="status-add-category"
+                    required
+                    name="category"
+                    onChange={props.handleChange}
+                    onBlur={props.handleBlur}
+                    value={props.values.category}
+                    color={props.errors.category && props.touched.category ? "failure" : "gray"}
+                    helperText={props.errors.category && props.touched.category ? props.errors.category : null}
+                  >
+                    <option>TO_DO</option>
+                    <option>IN_PROGRESS</option>
+                    <option>DONE</option>
+                  </Select>
+                  <div className="text-xs mt-2">
+                    <span className="text-amber-600">Attention: </span>
+                    Depending on the category selected, different worklfows will be applied.
+                  </div>
                 </div>
               </div>
             </Modal.Body>

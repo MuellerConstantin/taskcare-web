@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { Pagination, Tooltip } from "flowbite-react";
+import { Pagination, Tooltip, Badge } from "flowbite-react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
@@ -71,19 +71,29 @@ function BoardColumn({status, onDelete}) {
       className="w-[20rem] min-w-[15rem] h-full flex bg-gray-100 dark:bg-gray-800 rounded-md cursor-grab"
     >
       <div className="flex flex-col text-gray-900 dark:text-white flex w-full items-start space-y-6">
-        <div className="flex w-full items-center justify-between space-x-4 p-2">
-          <span className="truncate text-sm font-semibold">
-            {status.name}
-          </span>
-          <div className="flex space-x-2">
-            <button
-              onClick={() => onDelete(status.id)}
-              className="h-fit flex items-center justify-center"
-            >
-              <Icon path={mdiDelete} size={0.75} />
-            </button>
-            <Icon path={mdiDrag} size={0.75} />
+        <div className="p-2 space-y-4">
+          <div className="flex w-full items-center justify-between space-x-4">
+            <span className="truncate text-sm font-semibold">
+              {status.name}
+            </span>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => onDelete(status.id)}
+                className="h-fit flex items-center justify-center"
+              >
+                <Icon path={mdiDelete} size={0.75} />
+              </button>
+              <Icon path={mdiDrag} size={0.75} />
+            </div>
           </div>
+          <Badge
+            size="xs"
+            color={status.category === "DONE" ? "green" :
+              status.category === "IN_PROGRESS" ? "blue" : "dark"}
+            className="w-fit"
+          >
+            {status.category}
+          </Badge>
         </div>
         <div className="grow w-full px-4">
           <div className="w-full h-full rounded-t-md bg-gray-200 dark:bg-gray-700" />

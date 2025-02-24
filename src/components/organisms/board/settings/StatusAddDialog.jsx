@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Button, Spinner, TextInput, Textarea, Modal } from "flowbite-react";
+import { Button, Spinner, TextInput, Textarea, Modal, Label, Select } from "flowbite-react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useApi from "@/hooks/useApi";
@@ -28,7 +28,8 @@ const customTextAreaTheme = {
 
 const schema = yup.object().shape({
   name: yup.string().required("Is required"),
-  description: yup.string()
+  description: yup.string(),
+  category: yup.string().required("Is required").oneOf(["TO_DO", "IN_PROGRESS", "DONE"]),
 });
 
 export default function StatusAddDialog({show, boardId, onAdd, onClose}) {
@@ -37,13 +38,14 @@ export default function StatusAddDialog({show, boardId, onAdd, onClose}) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const addStatus = useCallback(async ({ name, description }, {setFieldError}) => {
+  const addStatus = useCallback(async ({ name, description, category }, {setFieldError}) => {
     setLoading(true);
     setError(null);
 
     api.post(`/boards/${boardId}/statuses`, {
       name,
       description: description && description.length > 0 ? description : null,
+      category
     })
     .then(onAdd)
     .catch((err) => {
@@ -64,7 +66,7 @@ export default function StatusAddDialog({show, boardId, onAdd, onClose}) {
     <Modal size="md" show={show} onClose={onClose}>
       <Modal.Header>Add Status</Modal.Header>
       <Formik
-        initialValues={{ name: "", description: "" }}
+        initialValues={{ name: "", description: "", category: "TO_DO" }}
         validationSchema={schema}
         onSubmit={(values, { setFieldError }) => addStatus(values, { setFieldError })}
       >
@@ -106,6 +108,29 @@ export default function StatusAddDialog({show, boardId, onAdd, onClose}) {
                     color={props.errors.description && props.touched.description ? "failure" : "gray"}
                     helperText={props.errors.description && props.touched.description ? props.errors.description : null}
                   />
+                </div>
+                <div>
+                  <div className="mb-2 block">
+                    <Label htmlFor="status-add-category" value="Select category" />
+                  </div>
+                  <Select
+                    id="status-add-category"
+                    required
+                    name="category"
+                    onChange={props.handleChange}
+                    onBlur={props.handleBlur}
+                    value={props.values.category}
+                    color={props.errors.category && props.touched.category ? "failure" : "gray"}
+                    helperText={props.errors.category && props.touched.category ? props.errors.category : null}
+                  >
+                    <option>TO_DO</option>
+                    <option>IN_PROGRESS</option>
+                    <option>DONE</option>
+                  </Select>
+                  <div className="text-xs mt-2">
+                    <span className="text-amber-600">Attention: </span>
+                    Depending on the category selected, different worklfows will be applied.
+                  </div>
                 </div>
               </div>
             </Modal.Body>

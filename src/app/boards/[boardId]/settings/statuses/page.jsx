@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
-import { Table, Pagination, Checkbox, Button } from "flowbite-react";
+import { Table, Pagination, Checkbox, Button, Badge } from "flowbite-react";
 import useSWR from "swr";
 import { mdiDelete, mdiPlus, mdiPencil } from "@mdi/js";
 import StatusAddDialog from "@/components/organisms/board/settings/StatusAddDialog";
@@ -148,7 +148,7 @@ export default function BoardSettingsStatuses() {
             setSearchProperty(property);
             setSearchTerm(term);
           }}
-          properties={new Map([["id", "ID"], ["name", "Name"], ["description", "Description"]])}
+          properties={new Map([["id", "ID"], ["name", "Name"], ["description", "Description"], ["category", "Category"]])}
         />
         <Button.Group>
           <Button
@@ -232,6 +232,7 @@ export default function BoardSettingsStatuses() {
             <Table.HeadCell>ID</Table.HeadCell>
             <Table.HeadCell>Name</Table.HeadCell>
             <Table.HeadCell>Description</Table.HeadCell>
+            <Table.HeadCell>Category</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
             {loading ? Array.from(Array(10).keys()).map((key) =>
@@ -244,6 +245,9 @@ export default function BoardSettingsStatuses() {
                   />
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                  <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-36" />
+                </Table.Cell>
+                <Table.Cell>
                   <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-36" />
                 </Table.Cell>
                 <Table.Cell>
@@ -271,9 +275,12 @@ export default function BoardSettingsStatuses() {
                 <Table.Cell>
                   <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
                 </Table.Cell>
+                <Table.Cell>
+                  <div className="h-2.5 bg-red-200 dark:bg-red-400 rounded-full w-36" />
+                </Table.Cell>
               </Table.Row>
-            ) : data?.content.map((board, index) => (
-              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={board.id}>
+            ) : data?.content.map((status, index) => (
+              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={status.id}>
                 <Table.Cell className="p-4">
                   <Checkbox
                     checked={!!checkedList[index]}
@@ -284,18 +291,27 @@ export default function BoardSettingsStatuses() {
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                   <div className="relative">
-                    <span>{board.id}</span>
+                    <span>{status.id}</span>
                   </div>
                 </Table.Cell>
                 <Table.Cell>
                   <div className="line-clamp-3 min-w-[10rem] max-w-[20rem]">
-                    {board.name}
+                    {status.name}
                   </div>
                 </Table.Cell>
                 <Table.Cell>
                   <div className="line-clamp-3 min-w-[10rem] max-w-[20rem]">
-                    {board.description}
+                    {status.description}
                   </div>
+                </Table.Cell>
+                <Table.Cell>
+                  <Badge
+                    color={status.category === "DONE" ? "green" :
+                      status.category === "IN_PROGRESS" ? "blue" : "dark"}
+                    className="w-fit"
+                  >
+                    {status.category}
+                  </Badge>
                 </Table.Cell>
               </Table.Row>
             ))}
