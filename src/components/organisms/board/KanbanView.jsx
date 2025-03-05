@@ -46,7 +46,7 @@ export default function KanbanView({boardId}) {
             {columnsData?.length > 0 ? (
               columnsData?.map((column) => (
                 <div key={column.id}>
-                  <KanbanColumn status={column} />
+                  <KanbanColumn boardId={boardId} status={column} />
                 </div>
               ))
             ) : (
