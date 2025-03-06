@@ -1,8 +1,9 @@
 import { useState, useCallback } from "react";
-import { Button, Spinner, TextInput, Modal, Label, Select } from "flowbite-react";
+import { Button, Spinner, TextInput, Modal, Label } from "flowbite-react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useApi from "@/hooks/useApi";
+import Select from "@/components/atoms/Select";
 
 const customButtonTheme = {
   "color": {
@@ -28,7 +29,10 @@ const schema = yup.object().shape({
     .string()
     .oneOf([yup.ref("password")], "Passwords must match")
     .required("Is required"),
-  role: yup.string().required("Is required").oneOf(["ADMINISTRATOR", "USER"]),
+  role: yup.object({
+    label: yup.string(),
+    value: yup.string().oneOf(["ADMINISTRATOR", "USER"])
+  }).required("Is required"),
 });
 
 export default function UserAddDialog({show, onAdd, onClose}) {
@@ -45,7 +49,7 @@ export default function UserAddDialog({show, onAdd, onClose}) {
       username,
       password,
       displayName: displayName && displayName.length > 0 ? displayName : null,
-      role
+      role: role.value
     })
     .then(onAdd)
     .catch((err) => {
@@ -66,7 +70,7 @@ export default function UserAddDialog({show, onAdd, onClose}) {
     <Modal size="md" show={show} onClose={onClose}>
       <Modal.Header>Add User</Modal.Header>
       <Formik
-        initialValues={{ username: "", displayName: "", password: "", passwordConfirmation: "", role: "USER" }}
+        initialValues={{ username: "", displayName: "", password: "", passwordConfirmation: "", role: null }}
         validationSchema={schema}
         onSubmit={(values, { setFieldError }) => addUser(values, { setFieldError })}
       >
@@ -144,16 +148,17 @@ export default function UserAddDialog({show, onAdd, onClose}) {
                   <Select
                     id="user-add-roles"
                     required
+                    options={[
+                      { value: "USER", label: "User" },
+                      { value: "ADMINISTRATOR", label: "Administrator" },
+                    ]}
                     name="role"
-                    onChange={props.handleChange}
-                    onBlur={props.handleBlur}
+                    onChange={(option) => props.setFieldValue("role", option)}
+                    onBlur={() => props.setFieldTouched("role", true)}
                     value={props.values.role}
                     color={props.errors.role && props.touched.role ? "failure" : "gray"}
                     helperText={props.errors.role && props.touched.role ? props.errors.role : null}
-                  >
-                    <option>ADMINISTRATOR</option>
-                    <option>USER</option>
-                  </Select>
+                  />
                   <div className="text-xs mt-2">
                     <span className="text-amber-600">Attention: </span>
                     Depending on the role selected, the user is granted extensive rights for the entire platform.

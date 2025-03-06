@@ -1,8 +1,11 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { Button, Spinner, Modal, ListGroup, Pagination, Select, Label } from "flowbite-react";
+import { Button, Spinner, Modal, ListGroup, Pagination, Label } from "flowbite-react";
+import { useFormik } from "formik";
+import * as yup from "yup";
 import SearchBar from "@/components/molecules/SearchBar";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
+import Select from "@/components/atoms/Select";
 
 const customButtonTheme = {
   "color": {
@@ -42,6 +45,14 @@ const customPaginationTheme = {
   }
 };
 
+const schema = yup.object().shape({
+  id: yup.string().required("Is required"),
+  role: yup.object({
+    label: yup.string(),
+    value: yup.string().oneOf(["ADMINISTRATOR", "MAINTAINER", "MEMBER"])
+  }).required("Is required"),
+});
+
 export default function MemberAddDialog({show, boardId, onAdd, onClose}) {
   const api = useApi();
 
@@ -49,9 +60,6 @@ export default function MemberAddDialog({show, boardId, onAdd, onClose}) {
   const [perPage,] = useState(25);
   const [searchProperty, setSearchProperty] = useState(null);
   const [searchTerm, setSearchTerm] = useState(null);
-
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedRole, setSelectedRole] = useState("MEMBER");
 
   const [addError, setAddError] = useState(null);
   const [addLoading, setAddLoading] = useState(false);
@@ -89,146 +97,156 @@ export default function MemberAddDialog({show, boardId, onAdd, onClose}) {
     });
   }, [api, boardId]);
 
+  const formik = useFormik({
+    initialValues: { id: "", role: null },
+    validationSchema: schema,
+    onSubmit: (values) => addMember(values.id, values.role.value)
+  });
+
   useEffect(() => {
-    setSelectedUser(null);
-  }, [data]);
+    formik.setFieldValue("role", null);
+  }, []);
 
   return (
     <Modal size="lg" show={show} onClose={onClose}>
       <Modal.Header>Add Member</Modal.Header>
-        <Modal.Body className="space-y-4 flex flex-col">
-          <div className="flex flex-col space-y-4 text-gray-900 dark:text-white">
-            {addError && (
-              <p className="text-center text-red-500">{addError}</p>
-            )}
-            <SearchBar
-              onSearch={(property, term) => {
-                setSearchProperty(property);
-                setSearchTerm(term);
-              }}
-              properties={new Map([["id", "ID"], ["username", "Username"], ["displayName", "Display Name"]])}
-            />
-            <div className="min-h-[10rem]">
-              {loading ? (
-                <ListGroup theme={customListGroupTheme}>
-                  {Array.from(Array(5).keys()).map((key) => (
-                    <ListGroup.Item
-                      theme={customListGroupTheme["item"]}
-                      key={key}
-                      onClick={() => setSelectedUser(user.id)}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <div className="flex flex-col space-y-1 w-full">
-                        <div className="animate-pulse h-3 bg-gray-200 rounded-full dark:bg-gray-800 w-1/4" />
-                        <div className="animate-pulse h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-1/2" />
-                      </div>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              ) : error ? (
-                <ListGroup theme={customListGroupTheme}>
-                  {Array.from(Array(5).keys()).map((key) => (
-                    <ListGroup.Item
-                      theme={customListGroupTheme["item"]}
-                      key={key}
-                      onClick={() => setSelectedUser(user.id)}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <div className="flex flex-col space-y-1 w-full">
-                        <div className="h-3 bg-red-200 rounded-full dark:bg-red-400 w-1/4" />
-                        <div className="h-3 bg-red-200 rounded-full dark:bg-red-400 w-1/2" />
-                      </div>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              ) : (
-                <>
-                  {data?.content?.length > 0 ? (
-                    <ListGroup theme={customListGroupTheme}>
-                      {data?.content?.map((user) => (
-                        <ListGroup.Item
-                          theme={customListGroupTheme["item"]}
-                          key={user.id}
-                          onClick={() => setSelectedUser(user.id)}
-                          className={`flex items-center gap-2 cursor-pointer ${
-                            selectedUser === user.id ? "bg-amber-100 text-amber-700" : ""
-                          }`}
-                        >
-                          <div className="flex flex-col space-y-1 w-full">
-                            <div className="text-start text-sm font-semibold">
-                              {user.username}
-                            </div>
-                            <div className="text-start text-xs">
-                              {user.displayName || "-"}
-                            </div>
-                          </div>
-                        </ListGroup.Item>
-                      ))}
-                    </ListGroup>
-                  ) : (
-                    <div className="text-center text-sm">
-                      No users found.
-                    </div>
-                  )}
-                </>
+        <form
+          className="space-y-4 overflow-y-auto grow"
+          onSubmit={formik.handleSubmit}
+          noValidate
+        >
+          <Modal.Body className="space-y-4 flex flex-col">
+            <div className="flex flex-col space-y-4 text-gray-900 dark:text-white">
+              {addError && (
+                <p className="text-center text-red-500">{addError}</p>
               )}
-            </div>
-            <div className="flex justify-center">
-              <Pagination
-                theme={customPaginationTheme}
-                layout="pagination"
-                showIcons
-                currentPage={page}
-                totalPages={data?.info?.totalPages ? data.info.totalPages : 1}
-                onPageChange={setPage}
-                className="hidden md:block"
+              <SearchBar
+                onSearch={(property, term) => {
+                  setSearchProperty(property);
+                  setSearchTerm(term);
+                }}
+                properties={new Map([["id", "ID"], ["username", "Username"], ["displayName", "Display Name"]])}
               />
-              <Pagination
-                theme={customPaginationTheme}
-                layout="table"
-                showIcons
-                currentPage={page}
-                totalPages={data?.info?.totalPages ? data.info.totalPages : 1}
-                onPageChange={setPage}
-                className="block md:hidden"
-              />
-            </div>
-            <div>
-              <div className="mb-2 block">
-                <Label htmlFor="user-add-roles" value="Select role" />
+              <div className="min-h-[10rem]">
+                {loading ? (
+                  <ListGroup theme={customListGroupTheme}>
+                    {Array.from(Array(5).keys()).map((key) => (
+                      <ListGroup.Item
+                        theme={customListGroupTheme["item"]}
+                        key={key}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <div className="flex flex-col space-y-1 w-full">
+                          <div className="animate-pulse h-3 bg-gray-200 rounded-full dark:bg-gray-800 w-1/4" />
+                          <div className="animate-pulse h-2 bg-gray-200 rounded-full dark:bg-gray-800 w-1/2" />
+                        </div>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                ) : error ? (
+                  <ListGroup theme={customListGroupTheme}>
+                    {Array.from(Array(5).keys()).map((key) => (
+                      <ListGroup.Item
+                        theme={customListGroupTheme["item"]}
+                        key={key}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <div className="flex flex-col space-y-1 w-full">
+                          <div className="h-3 bg-red-200 rounded-full dark:bg-red-400 w-1/4" />
+                          <div className="h-3 bg-red-200 rounded-full dark:bg-red-400 w-1/2" />
+                        </div>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                ) : (
+                  <>
+                    {data?.content?.length > 0 ? (
+                      <ListGroup theme={customListGroupTheme}>
+                        {data?.content?.map((user) => (
+                          <ListGroup.Item
+                            theme={customListGroupTheme["item"]}
+                            key={user.id}
+                            onClick={() => formik.setFieldValue("id", user.id)}
+                            className={`flex items-center gap-2 cursor-pointer ${
+                              formik.values.id === user.id ? "bg-amber-100 text-amber-700" : ""
+                            }`}
+                          >
+                            <div className="flex flex-col space-y-1 w-full">
+                              <div className="text-start text-sm font-semibold">
+                                {user.username}
+                              </div>
+                              <div className="text-start text-xs">
+                                {user.displayName || "-"}
+                              </div>
+                            </div>
+                          </ListGroup.Item>
+                        ))}
+                      </ListGroup>
+                    ) : (
+                      <div className="text-center text-sm">
+                        No users found.
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-              <Select
-                id="user-add-roles"
-                required
-                onChange={(e) => setSelectedRole(e.target.value)}
-                value={selectedRole}
-                color="gray"
-                disabled={loading || !selectedUser}
-              >
-                <option>ADMINISTRATOR</option>
-                <option>MAINTAINER</option>
-                <option>MEMBER</option>
-              </Select>
-              <div className="text-xs mt-2">
-                <span className="text-amber-600">Attention: </span>
-                Depending on the role selected, the user is granted extensive rights for the entire board.
+              <div className="flex justify-center">
+                <Pagination
+                  theme={customPaginationTheme}
+                  layout="pagination"
+                  showIcons
+                  currentPage={page}
+                  totalPages={data?.info?.totalPages ? data.info.totalPages : 1}
+                  onPageChange={setPage}
+                  className="hidden md:block"
+                />
+                <Pagination
+                  theme={customPaginationTheme}
+                  layout="table"
+                  showIcons
+                  currentPage={page}
+                  totalPages={data?.info?.totalPages ? data.info.totalPages : 1}
+                  onPageChange={setPage}
+                  className="block md:hidden"
+                />
+              </div>
+              <div>
+                <div className="mb-2 block">
+                  <Label htmlFor="user-add-roles" value="Select role" />
+                </div>
+                <Select
+                  id="user-add-roles"
+                  required
+                  options={[
+                    { label: "Administrator", value: "ADMINISTRATOR" },
+                    { label: "Maintainer", value: "MAINTAINER" },
+                    { label: "Member", value: "MEMBER" },
+                  ]}
+                  onChange={(option) => formik.setFieldValue("role", option)}
+                  value={formik.values.role}
+                  color="gray"
+                  isDisabled={loading || !formik.values.id}
+                />
+                <div className="text-xs mt-2">
+                  <span className="text-amber-600">Attention: </span>
+                  Depending on the role selected, the user is granted extensive rights for the entire board.
+                </div>
               </div>
             </div>
-          </div>
-        </Modal.Body>
-        <Modal.Footer className="justify-end">
-          <Button
-            theme={customButtonTheme}
-            color="amber"
-            type="submit"
-            className="w-full"
-            disabled={loading || !selectedUser}
-            onClick={() => addMember(selectedUser, selectedRole)}
-          >
-            {!addLoading && <span>Add Member</span>}
-            {addLoading && <Spinner size="sm" className="fill-white" />}
-          </Button>
-        </Modal.Footer>
+          </Modal.Body>
+          <Modal.Footer className="justify-end">
+            <Button
+              theme={customButtonTheme}
+              color="amber"
+              type="submit"
+              className="w-full"
+              disabled={loading || !(formik.isValid && formik.dirty)}
+            >
+              {!addLoading && <span>Add Member</span>}
+              {addLoading && <Spinner size="sm" className="fill-white" />}
+            </Button>
+          </Modal.Footer>
+        </form>
     </Modal>
   );
 }

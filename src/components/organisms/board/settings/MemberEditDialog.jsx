@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
 import Image from "next/image";
-import { Button, Spinner, Avatar, TextInput, Modal, Label, Select } from "flowbite-react";
+import { Button, Spinner, Modal, Label } from "flowbite-react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
+import Select from "@/components/atoms/Select";
 
 const customButtonTheme = {
   "color": {
@@ -23,7 +24,10 @@ const customTextInputTheme = {
 };
 
 const schema = yup.object().shape({
-  role: yup.string().oneOf(["ADMINISTRATOR", "MAINTAINER", "MEMBER"]),
+  role: yup.object({
+    label: yup.string(),
+    value: yup.string().oneOf(["ADMINISTRATOR", "MAINTAINER", "MEMBER"])
+  }).nullable(),
 });
 
 export default function MemberEditDialog({show, boardId, onEdit, onClose, memberId}) {
@@ -44,7 +48,7 @@ export default function MemberEditDialog({show, boardId, onEdit, onClose, member
     setEditError(null);
 
     api.patch(`/boards/${boardId}/members/${memberId}`, {
-      role: role
+      role: role.value
     })
     .then(() => onEdit())
     .catch((err) => {
@@ -70,7 +74,7 @@ export default function MemberEditDialog({show, boardId, onEdit, onClose, member
     <Modal size="md" show={show} onClose={onClose}>
       <Modal.Header>Edit Member</Modal.Header>
       <Formik
-        initialValues={{ role: data?.role || "MEMBER" }}
+        initialValues={{ role: null }}
         validationSchema={schema}
         onSubmit={(values, { setFieldError }) => editMember(values, { setFieldError })}
       >
@@ -98,16 +102,22 @@ export default function MemberEditDialog({show, boardId, onEdit, onClose, member
                     id="user-add-roles"
                     required
                     name="role"
-                    onChange={props.handleChange}
-                    onBlur={props.handleBlur}
+                    options={[
+                      { value: "ADMINISTRATOR", label: "Administrator" },
+                      { value: "MAINTAINER", label: "Maintainer" },
+                      { value: "MEMBER", label: "Member" },
+                    ]}
+                    placeholder={[
+                      { value: "ADMINISTRATOR", label: "Administrator" },
+                      { value: "MAINTAINER", label: "Maintainer" },
+                      { value: "MEMBER", label: "Member" },
+                    ].find((option) => option.value === data?.role).label || "Select..."}
+                    onChange={(option) => props.setFieldValue("role", option)}
+                    onBlur={() => props.setFieldTouched("role", true)}
                     value={props.values.role}
                     color={props.errors.role && props.touched.role ? "failure" : "gray"}
                     helperText={props.errors.role && props.touched.role ? props.errors.role : null}
-                  >
-                    <option>ADMINISTRATOR</option>
-                    <option>MAINTAINER</option>
-                    <option>MEMBER</option>
-                  </Select>
+                  />
                   <div className="text-xs mt-2">
                     <span className="text-amber-600">Attention: </span>
                     Depending on the role selected, the user is granted extensive rights for the entire board.

@@ -1,8 +1,9 @@
 import { useState, useCallback } from "react";
-import { Button, Spinner, TextInput, Textarea, Modal, Label, Select } from "flowbite-react";
+import { Button, Spinner, TextInput, Textarea, Modal, Label } from "flowbite-react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useApi from "@/hooks/useApi";
+import Select from "@/components/atoms/Select";
 
 const customButtonTheme = {
   "color": {
@@ -29,7 +30,10 @@ const customTextAreaTheme = {
 const schema = yup.object().shape({
   name: yup.string().required("Is required"),
   description: yup.string(),
-  category: yup.string().required("Is required").oneOf(["TO_DO", "IN_PROGRESS", "DONE"]),
+  category: yup.object({
+    label: yup.string(),
+    value: yup.string().oneOf(["TO_DO", "IN_PROGRESS", "DONE"])
+  }).required("Is required"),
 });
 
 export default function StatusAddDialog({show, boardId, onAdd, onClose}) {
@@ -45,7 +49,7 @@ export default function StatusAddDialog({show, boardId, onAdd, onClose}) {
     api.post(`/boards/${boardId}/statuses`, {
       name,
       description: description && description.length > 0 ? description : null,
-      category
+      category: category.value
     })
     .then(onAdd)
     .catch((err) => {
@@ -66,7 +70,7 @@ export default function StatusAddDialog({show, boardId, onAdd, onClose}) {
     <Modal size="md" show={show} onClose={onClose}>
       <Modal.Header>Add Status</Modal.Header>
       <Formik
-        initialValues={{ name: "", description: "", category: "TO_DO" }}
+        initialValues={{ name: "", description: "", category: null }}
         validationSchema={schema}
         onSubmit={(values, { setFieldError }) => addStatus(values, { setFieldError })}
       >
@@ -117,16 +121,17 @@ export default function StatusAddDialog({show, boardId, onAdd, onClose}) {
                     id="status-add-category"
                     required
                     name="category"
-                    onChange={props.handleChange}
-                    onBlur={props.handleBlur}
+                    options={[
+                      { label: "To Do", value: "TO_DO" },
+                      { label: "In Progress", value: "IN_PROGRESS" },
+                      { label: "Done", value: "DONE" },
+                    ]}
+                    onChange={(option) => props.setFieldValue("category", option)}
+                    onBlur={() => props.setFieldTouched("category", true)}
                     value={props.values.category}
                     color={props.errors.category && props.touched.category ? "failure" : "gray"}
                     helperText={props.errors.category && props.touched.category ? props.errors.category : null}
-                  >
-                    <option>TO_DO</option>
-                    <option>IN_PROGRESS</option>
-                    <option>DONE</option>
-                  </Select>
+                  />
                   <div className="text-xs mt-2">
                     <span className="text-amber-600">Attention: </span>
                     Depending on the category selected, different worklfows will be applied.
