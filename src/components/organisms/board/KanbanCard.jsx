@@ -15,11 +15,11 @@ const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { s
 
 export default function KanbanCard({task}) {
   const priorityIcons = {
-    "VERY_LOW": <Icon path={mdiArrowDownBoldBox} size={0.5} color="#fb923c" />,
+    "VERY_LOW": <Icon path={mdiArrowDownBoldBox} size={0.75} color="#fb923c" />,
     "LOW": <Icon path={mdiArrowBottomLeftBoldBox} size={0.75} color="#38bdf8" />,
     "MEDIUM": <Icon path={mdiPauseBox} size={0.5} color="#94a3b8" />,
-    "HIGH": <Icon path={mdiArrowTopLeftBoldBox} size={0.5} color="#fb923c" />,
-    "VERY_HIGH": <Icon path={mdiArrowUpBoldBox} size={0.5} color="#ea580c" />,
+    "HIGH": <Icon path={mdiArrowTopLeftBoldBox} size={0.75} color="#fb923c" />,
+    "VERY_HIGH": <Icon path={mdiArrowUpBoldBox} size={0.75} color="#ea580c" />,
   };
 
   return (
