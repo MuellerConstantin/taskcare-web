@@ -43,7 +43,7 @@ export default function KanbanCard({task}) {
           </div>
           {task?.dueDate && (
             <>
-              <div class="border-l-2 h-2/3 w-[1px] mx-2"></div>
+              <div className="border-l-2 h-2/3 w-[1px] mx-2"></div>
               <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
                 <Icon path={mdiCalendarClock} size={0.5} />
                 <span className="text-xs">{new Date(task?.dueDate).toLocaleString()}</span>

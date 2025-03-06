@@ -14,8 +14,6 @@ export default function KanbanColumn({boardId, status}) {
     isLoading: loading
   } = useSWR(boardId && status ? `/boards/${boardId}/statuses/${status.id}/tasks` : null,
     (url) => api.get(url).then((res) => res.data));
-  
-    console.log(data);
 
   return (
     <div className="w-[20rem] h-full flex bg-gray-100 dark:bg-gray-800 rounded-md min-h-[30rem] flex flex-col">
