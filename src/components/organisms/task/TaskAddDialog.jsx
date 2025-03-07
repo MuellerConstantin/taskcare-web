@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
-import { Button, Spinner, TextInput, Textarea, Modal, Label } from "flowbite-react";
+import { Button, Spinner, TextInput, Textarea, Modal, Label, Datepicker } from "flowbite-react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
 import Select from "@/components/atoms/Select";
+import Timepicker from "@/components/atoms/Timepicker";
 
 const customButtonTheme = {
   "color": {
@@ -28,9 +29,53 @@ const customTextAreaTheme = {
   }
 };
 
+const customDatepickerTheme = {
+  "root": {
+    "input": customTextInputTheme
+  },
+  "popup": {
+    "footer": {
+      "button": {
+        "base": "w-full rounded-lg px-5 py-2 text-center text-sm font-medium focus:ring-4 focus:ring-amber-300",
+        "today": "bg-amber-700 text-white hover:bg-amber-800 dark:bg-amber-600 dark:hover:bg-amber-700",
+      }
+    }
+  },
+  "views": {
+    "days": {
+      "items": {
+        "item": {
+          "selected": "bg-amber-700 text-white hover:bg-amber-600",
+        }
+      }
+    },
+    "months": {
+      "items": {
+        "item": {
+          "selected": "bg-amber-700 text-white hover:bg-amber-600",
+        }
+      }
+    },
+    "years": {
+      "items": {
+        "item": {
+          "selected": "bg-amber-700 text-white hover:bg-amber-600",
+        }
+      }
+    },
+    "decades": {
+      "items": {
+        "item": {
+          "selected": "bg-amber-700 text-white hover:bg-amber-600",
+        }
+      }
+    }
+  }
+};
+
 const schema = yup.object().shape({
-  name: yup.string().required("Is required"),
-  description: yup.string(),
+  name: yup.string().max(255, "Must be 255 characters or less").required("Is required"),
+  description: yup.string().max(1024, "Must be 1024 characters or less"),
   statusId: yup.object({
     label: yup.string(),
     value: yup.string()
@@ -39,6 +84,15 @@ const schema = yup.object().shape({
     label: yup.string(),
     value: yup.string()
   })),
+  dueDate: yup.date()
+    .min(new Date(), "Must be in the future")
+    .nullable()
+    .when("dueTime", {
+      is: (dueTime) => dueTime && dueTime.length > 0,
+      then: (schema) => schema.required("Date is required when time is set"),
+      otherwise: (schema) => schema.optional(),
+    }),
+  dueTime: yup.string().nullable(),
   priority: yup.object({
     label: yup.string(),
     value: yup.string().oneOf(["VERY_LOW", "LOW", "MEDIUM", "HIGH", "VERY_HIGH"])
@@ -164,12 +218,21 @@ export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
     setLoading(true);
     setError(null);
 
+    let dueDate = null;
+
+    if(values.dueDate && (!values.dueTime || values.dueTime.length === 0)) {
+      dueDate = values.dueDate.toISOString();
+    } else if(values.dueDate && values.dueTime) {
+      dueDate = new Date(`${values.dueDate.toISOString().split("T")[0]} ${values.dueTime}`).toISOString();
+    }
+
     api.post(`/boards/${boardId}/tasks`, {
       name: values.name,
       description: values.description && values.description.length > 0 ? values.description : null,
       statusId: values.statusId && values.statusId.value || null,
       componentIds: values.componentIds?.map((component) => component.value) || null,
-      priority: values.priority && values.priority.value || null
+      priority: values.priority && values.priority.value || null,
+      dueDate
     })
     .then(onAdd)
     .catch((err) => {
@@ -190,7 +253,7 @@ export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
     <Modal size="lg" show={show} onClose={onClose}>
       <Modal.Header>Add Task</Modal.Header>
       <Formik
-        initialValues={{ name: "", description: "", statusId: "", componentIds: [], priority: "" }}
+        initialValues={{ name: "", description: "", statusId: "", componentIds: [], priority: "", dueDate: undefined, dueTime: "" }}
         validationSchema={schema}
         onSubmit={(values, { setFieldError }) => addTask(values, { setFieldError })}
       >
@@ -211,6 +274,7 @@ export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
                     name="name"
                     type="text"
                     placeholder="Name"
+                    maxLength={255}
                     disabled={loading}
                     onChange={props.handleChange}
                     onBlur={props.handleBlur}
@@ -225,6 +289,7 @@ export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
                     rows={4}
                     name="description"
                     placeholder="Description"
+                    maxLength={1024}
                     disabled={loading}
                     onChange={props.handleChange}
                     onBlur={props.handleBlur}
@@ -284,6 +349,31 @@ export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
                   color={props.errors.priority && props.touched.priority ? "failure" : "gray"}
                   helperText={props.errors.priority && props.touched.priority ? props.errors.priority : null}
                 />
+              </div>
+              <div>
+                <div className="mb-2 block">
+                  <Label htmlFor="task-add-due-date" value="Select due date" />
+                </div>
+                <div id="task-add-due-date" className="flex space-x-2">
+                  <Datepicker
+                    theme={customDatepickerTheme}
+                    name="dueDate"
+                    minDate={new Date()}
+                    onChange={(date) => props.setFieldValue("dueDate", date)}
+                    onBlur={() => props.setFieldTouched("dueDate", true)}
+                    value={props.values.dueDate}
+                    color={props.errors.dueDate && (props.touched.dueDate || props.touched.dueTime) ? "failure" : "gray"}
+                  />
+                  <Timepicker
+                    name="dueTime"
+                    onChange={props.handleChange}
+                    onBlur={props.handleBlur}
+                    value={props.values.dueTime}
+                    color={props.errors.dueTime && props.touched.dueTime ? "failure" : "gray"}
+                  />
+                </div>
+                {props.errors.dueDate && (props.touched.dueDate || props.touched.dueTime) && <p className="text-red-500 mt-1">{props.errors.dueDate}</p>}
+                {!props.errors.dueDate && props.errors.dueTime && props.touched.dueTime && <p className="text-red-500 mt-1">{props.errors.dueTime}</p>}
               </div>
             </Modal.Body>
             <Modal.Footer className="justify-end">
