@@ -171,7 +171,7 @@ export default function BoardSettingsStatuses() {
             setSearchProperty(property);
             setSearchTerm(term);
           }}
-          properties={new Map([["id", "ID"], ["userId", "User ID"], ["role", "Role"]])}
+          properties={new Map([["id", "ID"], ["userId", "User ID"], ["role", "Role"], ["username", "Username"], ["displayName", "Display Name"]])}
         />
         <Button.Group>
           <Button
