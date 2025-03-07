@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Accordion, Button, ListGroup, Badge } from "flowbite-react";
+import { Accordion, Button, ListGroup, Badge, Avatar } from "flowbite-react";
 import { useParams } from "next/navigation";
 import useSWRInfinite from "swr/infinite";
 import useSWR from "swr";
@@ -16,6 +16,7 @@ import {
   mdiArrowTopLeftBoldBox,
   mdiArrowUpBoldBox
 } from "@mdi/js";
+import Image from "next/image";
 import useApi from "@/hooks/useApi";
 import TaskAddDialog from "@/components/organisms/task/TaskAddDialog";
 
@@ -51,6 +52,49 @@ const customAccordionTheme = {
   },
 };
 
+function BacklogAvatar({username, userId}) {
+  const api = useApi();
+
+  const {
+    data,
+    isLoading: loading
+  } = useSWR(userId ? `/users/${userId}/profile-image` : null,
+    (url) => api.get(url, {responseType: "arraybuffer"})
+      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
+
+  if(loading || !username) {
+    return (
+      <div className="animate-pulse">
+        <Avatar size="sm" rounded />
+      </div>
+    );
+  } else {
+    if (data) {
+      return (
+        <Avatar
+          size="sm"
+          className="bg-gray-200 dark:bg-gray-900 rounded-full"
+          rounded
+          img={({className, ...props}) => (
+            <Image
+              src={data}
+              alt={username}
+              width={64}
+              height={64}
+              className={`${className} object-cover`}
+              {...props}
+            />
+          )}
+        />
+      )
+    } else {
+      return (
+        <Avatar size="sm" placeholderInitials={username.slice(0, 2).toUpperCase()} rounded />
+      );
+    }
+  }
+}
+
 function BacklogSection({boardId, statusId}) {
   const api = useApi();
 
@@ -79,6 +123,26 @@ function BacklogSection({boardId, statusId}) {
     size,
     setSize,
   } = useSWRInfinite(getKey, (url) => api.get(url).then((res) => res.data));
+
+  const {
+    data: membersData,
+    error: membersError,
+    isLoading: membersLoading 
+  } = useSWR(data ? data.flatMap(page => page.content).map(task => `/boards/${boardId}/members/${task.assigneeId}`) : null,
+    async (urls) => {
+      return await Promise.all(urls.map(url => api.get(url).then(res => res.data)));
+    }
+  , { keepPreviousData: true });
+
+  const {
+    data: usersData,
+    error: usersError,
+    isLoading: usersLoading
+  } = useSWR(membersData ? membersData.map(member => `/users/${member.userId}`) : null,
+    async (urls) => {
+      return await Promise.all(urls.map(url => api.get(url).then(res => res.data)));
+    }
+  , { keepPreviousData: true });
 
   return (
     <div className="flex flex-col gap-4">
@@ -117,37 +181,44 @@ function BacklogSection({boardId, statusId}) {
           <>
             {data?.length > 0 && data[0].info.totalElements > 0 ? (
               <ListGroup theme={customListGroupTheme}>
-                {data.map((page) =>
-                  page.content.map((task) => (
+                {data.map((page, pageIndex) =>
+                  page.content.map((task, taskIndex) => (
                     <ListGroup.Item
                       theme={customListGroupTheme["item"]}
                       key={task.id}
                       className="flex items-center gap-2 cursor-pointer"
                     >
-                      <div className="flex gap-4 w-full h-full">
-                        <div className="flex items-start min-w-4 justify-center">
-                          {task?.priority && priorityIcons[task?.priority]}
-                        </div>
-                        <div className="flex flex-col space-y-2">
-                          <div className="text-start text-sm font-semibold truncate">
-                            {task.name}
+                      <div className="flex gap-4 w-full h-full justify-between">
+                        <div className="flex gap-4 w-full h-full">
+                          <div className="flex items-start min-w-4 justify-center">
+                            {task?.priority && priorityIcons[task?.priority]}
                           </div>
-                          <div className="flex items-center gap-1">
-                            <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
-                              <Icon path={mdiClockEdit} size={0.5} />
-                              <span className="text-xs">{new Date(task?.updatedAt).toLocaleString()}</span>
+                          <div className="flex flex-col space-y-2">
+                            <div className="text-start text-sm font-semibold truncate">
+                              {task.name}
                             </div>
-                            {task?.dueDate && (
-                              <>
-                                <div className="border-l-2 h-2/3 w-[1px] mx-2"></div>
-                                <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
-                                  <Icon path={mdiCalendarClock} size={0.5} />
-                                  <span className="text-xs">{new Date(task?.dueDate).toLocaleString()}</span>
-                                </div>
-                              </>
-                            )}
+                            <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
+                                <Icon path={mdiClockEdit} size={0.5} />
+                                <span className="text-xs">{new Date(task?.updatedAt).toLocaleString()}</span>
+                              </div>
+                              {task?.dueDate && (
+                                <>
+                                  <div className="border-l-2 h-2/3 w-[1px] mx-2"></div>
+                                  <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
+                                    <Icon path={mdiCalendarClock} size={0.5} />
+                                    <span className="text-xs">{new Date(task?.dueDate).toLocaleString()}</span>
+                                  </div>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
+                        {task?.assigneeId && (
+                          <div className="flex items-center">
+                            <BacklogAvatar username={usersData?.[pageIndex * perPage + taskIndex]?.username} userId={usersData?.[pageIndex * perPage + taskIndex]?.id} />
+                          </div>
+                        )}
                       </div>
                     </ListGroup.Item>
                   ))

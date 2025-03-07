@@ -208,6 +208,71 @@ function ComponentsSelect({boardId, ...props}) {
   );
 }
 
+function AssigneeSelect({boardId, ...props}) {
+  const api = useApi();
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const {
+    data,
+    error,
+    isLoading: loading
+  } = useSWR(boardId ? `/boards/${boardId}/members?perPage=10${searchQuery ? `&search=${searchQuery}` : ""}` : null,
+    (url) => api.get(url).then((res) => res.data), [boardId, searchQuery], { keepPreviousData: false });
+
+  const {
+    data: usersData,
+    error: usersError,
+    isLoading: usersLoading
+  } = useSWR(
+    data ? data.content.map(member => `/users/${member.userId}`) : null,
+    async (urls) => {
+      return await Promise.all(urls.map(url => api.get(url).then(res => res.data)));
+    }
+  , [data]);
+
+  const loadOptions = useCallback((_, callback) => {
+    if (error || usersError) {
+      callback({ options: [] });
+      return;
+    }
+  
+    if (!data || !usersData) {
+      callback({ options: [] });
+      return;
+    }
+
+    callback(usersData?.map((user, index) => ({
+        label: user.username,
+        value: data.content[index].id
+    })) || []);
+  }, [usersData, data, usersError, error]);
+
+  const handleInputChange = useCallback((newValue) => {
+    if(newValue) {
+      setSearchQuery(encodeURIComponent(`username=like="%${newValue}%"`));
+    } else {
+      setSearchQuery(null);
+    }
+  }, [setSearchQuery]);
+
+  return (
+    <Select
+      async
+      isClearable
+      isSearchable
+      defaultOptions={usersData?.map((user, index) => ({
+        label: user.username,
+        value: data.content[index].id
+      })) || []}
+      loadOptions={loadOptions}
+      onInputChange={handleInputChange}
+      isLoading={loading}
+      {...props}
+    />
+  );
+}
+
 export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
   const api = useApi();
 
@@ -230,6 +295,7 @@ export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
       name: values.name,
       description: values.description && values.description.length > 0 ? values.description : null,
       statusId: values.statusId && values.statusId.value || null,
+      assigneeId: values.assigneeId && values.assigneeId.value || null,
       componentIds: values.componentIds?.map((component) => component.value) || null,
       priority: values.priority && values.priority.value || null,
       dueDate
@@ -253,7 +319,7 @@ export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
     <Modal size="lg" show={show} onClose={onClose}>
       <Modal.Header>Add Task</Modal.Header>
       <Formik
-        initialValues={{ name: "", description: "", statusId: "", componentIds: [], priority: "", dueDate: undefined, dueTime: "" }}
+        initialValues={{ name: "", description: "", statusId: "", assigneeId: "", componentIds: [], priority: "", dueDate: undefined, dueTime: "" }}
         validationSchema={schema}
         onSubmit={(values, { setFieldError }) => addTask(values, { setFieldError })}
       >
@@ -327,6 +393,21 @@ export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
                   value={props.values.componentIds}
                   color={props.errors.componentIds && props.touched.componentIds ? "failure" : "gray"}
                   helperText={props.errors.componentIds && props.touched.componentIds ? props.errors.componentIds : null}
+                />
+              </div>
+              <div>
+                <div className="mb-2 block">
+                  <Label htmlFor="task-add-assignee" value="Select assignee" />
+                </div>
+                <AssigneeSelect
+                  id="task-add-assignee"
+                  boardId={boardId}
+                  name="assigneeId"
+                  onChange={(option) => props.setFieldValue("assigneeId", option)}
+                  onBlur={() => props.setFieldTouched("assigneeId", true)}
+                  value={props.values.assigneeId}
+                  color={props.errors.assigneeId && props.touched.assigneeId ? "failure" : "gray"}
+                  helperText={props.errors.assigneeId && props.touched.assigneeId ? props.errors.assigneeId : null}
                 />
               </div>
               <div>
