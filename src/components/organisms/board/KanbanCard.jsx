@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import {
-  mdiClock,
+  mdiClockEdit,
   mdiCalendarClock,
   mdiArrowDownBoldBox,
   mdiArrowBottomLeftBoldBox,
@@ -38,8 +38,8 @@ export default function KanbanCard({task}) {
         </div>
         <div className="flex items-center gap-1">
           <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
-            <Icon path={mdiClock} size={0.5} />
-            <span className="text-xs">{new Date(task?.createdAt).toLocaleString()}</span>
+            <Icon path={mdiClockEdit} size={0.5} />
+            <span className="text-xs">{new Date(task?.updatedAt).toLocaleString()}</span>
           </div>
           {task?.dueDate && (
             <>
