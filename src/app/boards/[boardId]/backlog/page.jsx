@@ -204,6 +204,23 @@ function BacklogSection({boardId, statusId}) {
     api.patch(`/tasks/${taskId}`, {
       statusId: statusId
     })
+    .then(() => {
+      cache.keys().forEach((key) => {
+        let matchs = false;
+
+        if(Array.isArray(key)) {
+          matchs = key.some((key) => new RegExp(`^\\$inf\\$\\/boards\\/${boardId}\\/statuses\\/[^/]+\\/tasks.*$`).test(key)) ||
+            key.some((key) => new RegExp(`^\\$inf\\$\\/boards\\/${boardId}\\/tasks\\/no-status.*$`).test(key));
+        } else {
+          matchs = new RegExp(`^\\$inf\\$\\/boards\\/${boardId}\\/statuses\\/[^/]+\\/tasks.*$`).test(key) ||
+            new RegExp(`^\\$inf\\$\\/boards\\/${boardId}\\/tasks\\/no-status.*$`).test(key);
+        }
+        
+        if(matchs) {
+          mutate(key, null);
+        }
+      });
+    })
     .then(() => mutate((key) => new RegExp(`^\\/boards\\/${boardId}\\/statuses\\/[^/]+\\/tasks.*$`).test(key), null))
     .then(() => mutate((key) => new RegExp(`^\\/boards\\/${boardId}\\/tasks\\/no-status.*$`).test(key), null));
   }, [boardId]);
@@ -291,6 +308,7 @@ function BacklogSection({boardId, statusId}) {
 function BoardBacklog() {
   const api = useApi();
   const { boardId } = useParams();
+  const { mutate, cache } = useSWRConfig();
 
   const [statusesPerPage] = useState(25);
   const [showTaskAddDialog, setShowTaskAddDialog] = useState(false);
@@ -345,7 +363,28 @@ function BoardBacklog() {
         boardId={boardId}
         show={showTaskAddDialog}
         onClose={() => setShowTaskAddDialog(false)}
-        onAdd={() => setShowTaskAddDialog(false)}
+        onAdd={() => {
+          setShowTaskAddDialog(false);
+
+          cache.keys().forEach((key) => {
+            let matchs = false;
+    
+            if(Array.isArray(key)) {
+              matchs = key.some((key) => new RegExp(`^\\$inf\\$\\/boards\\/${boardId}\\/statuses\\/[^/]+\\/tasks.*$`).test(key)) ||
+                key.some((key) => new RegExp(`^\\$inf\\$\\/boards\\/${boardId}\\/tasks\\/no-status.*$`).test(key));
+            } else {
+              matchs = new RegExp(`^\\$inf\\$\\/boards\\/${boardId}\\/statuses\\/[^/]+\\/tasks.*$`).test(key) ||
+                new RegExp(`^\\$inf\\$\\/boards\\/${boardId}\\/tasks\\/no-status.*$`).test(key);
+            }
+            
+            if(matchs) {
+              mutate(key, null);
+            }
+          });
+
+          mutate((key) => new RegExp(`^\\/boards\\/${boardId}\\/statuses\\/[^/]+\\/tasks.*$`).test(key), null);
+          mutate((key) => new RegExp(`^\\/boards\\/${boardId}\\/tasks\\/no-status.*$`).test(key), null);
+        }}
       />
       <Accordion flush alwaysOpen>
         <Accordion.Panel>
