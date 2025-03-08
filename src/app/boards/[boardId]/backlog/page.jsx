@@ -184,9 +184,9 @@ function BacklogSection({boardId, statusId}) {
     data: membersData,
     error: membersError,
     isLoading: membersLoading
-  } = useSWR(data ? data.flatMap(page => page.content).map(task => `/boards/${boardId}/members/${task.assigneeId}`) : null,
+  } = useSWR(data ? data.flatMap(page => page.content).map(task => task.assigneeId && `/boards/${boardId}/members/${task.assigneeId}`) : null,
     async (urls) => {
-      return await Promise.all(urls.map(url => api.get(url).then(res => res.data)));
+      return await Promise.all(urls.map(url => url && api.get(url).then(res => res.data)));
     }
   , [data], { keepPreviousData: true });
 
@@ -194,9 +194,9 @@ function BacklogSection({boardId, statusId}) {
     data: usersData,
     error: usersError,
     isLoading: usersLoading
-  } = useSWR(membersData ? membersData.map(member => `/users/${member.userId}`) : null,
+  } = useSWR(membersData ? membersData.map(member => member && `/users/${member.userId}`) : null,
     async (urls) => {
-      return await Promise.all(urls.map(url => api.get(url).then(res => res.data)));
+      return await Promise.all(urls.map(url => url && api.get(url).then(res => res.data)));
     }
   , [membersData], { keepPreviousData: true });
 
