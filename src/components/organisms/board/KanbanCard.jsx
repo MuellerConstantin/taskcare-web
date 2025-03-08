@@ -129,9 +129,9 @@ export default function KanbanCard({task}) {
     (url) => api.get(url).then((res) => res.data));
 
   const [{ opacity }, dragRef] = useDrag(() => ({
-      type: "KanbanCard",
-      item: task,
-    }), []);
+    type: "KanbanCard",
+    item: task,
+  }), []);
 
   return (
     <div

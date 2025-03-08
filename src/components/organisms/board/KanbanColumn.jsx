@@ -23,14 +23,14 @@ export default function KanbanColumn({boardId, status}) {
       statusId: statusId
     })
     .then(() => mutate((key) => new RegExp(`^.*\/boards\/${boardId}\/statuses\/[^/]+\/tasks.*$`).test(key), null));
-  }, []);
+  }, [boardId]);
 
   const [, dropRef] = useDrop(() => ({
     accept: ["KanbanCard"],
     drop: async (task, monitor) => {
       updateStatus(task.id, status.id);
     },
-  }), [boardId]);
+  }), [status]);
 
   return (
     <div ref={dropRef} className="w-[20rem] h-full flex bg-gray-100 dark:bg-gray-800 rounded-md min-h-[30rem] flex flex-col">

@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Accordion, Button, ListGroup, Badge, Avatar } from "flowbite-react";
 import { useParams } from "next/navigation";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { TouchBackend } from "react-dnd-touch-backend";
 import useSWRInfinite from "swr/infinite";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import dynamic from "next/dynamic";
 import {
   mdiPlus,
@@ -19,6 +22,8 @@ import {
 import Image from "next/image";
 import useApi from "@/hooks/useApi";
 import TaskAddDialog from "@/components/organisms/task/TaskAddDialog";
+
+const isTouchDevice = () => window && "ontouchstart" in window;
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -95,9 +100,7 @@ function BacklogAvatar({username, userId}) {
   }
 }
 
-function BacklogSection({boardId, statusId}) {
-  const api = useApi();
-
+function BacklogEntry({task, username, userId}) {
   const priorityIcons = {
     "VERY_LOW": <Icon path={mdiArrowDownBoldBox} size={0.75} color="#0ea5e9" />,
     "LOW": <Icon path={mdiArrowBottomLeftBoldBox} size={0.75} color="#38bdf8" />,
@@ -105,6 +108,59 @@ function BacklogSection({boardId, statusId}) {
     "HIGH": <Icon path={mdiArrowTopLeftBoldBox} size={0.75} color="#fb923c" />,
     "VERY_HIGH": <Icon path={mdiArrowUpBoldBox} size={0.75} color="#ea580c" />,
   };
+
+  const [{ opacity }, dragRef] = useDrag(() => ({
+    type: "BacklogEntry",
+    item: task,
+  }), []);
+
+  return (
+    <ListGroup.Item
+      ref={dragRef}
+      style={{ opacity }}
+      theme={customListGroupTheme["item"]}
+      key={task.id}
+      className="flex items-center gap-2 cursor-pointer"
+    >
+      <div className="flex gap-4 w-full h-full justify-between">
+        <div className="flex gap-4 w-full h-full">
+          <div className="flex items-start min-w-4 justify-center">
+            {task?.priority && priorityIcons[task?.priority]}
+          </div>
+          <div className="flex flex-col space-y-2">
+            <div className="text-start text-sm font-semibold truncate">
+              {task.name}
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
+                <Icon path={mdiClockEdit} size={0.5} />
+                <span className="text-xs">{new Date(task?.updatedAt).toLocaleString()}</span>
+              </div>
+              {task?.dueDate && (
+                <>
+                  <div className="border-l-2 h-2/3 w-[1px] mx-2"></div>
+                  <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
+                    <Icon path={mdiCalendarClock} size={0.5} />
+                    <span className="text-xs">{new Date(task?.dueDate).toLocaleString()}</span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+        {task?.assigneeId && (
+          <div className="flex items-center">
+            <BacklogAvatar username={username} userId={userId} />
+          </div>
+        )}
+      </div>
+    </ListGroup.Item>
+  );
+}
+
+function BacklogSection({boardId, statusId}) {
+  const api = useApi();
+  const { mutate, cache } = useSWRConfig();
 
   const [perPage] = useState(25);
 
@@ -121,18 +177,18 @@ function BacklogSection({boardId, statusId}) {
     error: error,
     isLoading: loading,
     size,
-    setSize,
-  } = useSWRInfinite(getKey, (url) => api.get(url).then((res) => res.data));
+    setSize
+  } = useSWRInfinite(getKey, (url) => api.get(url).then((res) => res.data), { revalidateAll: true });
 
   const {
     data: membersData,
     error: membersError,
-    isLoading: membersLoading 
+    isLoading: membersLoading
   } = useSWR(data ? data.flatMap(page => page.content).map(task => `/boards/${boardId}/members/${task.assigneeId}`) : null,
     async (urls) => {
       return await Promise.all(urls.map(url => api.get(url).then(res => res.data)));
     }
-  , { keepPreviousData: true });
+  , [data], { keepPreviousData: true });
 
   const {
     data: usersData,
@@ -142,7 +198,22 @@ function BacklogSection({boardId, statusId}) {
     async (urls) => {
       return await Promise.all(urls.map(url => api.get(url).then(res => res.data)));
     }
-  , { keepPreviousData: true });
+  , [membersData], { keepPreviousData: true });
+
+  const updateStatus = useCallback((taskId, statusId) => {
+    api.patch(`/tasks/${taskId}`, {
+      statusId: statusId
+    })
+    .then(() => mutate((key) => new RegExp(`^\\/boards\\/${boardId}\\/statuses\\/[^/]+\\/tasks.*$`).test(key), null))
+    .then(() => mutate((key) => new RegExp(`^\\/boards\\/${boardId}\\/tasks\\/no-status.*$`).test(key), null));
+  }, [boardId]);
+
+  const [, dropRef] = useDrop(() => ({
+    accept: ["BacklogEntry"],
+    drop: async (task, monitor) => {
+      updateStatus(task.id, statusId);
+    },
+  }), [statusId]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -180,52 +251,20 @@ function BacklogSection({boardId, statusId}) {
         ) : (
           <>
             {data?.length > 0 && data[0].info.totalElements > 0 ? (
-              <ListGroup theme={customListGroupTheme}>
+              <ListGroup ref={dropRef} theme={customListGroupTheme}>
                 {data.map((page, pageIndex) =>
                   page.content.map((task, taskIndex) => (
-                    <ListGroup.Item
-                      theme={customListGroupTheme["item"]}
+                    <BacklogEntry
+                      task={task}
                       key={task.id}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <div className="flex gap-4 w-full h-full justify-between">
-                        <div className="flex gap-4 w-full h-full">
-                          <div className="flex items-start min-w-4 justify-center">
-                            {task?.priority && priorityIcons[task?.priority]}
-                          </div>
-                          <div className="flex flex-col space-y-2">
-                            <div className="text-start text-sm font-semibold truncate">
-                              {task.name}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
-                                <Icon path={mdiClockEdit} size={0.5} />
-                                <span className="text-xs">{new Date(task?.updatedAt).toLocaleString()}</span>
-                              </div>
-                              {task?.dueDate && (
-                                <>
-                                  <div className="border-l-2 h-2/3 w-[1px] mx-2"></div>
-                                  <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
-                                    <Icon path={mdiCalendarClock} size={0.5} />
-                                    <span className="text-xs">{new Date(task?.dueDate).toLocaleString()}</span>
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        {task?.assigneeId && (
-                          <div className="flex items-center">
-                            <BacklogAvatar username={usersData?.[pageIndex * perPage + taskIndex]?.username} userId={usersData?.[pageIndex * perPage + taskIndex]?.id} />
-                          </div>
-                        )}
-                      </div>
-                    </ListGroup.Item>
+                      username={usersData?.[pageIndex * perPage + taskIndex]?.username}
+                      userId={usersData?.[pageIndex * perPage + taskIndex]?.id}
+                    />
                   ))
                 )}
               </ListGroup>
             ) : (
-              <div className="text-center text-sm my-4 text-gray-500 dark:text-gray-400">
+              <div ref={dropRef} className="text-center text-sm py-4 text-gray-500 dark:text-gray-400">
                 No tasks found.
               </div>
             )}
@@ -249,7 +288,7 @@ function BacklogSection({boardId, statusId}) {
   );
 }
 
-export default function BoardBacklog() {
+function BoardBacklog() {
   const api = useApi();
   const { boardId } = useParams();
 
@@ -320,7 +359,7 @@ export default function BoardBacklog() {
           </Accordion.Title>
           <Accordion.Content theme={customAccordionTheme.content}>
             <div className="bg-gray-100 dark:bg-gray-800 p-2">
-              <BacklogSection boardId={boardId} />
+              <BacklogSection boardId={boardId} statusId={null} />
             </div>
           </Accordion.Content>
         </Accordion.Panel>
@@ -374,5 +413,13 @@ export default function BoardBacklog() {
         </Button>
       </div>
     </div>
+  );
+}
+
+export default function BoardBacklogWrapper() {
+  return (
+    <DndProvider backend={isTouchDevice() ? TouchBackend : HTML5Backend}>
+      <BoardBacklog />
+    </DndProvider>
   );
 }
