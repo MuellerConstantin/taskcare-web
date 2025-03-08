@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import dynamic from "next/dynamic";
 import { Button } from "flowbite-react";
 import { mdiPlus } from "@mdi/js";
@@ -20,6 +20,7 @@ const customButtonTheme = {
 
 export default function KanbanView({boardId}) {
   const api = useApi();
+  const { mutate } = useSWRConfig();
 
   const [showTaskAddDialog, setShowTaskAddDialog] = useState(false);
 
@@ -61,7 +62,10 @@ export default function KanbanView({boardId}) {
         boardId={boardId}
         show={showTaskAddDialog}
         onClose={() => setShowTaskAddDialog(false)}
-        onAdd={() => setShowTaskAddDialog(false)}
+        onAdd={() => {
+          setShowTaskAddDialog(false);
+          mutate((key) => new RegExp(`^.*\/boards\/${boardId}\/statuses\/[^/]+\/tasks.*$`).test(key), null);
+        }}
       />
       <div className="flex gap-4 overflow-x-auto h-full grow">
         {(loading || columnsLoading) ? (

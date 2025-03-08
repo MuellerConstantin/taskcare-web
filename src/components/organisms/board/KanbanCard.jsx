@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import dynamic from "next/dynamic";
-import { Avatar } from "flowbite-react";
+import { Avatar, Dropdown } from "flowbite-react";
 import {
+  mdiDotsVertical,
   mdiClockEdit,
   mdiCalendarClock,
   mdiArrowDownBoldBox,
@@ -12,8 +14,9 @@ import {
   mdiArrowUpBoldBox
 } from "@mdi/js";
 import Image from "next/image";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import useApi from "@/hooks/useApi";
+import TaskRemoveDialog from "../task/TaskRemoveDialog";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -60,6 +63,45 @@ function KanbanCardAvatar({username, userId}) {
   }
 }
 
+function KanbanCardMenu({boardId, taskId}) {
+  const { mutate } = useSWRConfig();
+
+  const [showTaskRemoveDialog, setShowTaskRemoveDialog] = useState(false);
+
+  return (
+    <>
+      <Dropdown
+        placement="left-end"
+        renderTrigger={() => (
+          <button
+            className="inline-flex items-center rounded-lg p-0 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700"
+          >
+            <Icon path={mdiDotsVertical}
+              title="Theme Toggle"
+              size={0.75}
+            />
+          </button>
+        )}
+      >
+        <Dropdown.Item as="div" onClick={() => setShowTaskRemoveDialog(true)}>
+          <div className="flex items-center space-x-4 w-full justify-between">
+            Delete
+          </div>
+        </Dropdown.Item>
+      </Dropdown>
+      <TaskRemoveDialog
+        taskId={taskId}
+        show={showTaskRemoveDialog}
+        onClose={() => setShowTaskRemoveDialog(false)}
+        onRemove={() => {
+          setShowTaskRemoveDialog(false);
+          mutate((key) => new RegExp(`^.*\/boards\/${boardId}\/statuses\/[^/]+\/tasks.*$`).test(key), null);
+        }}
+      />
+    </>
+  );
+}
+
 export default function KanbanCard({task}) {
   const api = useApi();
 
@@ -86,40 +128,42 @@ export default function KanbanCard({task}) {
     (url) => api.get(url).then((res) => res.data));
 
   return (
-    <div className="w-full h-[12rem] flex flex-col bg-white shadow dark:bg-gray-900 rounded-md p-2 overflow-hidden space-y-2 justify-between">
-      <div className="space-y-2">
-        <div className="flex space-x-4 items-start justify-between">
+    <div className="w-full h-[12rem] bg-white shadow dark:bg-gray-900 rounded-md p-2 overflow-hidden flex space-x-2">
+      <div className="flex flex-col space-y-2 justify-between grow">
+        <div className="space-y-2">
           <div className="font-semibold text-gray-900 dark:text-white truncate">
             {task?.name}
           </div>
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-full w-fit shrink-0">
-            {task?.assigneeId && (
-              <KanbanCardAvatar username={userData?.username} userId={userData?.id} />
-            )}
+          <div className="line-clamp-3 text-sm font-normal text-gray-700 dark:text-gray-400">
+            {task?.description || (<span className="italic">No description</span>)}
           </div>
         </div>
-        <div className="line-clamp-3 text-sm font-normal text-gray-700 dark:text-gray-400">
-          {task?.description || (<span className="italic">No description</span>)}
-        </div>
-      </div>
-      <div className="flex flex-col space-y-2">
-        <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
-          {task?.priority && priorityIcons[task?.priority]}
-        </div>
-        <div className="flex items-center gap-1">
+        <div className="flex flex-col space-y-2">
           <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
-            <Icon path={mdiClockEdit} size={0.5} />
-            <span className="text-xs">{new Date(task?.updatedAt).toLocaleString()}</span>
+            {task?.priority && priorityIcons[task?.priority]}
           </div>
-          {task?.dueDate && (
-            <>
-              <div className="border-l-2 h-2/3 w-[1px] mx-2"></div>
+          <div className="flex flex-wrap items-start gap-x-2">
+            <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
+              <Icon path={mdiClockEdit} size={0.5} />
+              <span className="text-xs">{new Date(task?.updatedAt).toLocaleString()}</span>
+            </div>
+            {task?.dueDate && (
               <div className="flex items-center gap-1 font-normal text-gray-700 dark:text-gray-400">
                 <Icon path={mdiCalendarClock} size={0.5} />
                 <span className="text-xs">{new Date(task?.dueDate).toLocaleString()}</span>
               </div>
-            </>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col space-y-2 justify-between shrink-0 items-end">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-full w-fit shrink-0">
+          {task?.assigneeId && (
+            <KanbanCardAvatar username={userData?.username} userId={userData?.id} />
           )}
+        </div>
+        <div>
+          <KanbanCardMenu boardId={task?.boardId} taskId={task?.id} />
         </div>
       </div>
     </div>

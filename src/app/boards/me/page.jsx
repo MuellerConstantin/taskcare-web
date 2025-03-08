@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { useSWRConfig } from "swr"
+import { useSWRConfig } from "swr";
 import { Button } from "flowbite-react";
 import { mdiPlus } from "@mdi/js";
 import SearchBar from "@/components/molecules/SearchBar";
