@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { useDrag } from "react-dnd";
 import { Avatar, Dropdown } from "flowbite-react";
 import {
   mdiDotsVertical,
@@ -127,8 +128,17 @@ export default function KanbanCard({task}) {
   } = useSWR(data ? `/users/${data.userId}` : null,
     (url) => api.get(url).then((res) => res.data));
 
+  const [{ opacity }, dragRef] = useDrag(() => ({
+      type: "KanbanCard",
+      item: task,
+    }), []);
+
   return (
-    <div className="w-full h-[12rem] bg-white shadow dark:bg-gray-900 rounded-md p-2 overflow-hidden flex space-x-2">
+    <div
+      ref={dragRef}
+      style={{ opacity }}
+      className="w-full h-[12rem] bg-white shadow dark:bg-gray-900 rounded-md p-2 overflow-hidden flex space-x-2"
+    >
       <div className="flex flex-col space-y-2 justify-between grow">
         <div className="space-y-2">
           <div className="font-semibold text-gray-900 dark:text-white truncate">

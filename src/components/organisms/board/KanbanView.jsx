@@ -5,10 +5,15 @@ import useSWR, { useSWRConfig } from "swr";
 import dynamic from "next/dynamic";
 import { Button } from "flowbite-react";
 import { mdiPlus } from "@mdi/js";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { TouchBackend } from "react-dnd-touch-backend";
 import useApi from "@/hooks/useApi";
 import KanbanColumn from "./KanbanColumn";
 import KanbanColumnSkeleton from "./KanbanColumnSkeleton";
 import TaskAddDialog from "@/components/organisms/task/TaskAddDialog";
+
+const isTouchDevice = () => window && "ontouchstart" in window;
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -18,7 +23,7 @@ const customButtonTheme = {
   }
 };
 
-export default function KanbanView({boardId}) {
+function KanbanView({boardId}) {
   const api = useApi();
   const { mutate } = useSWRConfig();
 
@@ -97,5 +102,13 @@ export default function KanbanView({boardId}) {
         )}
       </div>
     </div>
+  );
+}
+
+export default function KanbanViewWrapper({boardId}) {
+  return (
+    <DndProvider backend={isTouchDevice() ? TouchBackend : HTML5Backend}>
+      <KanbanView boardId={boardId} />
+    </DndProvider>
   );
 }

@@ -1,12 +1,15 @@
 "use client";
 
-import useSWR from "swr";
+import { useCallback } from "react";
+import useSWR, { useSWRConfig } from "swr";
+import { useDrop } from "react-dnd";
 import useApi from "@/hooks/useApi";
 import KanbanCard from "./KanbanCard";
 import KanbanCardSkeleton from "./KanbanCardSkeleton";
 
 export default function KanbanColumn({boardId, status}) {
   const api = useApi();
+  const { mutate } = useSWRConfig();
 
   const {
     data,
@@ -15,8 +18,22 @@ export default function KanbanColumn({boardId, status}) {
   } = useSWR(boardId && status ? `/boards/${boardId}/statuses/${status.id}/tasks` : null,
     (url) => api.get(url).then((res) => res.data));
 
+  const updateStatus = useCallback((taskId, statusId) => {
+    api.patch(`/tasks/${taskId}`, {
+      statusId: statusId
+    })
+    .then(() => mutate((key) => new RegExp(`^.*\/boards\/${boardId}\/statuses\/[^/]+\/tasks.*$`).test(key), null));
+  }, []);
+
+  const [, dropRef] = useDrop(() => ({
+    accept: ["KanbanCard"],
+    drop: async (task, monitor) => {
+      updateStatus(task.id, status.id);
+    },
+  }), [boardId]);
+
   return (
-    <div className="w-[20rem] h-full flex bg-gray-100 dark:bg-gray-800 rounded-md min-h-[30rem] flex flex-col">
+    <div ref={dropRef} className="w-[20rem] h-full flex bg-gray-100 dark:bg-gray-800 rounded-md min-h-[30rem] flex flex-col">
       <div className="p-2 text-sm font-semibold text-gray-900 dark:text-white truncate">
         {status?.name}
       </div>
