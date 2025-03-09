@@ -31,7 +31,7 @@ dependencies and executing the web client.
 
 For a custom configured deployment, a rebuild of the application is required. This
 especially applies to web client configuration settings
-(See [Configuration](docs/configuration.md)) like API endpoints and other settings
+(See [Configuration](./configuration.md)) like API endpoints and other settings
 because these variables are loaded and hardcoded at build time.
 
 For building the application, the [npm](https://www.npmjs.com/) package manager
