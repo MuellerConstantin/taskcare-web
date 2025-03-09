@@ -9,6 +9,7 @@
 ## Table of contents
 
 - [Introduction](#introduction)
+- [Getting Started](#getting-started)
 - [License](#license)
   - [Forbidden](#forbidden)
 
@@ -18,6 +19,14 @@ This is the browser based frontend of the _TaskCare_ platform, a collaboration
 network for managing tasks in teams. This web application provides a user-friendly
 interface for interacting with the TaskCare platform and for managing and using
 its boards.
+
+## Getting Started
+
+The frontend client is generally operated on-premise. Because it is written with
+[Next.js](https://nextjs.org/) as SSR (Server Side Rendering) application, it
+requires a proper runtime environment to run (See [Operation](docs/operation.md)).
+Besides the runtime environment, there are a few configuration settings that need
+to be set (See [Configuration](docs/configuration.md)).
 
 ## License
 
