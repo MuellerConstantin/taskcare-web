@@ -17,7 +17,7 @@ communication.
 The web client can be deployed on any [Node.js](https://nodejs.org/) runtime
 environment matching the version required in the [package.json](/package.json)
 file. For a proper deployment, the application must also be configured properly
-(See [Configuration](docs/configuration.md)).
+(See [Configuration](./configuration.md)).
 
 ### Standalone
 
