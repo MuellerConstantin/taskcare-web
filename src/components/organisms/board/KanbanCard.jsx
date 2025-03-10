@@ -103,7 +103,7 @@ function KanbanCardMenu({boardId, taskId}) {
   );
 }
 
-export default function KanbanCard({task}) {
+export default function KanbanCard({task, selected}) {
   const api = useApi();
 
   const priorityIcons = {
@@ -137,7 +137,7 @@ export default function KanbanCard({task}) {
     <div
       ref={dragRef}
       style={{ opacity }}
-      className="w-full h-[12rem] bg-white shadow dark:bg-gray-900 rounded-md p-2 overflow-hidden flex space-x-2"
+      className={`w-full h-[12rem] bg-white shadow dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md p-2 overflow-hidden flex space-x-2 ${selected ? "border-2 border-amber-500" : ""}`}
     >
       <div className="flex flex-col space-y-2 justify-between grow">
         <div className="space-y-2">

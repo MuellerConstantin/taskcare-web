@@ -7,7 +7,7 @@ import useApi from "@/hooks/useApi";
 import KanbanCard from "./KanbanCard";
 import KanbanCardSkeleton from "./KanbanCardSkeleton";
 
-export default function KanbanColumn({boardId, status}) {
+export default function KanbanColumn({boardId, status, selectedTaskId, onTaskSelect}) {
   const api = useApi();
   const { mutate } = useSWRConfig();
 
@@ -22,7 +22,8 @@ export default function KanbanColumn({boardId, status}) {
     api.patch(`/tasks/${taskId}`, {
       statusId: statusId
     })
-    .then(() => mutate((key) => new RegExp(`^.*\/boards\/${boardId}\/statuses\/[^/]+\/tasks.*$`).test(key), null));
+    .then(() => mutate((key) => new RegExp(`^.*\/boards\/${boardId}\/statuses\/[^/]+\/tasks.*$`).test(key), null))
+    .then(() => mutate((key) =>new RegExp(`^.*\/tasks\/${taskId}`).test(key), null));
   }, [boardId]);
 
   const [, dropRef] = useDrop(() => ({
@@ -51,8 +52,8 @@ export default function KanbanColumn({boardId, status}) {
             </div>
           ))
         ) : data?.content?.map((task) => (
-          <div key={task.id}>
-            <KanbanCard task={task} />
+          <div key={task.id} onClick={() => onTaskSelect(task?.id)} className="cursor-pointer">
+            <KanbanCard task={task} selected={task?.id === selectedTaskId} />
           </div>
         ))}
       </div>
