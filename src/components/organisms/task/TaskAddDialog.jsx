@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
-import { Button, Spinner, TextInput, Textarea, Modal, Label, Datepicker } from "flowbite-react";
+import { Button, Spinner, TextInput, Textarea, Modal, Label, Datepicker, ButtonGroup } from "flowbite-react";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useSWR from "swr";
@@ -9,7 +11,8 @@ import Timepicker from "@/components/atoms/Timepicker";
 
 const customButtonTheme = {
   "color": {
-    "amber": "border border-transparent bg-amber-500 text-white focus:ring-4 focus:ring-amber-300 enabled:hover:bg-amber-600 dark:focus:ring-amber-900"
+    "amber": "border border-transparent bg-amber-500 text-white focus:ring-4 focus:ring-amber-300 enabled:hover:bg-amber-600 dark:focus:ring-amber-900",
+    "light": "border border-gray-300 bg-white text-gray-900 focus:ring-4 focus:ring-amber-300 enabled:hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:focus:ring-gray-700 dark:enabled:hover:border-gray-700 dark:enabled:hover:bg-gray-700",
   }
 };
 
@@ -278,6 +281,7 @@ export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showDescriptionPreview, setShowDescriptionPreview] = useState(false);
 
   const addTask = useCallback(async (values, {setFieldError}) => {
     setLoading(true);
@@ -349,20 +353,51 @@ export default function TaskAddDialog({boardId, show, onAdd, onClose}) {
                     helperText={props.errors.name && props.touched.name ? props.errors.name : null}
                   />
                 </div>
-                <div>
-                  <Textarea
-                    theme={customTextAreaTheme}
-                    rows={4}
-                    name="description"
-                    placeholder="Description"
-                    maxLength={1024}
-                    disabled={loading}
-                    onChange={props.handleChange}
-                    onBlur={props.handleBlur}
-                    value={props.values.description}
-                    color={props.errors.description && props.touched.description ? "failure" : "gray"}
-                    helperText={props.errors.description && props.touched.description ? props.errors.description : null}
-                  />
+                <div className="space-y-2">
+                  <div>
+                    <ButtonGroup>
+                      <Button
+                        theme={customButtonTheme}
+                        color="light"
+                        size="xs"
+                        onClick={() => setShowDescriptionPreview(false)}
+                        className={!showDescriptionPreview && "bg-gray-100 dark:bg-gray-700"}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        theme={customButtonTheme}
+                        color="light"
+                        size="xs"
+                        onClick={() => setShowDescriptionPreview(true)}
+                        className={showDescriptionPreview && "bg-gray-100 dark:bg-gray-700"}
+                      >
+                        Preview
+                      </Button>
+                    </ButtonGroup>
+                  </div>
+                  {showDescriptionPreview ? (
+                    <div className="prose-sm md:prose dark:prose-invert h-64 overflow-y-auto rounded-lg border px-4 py-2 border-gray-300 bg-gray-50 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                      <Markdown remarkPlugins={[remarkGfm]}>
+                        {props.values.description}
+                      </Markdown>
+                    </div>
+                  ) : (
+                    <Textarea
+                      theme={customTextAreaTheme}
+                      rows={4}
+                      name="description"
+                      placeholder="Description"
+                      className="h-64"
+                      maxLength={1024}
+                      disabled={loading}
+                      onChange={props.handleChange}
+                      onBlur={props.handleBlur}
+                      value={props.values.description}
+                      color={props.errors.description && props.touched.description ? "failure" : "gray"}
+                      helperText={props.errors.description && props.touched.description ? props.errors.description : null}
+                    />
+                  )}
                 </div>
               </div>
               <div>

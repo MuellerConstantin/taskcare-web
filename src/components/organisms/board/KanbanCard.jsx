@@ -14,6 +14,8 @@ import {
   mdiArrowTopLeftBoldBox,
   mdiArrowUpBoldBox
 } from "@mdi/js";
+import { remark } from "remark";
+import strip from "strip-markdown";
 import Image from "next/image";
 import useSWR, { useSWRConfig } from "swr";
 import useApi from "@/hooks/useApi";
@@ -133,6 +135,10 @@ export default function KanbanCard({task, selected}) {
     item: task,
   }), []);
 
+  const markdownToPlainText = (markdown) => {
+    return remark().use(strip).processSync(markdown).toString();
+  };
+
   return (
     <div
       ref={dragRef}
@@ -145,7 +151,7 @@ export default function KanbanCard({task, selected}) {
             {task?.name}
           </div>
           <div className="line-clamp-3 text-sm font-normal text-gray-700 dark:text-gray-400">
-            {task?.description || (<span className="italic">No description</span>)}
+            {task?.description ? markdownToPlainText(task?.description) : (<span className="italic">No description</span>)}
           </div>
         </div>
         <div className="flex flex-col space-y-2">

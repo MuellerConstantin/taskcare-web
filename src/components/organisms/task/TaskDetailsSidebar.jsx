@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Avatar } from "flowbite-react";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   mdiClose,
   mdiArrowDownBoldBox,
@@ -394,10 +396,12 @@ export default function TaskDetailsSidebar({taskId, onClose}) {
               <div className="h-3 bg-red-200 dark:bg-red-400 rounded-full w-48" />
             </div>
           ) : (
-            <div>
+            <div className="max-h-[20rem] overflow-y-auto">
               {data?.description ? (
-                <div className="text-gray-900 dark:text-white">
-                  {data.description}
+                <div className="prose-sm md:prose dark:prose-invert">
+                  <Markdown remarkPlugins={[remarkGfm]}>
+                    {data.description}
+                  </Markdown>
                 </div>
               ) : (
                 <div className="text-gray-900 dark:text-white">

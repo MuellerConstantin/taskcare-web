@@ -1,4 +1,5 @@
 const flowbite = require("flowbite-react/tailwind");
+const typography = require("@tailwindcss/typography");
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -19,5 +20,6 @@ export default {
   },
   plugins: [
     flowbite.plugin(),
+    typography,
   ],
 };
