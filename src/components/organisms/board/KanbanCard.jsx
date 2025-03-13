@@ -86,6 +86,11 @@ function KanbanCardMenu({boardId, taskId}) {
           </button>
         )}
       >
+        <Dropdown.Item as="a" href={`/boards/${boardId}/backlog/${taskId}`}>
+          <div className="flex items-center space-x-4 w-full justify-between">
+            View Details
+          </div>
+        </Dropdown.Item>
         <Dropdown.Item as="div" onClick={() => setShowTaskRemoveDialog(true)}>
           <div className="flex items-center space-x-4 w-full justify-between">
             Delete

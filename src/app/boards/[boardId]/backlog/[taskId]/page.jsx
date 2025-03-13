@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import dynamic from "next/dynamic";
-import { Avatar } from "flowbite-react";
+import { Avatar, Button } from "flowbite-react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import {
-  mdiClose,
+  mdiPencil,
+  mdiDelete,
   mdiArrowDownBoldBox,
   mdiArrowBottomLeftBoldBox,
   mdiPauseBox,
@@ -19,7 +21,13 @@ import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
-function TaskDetailsSidebarAvatar({username, userId}) {
+const customButtonTheme = {
+  "color": {
+    "light": "border border-gray-300 bg-white text-gray-900 focus:ring-4 focus:ring-amber-300 enabled:hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:focus:ring-gray-700 dark:enabled:hover:border-gray-700 dark:enabled:hover:bg-gray-700",
+  }
+};
+
+function BoardBacklogTaskAvatar({username, userId}) {
   const api = useApi();
 
   const {
@@ -62,8 +70,9 @@ function TaskDetailsSidebarAvatar({username, userId}) {
   }
 }
 
-export default function TaskDetailsSidebar({taskId, onClose}) {
+export default function BoardBacklogTask() {
   const api = useApi();
+  const { taskId } = useParams();
 
   const priorityIcons = {
     "VERY_LOW": <Icon path={mdiArrowDownBoldBox} size={0.75} color="#0ea5e9" />,
@@ -132,36 +141,41 @@ export default function TaskDetailsSidebar({taskId, onClose}) {
   }, [componentsData, showAllComponents]);
 
   return (
-    <div className="flex flex-col p-4 space-y-4 h-full overflow-y-auto">
-      <div className="flex justify-between items-center space-x-4">
-        <h2 className="font-semibold text-gray-900 dark:text-white">
-          Task Details
-        </h2>
-        <button
-          onClick={onClose}
-          className="p-2 rounded-lg text-gray-400 hover:text-gray-900 hover:dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600"
-        >
-          <Icon path={mdiClose} size={0.75} />
-        </button>
+    <div className="space-y-4 flex flex-col">
+      <div className="flex items-center justify-between space-x-4">
+        <div className="overflow-hidden">
+          <h1 className="text-xl font-semibold truncate">
+            {data?.name}
+          </h1>
+        </div>
+        <div className="shrink-0">
+          <Button.Group>
+            <Button
+              theme={customButtonTheme}
+              color="light"
+              size="xs"
+              disabled={loading || error}
+            >
+              <div className="flex items-center space-x-2 justify-center">
+                <Icon path={mdiPencil} size={0.75} />
+                <span>Edit</span>
+              </div>
+            </Button>
+            <Button
+              theme={customButtonTheme}
+              color="light"
+              size="xs"
+              disabled={loading || error}
+            >
+              <div className="flex items-center space-x-2 justify-center">
+                <Icon path={mdiDelete} size={0.75} />
+                <span>Remove</span>
+              </div>
+            </Button>
+          </Button.Group>
+        </div>
       </div>
-      <div>
-        {loading ? (
-          <div>
-            <div className="animate-pulse h-4 bg-gray-200 rounded-full dark:bg-gray-800 w-48" />
-          </div>
-        ) : error ? (
-          <div>
-            <div className="h-4 bg-red-200 dark:bg-red-400 rounded-full w-48" />
-          </div>
-        ) : (
-          <a href={`/boards/${data?.boardId}/backlog/${data?.id}`}>
-            <h3 className="text-amber-500 truncate hover:underline">
-              {data?.name}
-            </h3>
-          </a>
-        )}
-      </div>
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-2">
           <div className="font-semibold text-gray-900 dark:text-white">Details</div>
           <hr />
@@ -370,7 +384,7 @@ export default function TaskDetailsSidebar({taskId, onClose}) {
                   {data?.assigneeId ? (
                     <div className="flex items-center space-x-2">
                       <div className="bg-gray-100 dark:bg-gray-800 rounded-full w-fit">
-                        <TaskDetailsSidebarAvatar username={userData?.username} userId={assigneeData?.userId} />
+                        <BoardBacklogTaskAvatar username={userData?.username} userId={assigneeData?.userId} />
                       </div>
                       <div className="text-gray-900 dark:text-white truncate">
                         {userData?.displayName || userData?.username}
@@ -386,7 +400,7 @@ export default function TaskDetailsSidebar({taskId, onClose}) {
             </div>
           </div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 lg:col-span-2">
           <div className="font-semibold text-gray-900 dark:text-white">Description</div>
           <hr />
           {loading ? (

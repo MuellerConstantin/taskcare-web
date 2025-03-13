@@ -121,6 +121,7 @@ function BacklogEntry({task, username, userId}) {
       theme={customListGroupTheme["item"]}
       key={task.id}
       className="flex items-center gap-2 cursor-pointer"
+      href={`/boards/${task.boardId}/backlog/${task.id}`}
     >
       <div className="flex gap-4 w-full h-full justify-between">
         <div className="flex gap-4 w-full h-full">

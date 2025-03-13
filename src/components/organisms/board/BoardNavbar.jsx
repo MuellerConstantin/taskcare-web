@@ -60,7 +60,7 @@ export default function BoardNavbar() {
   const navigation = useMemo(() => {
     return [
       {name: "Board", icon: mdiViewDashboardVariant, path: `/boards/${boardId}`, isCurrent: `/boards/${boardId}` === pathname},
-      {name: "Backlog", icon: mdiViewList, path: `/boards/${boardId}/backlog`, isCurrent: `/boards/${boardId}/backlog` === pathname},
+      {name: "Backlog", icon: mdiViewList, path: `/boards/${boardId}/backlog`, isCurrent: pathname.startsWith(`/boards/${boardId}/backlog`)},
       {name: "Settings", icon: mdiCog, path: `/boards/${boardId}/settings`, isCurrent: pathname.startsWith(`/boards/${boardId}/settings`)}
     ];
   }, [boardId, pathname]);
