@@ -19,6 +19,7 @@ import Image from "next/image";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
 import TaskRemoveDialog from "@/components/organisms/task/TaskRemoveDialog";
+import TaskEditDialog from "@/components/organisms/task/TaskEditDialog";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -93,11 +94,13 @@ export default function BoardBacklogTask() {
   }
 
   const [showTaskRemoveDialog, setShowTaskRemoveDialog] = useState(false);
+  const [showTaskEditDialog, setShowTaskEditDialog] = useState(false);
 
   const {
     data,
     error,
-    isLoading: loading
+    isLoading: loading,
+    mutate
   } = useSWR(taskId ? `/tasks/${taskId}` : null,
     (url) => api.get(url).then((res) => res.data));
 
@@ -159,6 +162,7 @@ export default function BoardBacklogTask() {
               color="light"
               size="xs"
               disabled={loading || error}
+              onClick={() => setShowTaskEditDialog(true)}
             >
               <div className="flex items-center space-x-2 justify-center">
                 <Icon path={mdiPencil} size={0.75} />
@@ -188,6 +192,15 @@ export default function BoardBacklogTask() {
           router.push(`/boards/${data.boardId}/backlog`);
         }}
         taskId={taskId}
+      />
+      <TaskEditDialog
+        show={showTaskEditDialog}
+        onClose={() => setShowTaskEditDialog(false)}
+        taskId={taskId}
+        onEdit={() => {
+          setShowTaskEditDialog(false);
+          mutate(null);
+        }}
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-2">
