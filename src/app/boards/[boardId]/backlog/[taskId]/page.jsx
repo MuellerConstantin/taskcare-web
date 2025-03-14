@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { Avatar, Button } from "flowbite-react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
   mdiPencil,
@@ -18,6 +18,7 @@ import {
 import Image from "next/image";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
+import TaskRemoveDialog from "@/components/organisms/task/TaskRemoveDialog";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -73,6 +74,7 @@ function BoardBacklogTaskAvatar({username, userId}) {
 export default function BoardBacklogTask() {
   const api = useApi();
   const { taskId } = useParams();
+  const router = useRouter();
 
   const priorityIcons = {
     "VERY_LOW": <Icon path={mdiArrowDownBoldBox} size={0.75} color="#0ea5e9" />,
@@ -89,6 +91,8 @@ export default function BoardBacklogTask() {
     "HIGH": "High",
     "VERY_HIGH": "Very High",
   }
+
+  const [showTaskRemoveDialog, setShowTaskRemoveDialog] = useState(false);
 
   const {
     data,
@@ -166,6 +170,7 @@ export default function BoardBacklogTask() {
               color="light"
               size="xs"
               disabled={loading || error}
+              onClick={() => setShowTaskRemoveDialog(true)}
             >
               <div className="flex items-center space-x-2 justify-center">
                 <Icon path={mdiDelete} size={0.75} />
@@ -175,6 +180,15 @@ export default function BoardBacklogTask() {
           </Button.Group>
         </div>
       </div>
+      <TaskRemoveDialog
+        show={showTaskRemoveDialog}
+        onClose={() => setShowTaskRemoveDialog(false)}
+        onRemove={() => {
+          setShowTaskRemoveDialog(false);
+          router.push(`/boards/${data.boardId}/backlog`);
+        }}
+        taskId={taskId}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-2">
           <div className="font-semibold text-gray-900 dark:text-white">Details</div>
