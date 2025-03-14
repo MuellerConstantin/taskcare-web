@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { Button, Spinner, Avatar, TextInput, Modal, Label } from "flowbite-react";
 import { Formik } from "formik";
@@ -84,6 +84,13 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState(null);
 
+  const roleOptions = useMemo(() => {
+    return [
+      {"label": "Administrator", "value": "ADMINISTRATOR"},
+      {"label": "User", "value": "USER"},
+    ];
+  }, []);
+
   const {
     data,
     error,
@@ -96,9 +103,9 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
     setEditError(null);
 
     api.patch(`/users/${userId}`, {
-      displayName: displayName && displayName.length > 0 ? displayName : undefined,
-      password: password && password.length > 0 ? password : undefined,
-      role: role ? role.value : undefined
+      displayName: displayName && displayName.length > 0 ? displayName : null,
+      password: password && password.length > 0 ? password : null,
+      role: role ? role.value : null
     })
     .then(() => onEdit())
     .catch((err) => {
@@ -124,7 +131,12 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
     <Modal size="md" show={show} onClose={onClose}>
       <Modal.Header>Edit User</Modal.Header>
       <Formik
-        initialValues={{ displayName: "", password: "", passwordConfirmation: "", role: null }}
+        initialValues={{
+          displayName: data?.displayName || "",
+          password: "",
+          passwordConfirmation: "",
+          role: data?.role && roleOptions.find((option) => option.value === data?.role) || null
+        }}
         validationSchema={schema}
         onSubmit={(values, { setFieldError }) => editUser(values, { setFieldError })}
       >
@@ -166,7 +178,7 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
                       theme={customTextInputTheme}
                       name="displayName"
                       type="text"
-                      placeholder={data?.displayName || "Display Name"}
+                      placeholder="Display Name"
                       disabled={loading}
                       onChange={props.handleChange}
                       onBlur={props.handleBlur}
@@ -215,15 +227,9 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
                   <Select
                     id="user-add-roles"
                     required
-                    options={[
-                      { value: "USER", label: "User" },
-                      { value: "ADMINISTRATOR", label: "Administrator" },
-                    ]}
+                    options={roleOptions}
                     name="role"
-                    placeholder={[
-                      { value: "USER", label: "User" },
-                      { value: "ADMINISTRATOR", label: "Administrator" },
-                    ].find((option) => option.value === data?.role).label || "Select..."}
+                    placeholder="Select..."
                     onChange={(option) => props.setFieldValue("role", option)}
                     onBlur={() => props.setFieldTouched("role", true)}
                     value={props.values.role}
