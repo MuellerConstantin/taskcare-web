@@ -27,8 +27,13 @@ FROM node:18-alpine
 RUN mkdir -p /usr/local/bin/taskcare/web
 WORKDIR /usr/local/bin/taskcare/web
 
+VOLUME ["/usr/local/etc/taskcare/web"]
+
 COPY --from=build /usr/local/src/taskcare/web/.next/standalone ./
 COPY --from=build /usr/local/src/taskcare/web/.next/static ./.next/static
 COPY --from=build /usr/local/src/taskcare/web/public ./public
 
-ENTRYPOINT ["node", "server.js"]
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

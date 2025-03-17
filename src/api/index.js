@@ -8,7 +8,7 @@ export const injectStore = (_store) => {
 };
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_TASKCARE_API_URL,
+  baseURL: "/api/proxy",
   timeout: 10000,
   headers: {
     Accept: "application/json",

@@ -31,13 +31,13 @@ here for the sake of completeness.
 Build time configuration variables are in general prefixed with `NEXT_PUBLIC_`. Changing these variables
 requires a rebuild of the web client. These variables are loaded and hardcoded at build time.
 
-| Environment Variable         | Description                                                                                         | Required |
-|------------------------------|-----------------------------------------------------------------------------------------------------|----------|
-| NEXT_PUBLIC_TASKCARE_API_URL | Url of the TaskCare API. Including the api prefix and version. (e.g. `http://<HOST>:<PORT>/api/v1`) | Yes      |
+*None variables to configure.*
 
 ### Runtime configuration
 
 Runtime configuration variables are used by the frontend's web server responsible for serving the web client. Changing these variables
 requires a restart of the web server.
 
-*None variables to configure.*
+| Environment Variable | Description                                                                                         | Required |
+|----------------------|-----------------------------------------------------------------------------------------------------|----------|
+| TASKCARE_API_URL     | Url of the TaskCare API. Including the api prefix and version. (e.g. `http://<HOST>:<PORT>/api/v1`) | Yes      |

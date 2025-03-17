@@ -71,7 +71,7 @@ see [configuration](./configuration.md).
 The release in the form of a Docker image can be started as follows:
 
 ```shell
-docker run -d -p 3000:3000 taskcare/web:<VERSION>
+docker run -d -p 3000:3000 -v <CONFIG_PATH>:/usr/local/etc/taskcare/web taskcare/web:<VERSION>
 ```
 
 #### Build image
