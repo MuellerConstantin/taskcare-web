@@ -26,19 +26,28 @@ export default function KanbanColumn({boardId, status, selectedTaskId, onTaskSel
     .then(() => mutate((key) =>new RegExp(`^.*\/tasks\/${taskId}`).test(key), null));
   }, [boardId]);
 
-  const [, dropRef] = useDrop(() => ({
+  const [{ isOver, canDrop }, dropRef] = useDrop(() => ({
     accept: ["KanbanCard"],
     drop: async (task, monitor) => {
+      if(task.statusId === status.id) return;
+
       updateStatus(task.id, status.id);
     },
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+      canDrop: !!monitor.canDrop(),
+    }),
   }), [status]);
 
   return (
-    <div ref={dropRef} className="w-[20rem] h-full flex bg-gray-100 dark:bg-gray-800 rounded-md min-h-[30rem] flex flex-col">
+    <div
+      ref={dropRef}
+      className="w-[20rem] h-full flex bg-gray-100 dark:bg-gray-800 rounded-md min-h-[30rem] flex flex-col"
+    >
       <div className="p-2 text-sm font-semibold text-gray-900 dark:text-white truncate">
         {status?.name}
       </div>
-      <div className="p-2 flex flex-col gap-2">
+      <div className="p-2 flex flex-col gap-2 h-full relative">
         {(loading) ? (
           Array.from(Array(Math.floor(Math.random() * 4) + 1).keys()).map((key) => (
             <div key={key}>
@@ -56,6 +65,13 @@ export default function KanbanColumn({boardId, status, selectedTaskId, onTaskSel
             <KanbanCard task={task} selected={task?.id === selectedTaskId} />
           </div>
         ))}
+        {canDrop && (
+          <div className="absolute w-full h-full inset-0 z-10 p-2 bg-gray-100 dark:bg-gray-800">
+            <div className={`border-2 flex justify-center border-dashed h-full w-full rounded-md ${isOver ? "bg-green-200 border-green-500 dark:bg-green-800 dark:border-green-400" : "bg-amber-200 border-amber-500 dark:bg-amber-800 dark:border-amber-400"}`}>
+
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

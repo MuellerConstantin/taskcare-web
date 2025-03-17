@@ -135,7 +135,7 @@ export default function KanbanCard({task, selected}) {
   } = useSWR(data ? `/users/${data.userId}` : null,
     (url) => api.get(url).then((res) => res.data));
 
-  const [{ opacity }, dragRef] = useDrag(() => ({
+  const [, dragRef] = useDrag(() => ({
     type: "KanbanCard",
     item: task,
   }), []);
@@ -147,7 +147,6 @@ export default function KanbanCard({task, selected}) {
   return (
     <div
       ref={dragRef}
-      style={{ opacity }}
       className={`w-full h-[12rem] bg-white shadow dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md p-2 overflow-hidden flex space-x-2 ${selected ? "border-2 border-amber-500" : ""}`}
     >
       <div className="flex flex-col space-y-2 justify-between grow">

@@ -5,7 +5,7 @@ import useSWR, { useSWRConfig } from "swr";
 import dynamic from "next/dynamic";
 import { Button } from "flowbite-react";
 import { mdiPlus } from "@mdi/js";
-import { DndProvider } from "react-dnd";
+import { DndProvider, TouchTransition, MouseTransition } from "react-dnd-multi-backend";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
 import useApi from "@/hooks/useApi";
@@ -13,8 +13,6 @@ import KanbanColumn from "./KanbanColumn";
 import KanbanColumnSkeleton from "./KanbanColumnSkeleton";
 import TaskAddDialog from "@/components/organisms/task/TaskAddDialog";
 import TaskDetailsSidebar from "../task/TaskDetailsSidebar";
-
-const isTouchDevice = () => window && "ontouchstart" in window;
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -147,8 +145,25 @@ function KanbanView({boardId}) {
 }
 
 export default function KanbanViewWrapper({boardId}) {
+  const HTML5toTouch = {
+    backends: [
+      {
+        id: "html5",
+        backend: HTML5Backend,
+        transition: MouseTransition,
+      },
+      {
+        id: "touch",
+        backend: TouchBackend,
+        options: {enableMouseEvents: true},
+        preview: true,
+        transition: TouchTransition,
+      },
+    ],
+  };
+
   return (
-    <DndProvider backend={isTouchDevice() ? TouchBackend : HTML5Backend}>
+    <DndProvider options={HTML5toTouch}>
       <KanbanView boardId={boardId} />
     </DndProvider>
   );

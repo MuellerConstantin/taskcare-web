@@ -3,7 +3,8 @@
 import { useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { Pagination, Tooltip, Badge } from "flowbite-react";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { useDrag, useDrop } from "react-dnd";
+import { DndProvider, TouchTransition, MouseTransition } from "react-dnd-multi-backend";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
 import dynamic from "next/dynamic";
@@ -320,8 +321,25 @@ function BoardSettingsLayout() {
 }
 
 export default function BoardSettingsLayoutWrapper() {
+  const HTML5toTouch = {
+    backends: [
+      {
+        id: "html5",
+        backend: HTML5Backend,
+        transition: MouseTransition,
+      },
+      {
+        id: "touch",
+        backend: TouchBackend,
+        options: {enableMouseEvents: true},
+        preview: true,
+        transition: TouchTransition,
+      },
+    ],
+  };
+
   return (
-    <DndProvider backend={isTouchDevice() ? TouchBackend : HTML5Backend}>
+    <DndProvider options={HTML5toTouch}>
       <BoardSettingsLayout />
     </DndProvider>
   );

@@ -3,7 +3,8 @@
 import { useState, useCallback } from "react";
 import { Accordion, Button, ListGroup, Badge, Avatar } from "flowbite-react";
 import { useParams } from "next/navigation";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { useDrag, useDrop } from "react-dnd";
+import { DndProvider, TouchTransition, MouseTransition } from "react-dnd-multi-backend";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
 import useSWRInfinite from "swr/infinite";
@@ -22,8 +23,6 @@ import {
 import Image from "next/image";
 import useApi from "@/hooks/useApi";
 import TaskAddDialog from "@/components/organisms/task/TaskAddDialog";
-
-const isTouchDevice = () => window && "ontouchstart" in window;
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
@@ -457,8 +456,25 @@ function BoardBacklog() {
 }
 
 export default function BoardBacklogWrapper() {
+  const HTML5toTouch = {
+    backends: [
+      {
+        id: "html5",
+        backend: HTML5Backend,
+        transition: MouseTransition,
+      },
+      {
+        id: "touch",
+        backend: TouchBackend,
+        options: {enableMouseEvents: true},
+        preview: true,
+        transition: TouchTransition,
+      },
+    ],
+  };
+
   return (
-    <DndProvider backend={isTouchDevice() ? TouchBackend : HTML5Backend}>
+    <DndProvider options={HTML5toTouch}>
       <BoardBacklog />
     </DndProvider>
   );
