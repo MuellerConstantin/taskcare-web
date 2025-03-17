@@ -17,7 +17,9 @@ communication.
 The web client can be deployed on any [Node.js](https://nodejs.org/) runtime
 environment matching the version required in the [package.json](/package.json)
 file. For a proper deployment, the application must also be configured properly
-(See [Configuration](./configuration.md)).
+(See [Configuration](./configuration.md)). The application can run either as
+system software (standalone) or in a container. Depending on this, either
+Docker or a the Node.js runtime environment is required.
 
 ### Standalone
 
@@ -54,4 +56,31 @@ can also be used.
 
 ```bash
 npm run start
+```
+
+### Container
+
+The application can also be run in a container using the provided or self-built
+Docker image. This does not require a Node.js installation on the target system,
+but an installation of the Docker Engine.
+
+Even with container deployment, the application still has to be configured. This
+is basically the same as for standalone operation. For configuration details
+see [configuration](./configuration.md).
+
+The release in the form of a Docker image can be started as follows:
+
+```shell
+docker run -d -p 3000:3000 taskcare/web:<VERSION>
+```
+
+#### Build image
+
+Should it be necessary in the development phase or for other reasons to build
+the Docker image directly from the source code, this is also possible. No Node.js
+installations are required for this either, the image is built in multi-stage
+operation on a Docker basis. The provided Dockerfile can be used to build:
+
+```shell
+docker build -t taskcare/web:<VERSION> .
 ```
