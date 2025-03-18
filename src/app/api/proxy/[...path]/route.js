@@ -33,14 +33,20 @@ async function proxyRequest(req, params) {
     targetUrl.searchParams.append(key, value);
   });
 
+  const headers = new Headers();
+
+  req.headers.forEach((value, key) => {
+    if (key.toLowerCase() !== "content-length") {
+      headers.append(key, value);
+    }
+  });
+
   const fetchOptions = {
     method: req.method,
-    headers: new Headers(req.headers),
+    headers,
+    body: req.method !== "GET" && req.method !== "HEAD" ? req.body : undefined,
+    duplex: "half",
   };
-
-  if (req.method !== "GET" && req.method !== "HEAD") {
-    fetchOptions.body = await req.text();
-  }
 
   try {
     const response = await fetch(targetUrl, fetchOptions);
