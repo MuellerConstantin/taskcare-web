@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Pagination } from "flowbite-react";
+import { useState, useMemo } from "react";
+import { Pagination, Spinner } from "flowbite-react";
 import useSWR from "swr";
 import BoardCard from "@/components/molecules/board/BoardCard";
 import BoardCardSkeleton from "@/components/molecules/board/BoardCardSkeleton";
@@ -35,41 +35,72 @@ export default function MyBoardsGallery({searchQuery}) {
   const {
     data,
     error,
-    isLoading: loading,
+    isLoading
   } = useSWR(`/user/me/boards?page=${page - 1}&perPage=${perPage}${searchQuery ? `&search=${searchQuery}` : ""}`,
     (url) => api.get(url).then((res) => res.data), { keepPreviousData: true });
 
+  const isInitialLoading = useMemo(() => isLoading && (!data || data.info.totalElements === 0), [isLoading, data]);
+  const isRefreshLoading = useMemo(() => isLoading && data && data.info.totalElements > 0, [isLoading, data]);
+  const hasErrored = useMemo(() => !isLoading && error, [isLoading, error]);
+  const hasSucceeded = useMemo(() => !isLoading && !error && data, [isLoading, error, data]);
+  const hasData = useMemo(() => hasSucceeded && data.info.totalElements > 0, [hasSucceeded, data]);
+  const isFiltered = useMemo(() => hasSucceeded && searchQuery, [hasSucceeded, searchQuery]);
+
   return (
     <div className="flex flex-col h-full w-full space-y-4">
-      <div className="flex flex-col md:flex-row gap-4 flex-wrap">
-        {loading ? (
+      <div className="flex flex-col md:flex-row gap-4 flex-wrap relative">
+        {isInitialLoading && (
           Array.from(Array(6).keys()).map((key) => (
             <BoardCardSkeleton key={key} />
           ))
-        ) : error ? (
-          Array.from(Array(6).keys()).map((key) => (
-            <BoardCardSkeleton key={key} error />
-          ))
-        ) : (
+        )}
+
+        {isRefreshLoading && (
           <>
-            {data?.info.totalElements > 0 ? (
-              data?.content.map((board) => <BoardCard key={board.id} board={board} />)
-            ) : (
+            {data.content.map((board) => (
+              <div key={board.id} className="relative">
+                <BoardCard board={board} />
+                <div className="absolute inset-0 rounded-md bg-opacity-50 dark:bg-opacity-50 w-full h-full z-50 bg-gray-200 dark:bg-gray-800 animate-pulse" />
+              </div>
+            ))}
+          </>
+        )}
+
+        {hasErrored && (
+          Array.from(Array(6).keys()).map((key) => (
+            <BoardCardSkeleton key={key} error={error} />
+          ))
+        )}
+
+        {hasSucceeded && (
+          <>
+            {hasData && data.content.map((board) => (
+              <BoardCard key={board.id} board={board} />
+            ))}
+
+            {!hasData && !isFiltered && (
               <div className="w-full text-center">
                 It seems like you are not a member of a board yet.
+              </div>
+            )}
+
+            {!hasData && isFiltered && (
+              <div className="w-full text-center">
+                It seems like no results were found.
               </div>
             )}
           </>
         )}
       </div>
-      {data?.info.totalElements > 0 && (
+
+      {hasSucceeded && hasData && (
         <div className="flex justify-center">
           <Pagination
             theme={customPaginationTheme}
             layout="pagination"
             showIcons
             currentPage={page}
-            totalPages={data?.info?.totalPages ? data.info.totalPages : 1}
+            totalPages={data.info.totalPages}
             onPageChange={setPage}
             className="hidden md:block"
           />
@@ -78,7 +109,7 @@ export default function MyBoardsGallery({searchQuery}) {
             layout="table"
             showIcons
             currentPage={page}
-            totalPages={data?.info?.totalPages ? data.info.totalPages : 1}
+            totalPages={data.info.totalPages}
             onPageChange={setPage}
             className="block md:hidden"
           />

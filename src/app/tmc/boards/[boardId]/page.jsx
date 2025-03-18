@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import { Accordion, Table, Pagination } from "flowbite-react";
 import useSWR from "swr";
-import IdentIcon from "@/components/atoms/IdentIcon";
+import BoardLogo from "@/components/molecules/board/BoardLogo";
 import useApi from "@/hooks/useApi";
 
 const customAccordionTheme = {
@@ -32,36 +31,6 @@ const customTableTheme = {
   },
 };
 
-function BoardInfoLogo({boardName, boardId}) {
-  const api = useApi();
-
-  const {
-    data
-  } = useSWR(boardId ? `/boards/${boardId}/logo-image` : null,
-    (url) => api.get(url, {responseType: "arraybuffer"})
-      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
-
-  if (data) {
-    return (
-      <div className="rounded-full bg-gray-200 dark:bg-gray-800 w-32 h-32 relative overflow-hidden">
-        <Image
-          src={data}
-          alt={boardName}
-          fill
-          objectFit="cover"
-          layout="fill"
-        />
-      </div>
-    );
-  } else {
-    return (
-      <div className="rounded-full bg-gray-200 dark:bg-gray-800 w-32 h-32 overflow-hidden">
-        <IdentIcon value={boardName} />
-      </div>
-    );
-  }
-}
-
 export default function TmcBoardInfo() {
   const { boardId } = useParams();
   const api = useApi();
@@ -86,7 +55,7 @@ export default function TmcBoardInfo() {
   return (
     <div className="h-full w-full flex flex-col lg:flex-row space-y-4 lg:space-y-0">
       <div className="lg:grow lg:w-[20%] flex flex-col items-center lg:pr-4">
-        <BoardInfoLogo boardName={data?.name} boardId={boardId} />
+        <BoardLogo boardId={boardId} className="w-32 h-32 rounded-full" />
         {loading ? (
           <div className="animate-pulse h-3 bg-gray-200 rounded-full dark:bg-gray-800 w-1/2 mt-4" />
         ) : error ? (
