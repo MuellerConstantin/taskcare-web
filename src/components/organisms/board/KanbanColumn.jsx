@@ -16,7 +16,8 @@ export default function KanbanColumn({boardId, status, selectedTaskId, onTaskSel
     error,
     isLoading: loading
   } = useSWR(boardId && status ? `/boards/${boardId}/statuses/${status.id}/tasks` : null,
-    (url) => api.get(url).then((res) => res.data));
+    (url) => api.get(url).then((res) => res.data),
+    { keepPreviousData: true });
 
   const updateStatus = useCallback((taskId, statusId) => {
     api.patch(`/tasks/${taskId}`, {
@@ -32,12 +33,14 @@ export default function KanbanColumn({boardId, status, selectedTaskId, onTaskSel
       if(task.statusId === status.id) return;
 
       updateStatus(task.id, status.id);
+
+      return task;
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop(),
     }),
-  }), [status]);
+  }), [status.id]);
 
   return (
     <div
@@ -48,13 +51,13 @@ export default function KanbanColumn({boardId, status, selectedTaskId, onTaskSel
         {status?.name}
       </div>
       <div className="p-2 flex flex-col gap-2 h-full relative">
-        {(loading) ? (
+        {(loading && false) ? (
           Array.from(Array(Math.floor(Math.random() * 4) + 1).keys()).map((key) => (
             <div key={key}>
               <KanbanCardSkeleton />
             </div>
           ))
-        ) : (error) ? (
+        ) : (error && false) ? (
           Array.from(Array(Math.floor(Math.random() * 4) + 1).keys()).map((key) => (
             <div key={key}>
               <KanbanCardSkeleton error />
@@ -66,10 +69,8 @@ export default function KanbanColumn({boardId, status, selectedTaskId, onTaskSel
           </div>
         ))}
         {canDrop && (
-          <div className="absolute w-full h-full inset-0 z-10 p-2 bg-gray-100 dark:bg-gray-800">
-            <div className={`border-2 flex justify-center border-dashed h-full w-full rounded-md ${isOver ? "bg-green-200 border-green-500 dark:bg-green-800 dark:border-green-400" : "bg-amber-200 border-amber-500 dark:bg-amber-800 dark:border-amber-400"}`}>
-
-            </div>
+          <div className="absolute w-full h-full inset-0 z-10 p-2 bg-gray-100 dark:bg-gray-800 pointer-events-none">
+            <div className={`border-2 flex justify-center border-dashed h-full w-full rounded-md ${isOver ? "bg-green-200 border-green-500 dark:bg-green-800 dark:border-green-400" : "bg-amber-200 border-amber-500 dark:bg-amber-800 dark:border-amber-400"}`} />
           </div>
         )}
       </div>

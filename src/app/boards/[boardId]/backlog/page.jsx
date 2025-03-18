@@ -108,15 +108,14 @@ function BacklogEntry({task, username, userId}) {
     "VERY_HIGH": <Icon path={mdiArrowUpBoldBox} size={0.75} color="#ea580c" />,
   };
 
-  const [{ opacity }, dragRef] = useDrag(() => ({
+  const [, dragRef] = useDrag(() => ({
     type: "BacklogEntry",
     item: task,
-  }), []);
+  }), [task]);
 
   return (
     <ListGroup.Item
       ref={dragRef}
-      style={{ opacity }}
       theme={customListGroupTheme["item"]}
       key={task.id}
       className="flex items-center gap-2 cursor-pointer"

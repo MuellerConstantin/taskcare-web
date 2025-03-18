@@ -12,7 +12,8 @@ export default function BoardLogo({ boardId, className }) {
     isLoading: loading,
   } = useSWR(boardId ? `/boards/${boardId}/logo-image` : null,
     (url) => api.get(url, {responseType: "arraybuffer"})
-      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
+      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))),
+      { keepPreviousData: true });
 
   if (loading) {
     return (

@@ -31,7 +31,8 @@ function KanbanCardAvatar({username, userId}) {
     isLoading: loading
   } = useSWR(userId ? `/users/${userId}/profile-image` : null,
     (url) => api.get(url, {responseType: "arraybuffer"})
-      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
+      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))),
+      { keepPreviousData: true });
 
   if(loading || !username) {
     return (
@@ -126,19 +127,21 @@ export default function KanbanCard({task, selected}) {
     error,
     isLoading: loading
   } = useSWR(task && task.assigneeId ? `/boards/${task.boardId}/members/${task.assigneeId}` : null,
-    (url) => api.get(url).then((res) => res.data));
+    (url) => api.get(url).then((res) => res.data),
+    { keepPreviousData: true });
 
   const {
     data: userData,
     error: userError,
     isLoading: userLoading
   } = useSWR(data ? `/users/${data.userId}` : null,
-    (url) => api.get(url).then((res) => res.data));
+    (url) => api.get(url).then((res) => res.data),
+    { keepPreviousData: true });
 
   const [, dragRef] = useDrag(() => ({
     type: "KanbanCard",
     item: task,
-  }), []);
+  }), [task]);
 
   const markdownToPlainText = (markdown) => {
     return remark().use(strip).processSync(markdown).toString();

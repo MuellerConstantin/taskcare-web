@@ -37,7 +37,7 @@ export default function MyBoardsGallery({searchQuery}) {
     error,
     isLoading: loading,
   } = useSWR(`/user/me/boards?page=${page - 1}&perPage=${perPage}${searchQuery ? `&search=${searchQuery}` : ""}`,
-    (url) => api.get(url).then((res) => res.data));
+    (url) => api.get(url).then((res) => res.data), { keepPreviousData: true });
 
   return (
     <div className="flex flex-col h-full w-full space-y-4">

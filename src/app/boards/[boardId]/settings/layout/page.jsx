@@ -12,8 +12,6 @@ import { mdiDrag, mdiDelete, mdiHelp } from "@mdi/js";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
 
-const isTouchDevice = () => window && "ontouchstart" in window;
-
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
 
 const customPaginationTheme = {
