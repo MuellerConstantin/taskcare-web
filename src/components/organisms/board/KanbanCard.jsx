@@ -3,7 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useDrag } from "react-dnd";
-import { Avatar, Dropdown } from "flowbite-react";
+import { Dropdown } from "flowbite-react";
 import {
   mdiDotsVertical,
   mdiClockEdit,
@@ -16,56 +16,12 @@ import {
 } from "@mdi/js";
 import { remark } from "remark";
 import strip from "strip-markdown";
-import Image from "next/image";
 import useSWR, { useSWRConfig } from "swr";
 import useApi from "@/hooks/useApi";
+import UserAvatar from "@/components/molecules/user/UserAvatar";
 import TaskRemoveDialog from "../task/TaskRemoveDialog";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
-
-function KanbanCardAvatar({username, userId}) {
-  const api = useApi();
-
-  const {
-    data,
-    isLoading: loading
-  } = useSWR(userId ? `/users/${userId}/profile-image` : null,
-    (url) => api.get(url, {responseType: "arraybuffer"})
-      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))),
-      { keepPreviousData: true });
-
-  if(loading || !username) {
-    return (
-      <div className="animate-pulse">
-        <Avatar size="sm" rounded />
-      </div>
-    );
-  } else {
-    if (data) {
-      return (
-        <Avatar
-          size="sm"
-          className="bg-gray-200 dark:bg-gray-900 rounded-full"
-          rounded
-          img={({className, ...props}) => (
-            <Image
-              src={data}
-              alt={username}
-              width={64}
-              height={64}
-              className={`${className} object-cover`}
-              {...props}
-            />
-          )}
-        />
-      )
-    } else {
-      return (
-        <Avatar size="sm" placeholderInitials={username.slice(0, 2).toUpperCase()} rounded />
-      );
-    }
-  }
-}
 
 function KanbanCardMenu({boardId, taskId}) {
   const { mutate } = useSWRConfig();
@@ -182,7 +138,7 @@ export default function KanbanCard({task, selected}) {
       <div className="flex flex-col space-y-2 justify-between shrink-0 items-end">
         <div className="bg-gray-100 dark:bg-gray-800 rounded-full w-fit shrink-0">
           {task?.assigneeId && (
-            <KanbanCardAvatar username={userData?.username} userId={userData?.id} />
+            <UserAvatar username={userData?.username} userId={userData?.id} />
           )}
         </div>
         <div>

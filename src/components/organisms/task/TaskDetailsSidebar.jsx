@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { Avatar } from "flowbite-react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -13,54 +12,11 @@ import {
   mdiArrowTopLeftBoldBox,
   mdiArrowUpBoldBox
 } from "@mdi/js";
-import Image from "next/image";
 import useSWR from "swr";
+import UserAvatar from "@/components/molecules/user/UserAvatar";
 import useApi from "@/hooks/useApi";
 
 const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
-
-function TaskDetailsSidebarAvatar({username, userId}) {
-  const api = useApi();
-
-  const {
-    data,
-    isLoading: loading
-  } = useSWR(userId ? `/users/${userId}/profile-image` : null,
-    (url) => api.get(url, {responseType: "arraybuffer"})
-      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
-
-  if(loading || !username) {
-    return (
-      <div className="animate-pulse">
-        <Avatar size="xs" rounded />
-      </div>
-    );
-  } else {
-    if (data) {
-      return (
-        <Avatar
-          size="xs"
-          className="bg-gray-200 dark:bg-gray-900 rounded-full"
-          rounded
-          img={({className, ...props}) => (
-            <Image
-              src={data}
-              alt={username}
-              width={64}
-              height={64}
-              className={`${className} object-cover`}
-              {...props}
-            />
-          )}
-        />
-      )
-    } else {
-      return (
-        <Avatar size="xs" placeholderInitials={username.slice(0, 2).toUpperCase()} rounded />
-      );
-    }
-  }
-}
 
 export default function TaskDetailsSidebar({taskId, onClose}) {
   const api = useApi();
@@ -370,7 +326,7 @@ export default function TaskDetailsSidebar({taskId, onClose}) {
                   {data?.assigneeId ? (
                     <div className="flex items-center space-x-2">
                       <div className="bg-gray-100 dark:bg-gray-800 rounded-full w-fit">
-                        <TaskDetailsSidebarAvatar username={userData?.username} userId={assigneeData?.userId} />
+                        <UserAvatar size="xs" username={userData?.username} userId={assigneeData?.userId} />
                       </div>
                       <div className="text-gray-900 dark:text-white truncate">
                         {userData?.displayName || userData?.username}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Avatar, Button } from "flowbite-react";
+import { Button } from "flowbite-react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useParams, useRouter } from "next/navigation";
@@ -15,9 +15,9 @@ import {
   mdiArrowTopLeftBoldBox,
   mdiArrowUpBoldBox
 } from "@mdi/js";
-import Image from "next/image";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
+import UserAvatar from "@/components/molecules/user/UserAvatar";
 import TaskRemoveDialog from "@/components/organisms/task/TaskRemoveDialog";
 import TaskEditDialog from "@/components/organisms/task/TaskEditDialog";
 
@@ -28,49 +28,6 @@ const customButtonTheme = {
     "light": "border border-gray-300 bg-white text-gray-900 focus:ring-4 focus:ring-amber-300 enabled:hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:focus:ring-gray-700 dark:enabled:hover:border-gray-700 dark:enabled:hover:bg-gray-700",
   }
 };
-
-function BoardBacklogTaskAvatar({username, userId}) {
-  const api = useApi();
-
-  const {
-    data,
-    isLoading: loading
-  } = useSWR(userId ? `/users/${userId}/profile-image` : null,
-    (url) => api.get(url, {responseType: "arraybuffer"})
-      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
-
-  if(loading || !username) {
-    return (
-      <div className="animate-pulse">
-        <Avatar size="xs" rounded />
-      </div>
-    );
-  } else {
-    if (data) {
-      return (
-        <Avatar
-          size="xs"
-          className="bg-gray-200 dark:bg-gray-900 rounded-full"
-          rounded
-          img={({className, ...props}) => (
-            <Image
-              src={data}
-              alt={username}
-              width={64}
-              height={64}
-              className={`${className} object-cover`}
-              {...props}
-            />
-          )}
-        />
-      )
-    } else {
-      return (
-        <Avatar size="xs" placeholderInitials={username.slice(0, 2).toUpperCase()} rounded />
-      );
-    }
-  }
-}
 
 export default function BoardBacklogTask() {
   const api = useApi();
@@ -411,7 +368,7 @@ export default function BoardBacklogTask() {
                   {data?.assigneeId ? (
                     <div className="flex items-center space-x-2">
                       <div className="bg-gray-100 dark:bg-gray-800 rounded-full w-fit">
-                        <BoardBacklogTaskAvatar username={userData?.username} userId={assigneeData?.userId} />
+                        <UserAvatar size="xs" username={userData?.username} userId={assigneeData?.userId} />
                       </div>
                       <div className="text-gray-900 dark:text-white truncate">
                         {userData?.displayName || userData?.username}

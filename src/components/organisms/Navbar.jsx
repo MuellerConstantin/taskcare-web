@@ -46,23 +46,72 @@ function NavbarAvatar({principalName}) {
 
   const {
     data,
-    isLoading: loading
+    error,
+    isLoading
   } = useSWR("/user/me/profile-image",
     (url) => api.get(url, {responseType: "arraybuffer"})
       .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
 
-  if(loading) {
+  const isMissing = useMemo(() => error && error.status === 404, [isLoading, error]);
+  const isInitialLoading = useMemo(() => isLoading && !data && !isMissing, [isLoading, data, isMissing]);
+  const isRefreshLoading = useMemo(() => isLoading && (data || isMissing), [isLoading, data, isMissing]);
+  const hasErrored = useMemo(() => !isLoading && error && !isMissing, [isLoading, error, isMissing]);
+  const hasSucceeded = useMemo(() => !isLoading && (data || isMissing), [isLoading, isMissing, data]);
+
+  if(isInitialLoading) {
     return (
       <div className="animate-pulse">
         <Avatar size="sm" rounded />
       </div>
     );
-  } else {
-    if (data) {
+  }
+
+  if(isRefreshLoading) {
+    if(isMissing) {
+      return (
+        <div className="relative w-full h-full rounded-full">
+          <Avatar size="sm" placeholderInitials={principalName.slice(0, 2).toUpperCase()} rounded />
+          <div className="absolute inset-0 bg-opacity-50 rounded-full dark:bg-opacity-50 w-full h-full z-50 bg-gray-200 dark:bg-gray-800 animate-pulse" />
+        </div>
+      );
+    } else {
+      return (
+        <div className="relative w-full h-full">
+          <Avatar
+            size="sm"
+            rounded
+            img={({className, ...props}) => (
+              <Image
+                src={data}
+                alt={principalName}
+                width={64}
+                height={64}
+                className={`${className} bg-gray-200 dark:bg-gray-900 object-cover`}
+                {...props}
+              />
+            )}
+          />
+          <div className="absolute inset-0 bg-opacity-50 dark:bg-opacity-50 w-full h-full z-50 bg-gray-200 dark:bg-gray-800 animate-pulse" />
+        </div>
+      );
+    }
+  }
+
+  if(hasErrored) {
+    return (
+      <Avatar size="sm" bordered color="failure" rounded />
+    );
+  }
+
+  if(hasSucceeded) {
+    if(isMissing) {
+      return (
+        <Avatar size="sm" placeholderInitials={principalName.slice(0, 2).toUpperCase()} rounded />
+      );
+    } else {
       return (
         <Avatar
           size="sm"
-          className="bg-gray-200 dark:bg-gray-900 rounded-full"
           rounded
           img={({className, ...props}) => (
             <Image
@@ -70,18 +119,16 @@ function NavbarAvatar({principalName}) {
               alt={principalName}
               width={64}
               height={64}
-              className={`${className} object-cover`}
+              className={`${className} bg-gray-200 dark:bg-gray-900 object-cover`}
               {...props}
             />
           )}
         />
-      )
-    } else {
-      return (
-        <Avatar size="sm" placeholderInitials={principalName.slice(0, 2).toUpperCase()} rounded />
       );
     }
   }
+
+  return null;
 }
 
 function NavbarMenu() {
