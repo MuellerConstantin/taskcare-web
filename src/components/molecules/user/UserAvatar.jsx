@@ -12,7 +12,7 @@ export default function UserAvatar({ userId, username, size = "sm" }) {
     data,
     error,
     isLoading,
-  } = useSWR(userId ? `/users/${userId}/profile-image` : null,
+  } = useSWR(username && userId ? `/users/${userId}/profile-image` : null,
     (url) => api.get(url, {responseType: "arraybuffer"})
       .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))),
       { keepPreviousData: true });
@@ -34,14 +34,14 @@ export default function UserAvatar({ userId, username, size = "sm" }) {
   if(isRefreshLoading) {
     if(isMissing) {
       return (
-        <div className="relative w-full h-full rounded-full">
+        <div className="relative w-fit h-fit rounded-full">
           <Avatar size={size} placeholderInitials={username.slice(0, 2).toUpperCase()} rounded />
           <div className="absolute inset-0 bg-opacity-50 rounded-full dark:bg-opacity-50 w-full h-full z-50 bg-gray-200 dark:bg-gray-800 animate-pulse" />
         </div>
       );
     } else {
       return (
-        <div className="relative w-full h-full">
+        <div className="relative w-fit h-fit">
           <Avatar
             size={size}
             rounded
@@ -64,7 +64,10 @@ export default function UserAvatar({ userId, username, size = "sm" }) {
 
   if(hasErrored) {
     return (
-      <Avatar size={size} bordered color="failure" rounded />
+      <div className="relative w-fit h-fit rounded-full">
+        <Avatar size={size} rounded />
+        <div className="absolute inset-0 bg-opacity-50 rounded-full dark:bg-opacity-50 w-full h-full z-50 bg-red-500" />
+      </div>
     );
   }
 
@@ -93,5 +96,5 @@ export default function UserAvatar({ userId, username, size = "sm" }) {
     }
   }
 
-  return null;
+  return <Avatar size={size} rounded />;
 }

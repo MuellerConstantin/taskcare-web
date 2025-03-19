@@ -69,14 +69,14 @@ function NavbarAvatar({principalName}) {
   if(isRefreshLoading) {
     if(isMissing) {
       return (
-        <div className="relative w-full h-full rounded-full">
+        <div className="relative w-fit h-fit rounded-full">
           <Avatar size="sm" placeholderInitials={principalName.slice(0, 2).toUpperCase()} rounded />
           <div className="absolute inset-0 bg-opacity-50 rounded-full dark:bg-opacity-50 w-full h-full z-50 bg-gray-200 dark:bg-gray-800 animate-pulse" />
         </div>
       );
     } else {
       return (
-        <div className="relative w-full h-full">
+        <div className="relative w-fit h-fit">
           <Avatar
             size="sm"
             rounded
@@ -99,7 +99,10 @@ function NavbarAvatar({principalName}) {
 
   if(hasErrored) {
     return (
-      <Avatar size="sm" bordered color="failure" rounded />
+      <div className="relative w-fit h-fit rounded-full">
+        <Avatar size="sm" rounded />
+        <div className="absolute inset-0 bg-opacity-50 rounded-full dark:bg-opacity-50 w-full h-full z-50 bg-red-500" />
+      </div>
     );
   }
 

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import { Accordion, Table, Pagination, Avatar } from "flowbite-react";
 import useSWR from "swr";
+import UserAvatar from "@/components/molecules/user/UserAvatar";
 import useApi from "@/hooks/useApi";
 
 const customAccordionTheme = {
@@ -31,49 +31,6 @@ const customTableTheme = {
   },
 };
 
-function UserInfoAvatar({username, userId}) {
-  const api = useApi();
-
-  const {
-    data,
-    isLoading: loading
-  } = useSWR(userId ? `/users/${userId}/profile-image` : null,
-    (url) => api.get(url, {responseType: "arraybuffer"})
-      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
-
-  if(loading) {
-    return (
-      <div className="animate-pulse">
-        <Avatar size="xl" rounded />
-      </div>
-    );
-  } else {
-    if (data) {
-      return (
-        <Avatar
-          size="xl"
-          className="bg-gray-200 dark:bg-gray-800 rounded-full"
-          rounded
-          img={({className, ...props}) => (
-            <Image
-              src={data}
-              alt={username}
-              width={64}
-              height={64}
-              className={`${className} object-cover`}
-              {...props}
-            />
-          )}
-        />
-      )
-    } else {
-      return (
-        <Avatar size="xl" placeholderInitials={username?.slice(0, 2).toUpperCase()} rounded />
-      );
-    }
-  }
-}
-
 export default function TmcUserInfo() {
   const { userId } = useParams();
   const api = useApi();
@@ -98,7 +55,7 @@ export default function TmcUserInfo() {
   return (
     <div className="h-full w-full flex flex-col lg:flex-row space-y-4 lg:space-y-0">
       <div className="lg:grow lg:w-[20%] flex flex-col items-center lg:pr-4">
-        <UserInfoAvatar username={data?.username} userId={userId} />
+        <UserAvatar size="xl" username={data?.username} userId={userId} />
         {loading ? (
           <div className="animate-pulse h-3 bg-gray-200 rounded-full dark:bg-gray-800 w-1/2 mt-4" />
         ) : error ? (

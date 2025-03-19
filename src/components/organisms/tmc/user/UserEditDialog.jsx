@@ -4,6 +4,7 @@ import { Button, Spinner, Avatar, TextInput, Modal, Label } from "flowbite-react
 import { Formik } from "formik";
 import * as yup from "yup";
 import useSWR from "swr";
+import UserAvatar from "@/components/molecules/user/UserAvatar";
 import useApi from "@/hooks/useApi";
 import Select from "@/components/atoms/Select";
 
@@ -34,49 +35,6 @@ const schema = yup.object().shape({
     value: yup.string().oneOf(["ADMINISTRATOR", "USER"])
   }).nullable(),
 });
-
-function UserEditDialogAvatar({username, userId}) {
-  const api = useApi();
-
-  const {
-    data,
-    isLoading: loading
-  } = useSWR(userId ? `/users/${userId}/profile-image` : null,
-    (url) => api.get(url, {responseType: "arraybuffer"})
-      .then((res) => URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }))));
-
-  if(loading || !username) {
-    return (
-      <div className="animate-pulse">
-        <Avatar size="lg" rounded />
-      </div>
-    );
-  } else {
-    if (data) {
-      return (
-        <Avatar
-          size="lg"
-          className="bg-gray-200 dark:bg-gray-900 rounded-full"
-          rounded
-          img={({className, ...props}) => (
-            <Image
-              src={data}
-              alt={username}
-              width={64}
-              height={64}
-              className={`${className} object-cover`}
-              {...props}
-            />
-          )}
-        />
-      )
-    } else {
-      return (
-        <Avatar size="lg" placeholderInitials={username.slice(0, 2).toUpperCase()} rounded />
-      );
-    }
-  }
-}
 
 export default function UserEditDialog({show, importedUser, onEdit, onClose, userId}) {
   const api = useApi();
@@ -148,7 +106,7 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
           >
             <div className="shrink-0 relative h-24 bg-amber-500 mb-6">
               <div className="absolute top-12 m-auto left-0 right-0 bg-gray-100 dark:bg-gray-800 rounded-full w-fit">
-                <UserEditDialogAvatar username={data?.username} userId={userId} />
+                <UserAvatar size="lg" username={data?.username} userId={userId} />
               </div>
             </div>
             <Modal.Body className="space-y-4 flex flex-col">
