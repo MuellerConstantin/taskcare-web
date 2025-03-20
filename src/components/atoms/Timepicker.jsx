@@ -5,7 +5,7 @@ const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { s
 
 export default function Timepicker({color = "gray", helperText, ...props}) {
   return (
-    <div className="relative">
+    <div className="relative w-fit">
       <div className="absolute inset-y-0 left-0 flex items-center pl-3">
         <Icon path={mdiClock} size={0.75} className="text-gray-500 dark:text-gray-400" />
       </div>
