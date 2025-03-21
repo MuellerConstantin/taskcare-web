@@ -54,7 +54,7 @@ export function Navbar(props: NavbarProps) {
               className="h-6 sm:h-9"
               alt="TaskCare"
             />
-            <span className="hidden self-center text-xl font-semibold whitespace-nowrap md:block dark:text-white">
+            <span className="hidden self-center text-xl font-semibold whitespace-nowrap text-slate-700 md:block dark:text-white">
               TaskCare
             </span>
           </div>

@@ -17,7 +17,7 @@ const styles = tv({
   variants: {
     variant: {
       primary:
-        "text-amber-600 dark:text-amber-500 decoration-amber-600/60 hover:decoration-amber-600 dark:decoration-amber-500/60 dark:hover:decoration-amber-500",
+        "text-amber-500 dark:text-amber-500 decoration-amber-600/60 hover:decoration-amber-600 dark:decoration-amber-500/60 dark:hover:decoration-amber-500",
       secondary:
         "text-gray-700 dark:text-slate-300 decoration-gray-700/50 hover:decoration-gray-700 dark:decoration-slate-300/70 dark:hover:decoration-slate-300",
     },

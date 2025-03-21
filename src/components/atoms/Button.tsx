@@ -13,11 +13,11 @@ export interface ButtonProps extends RACButtonProps {
 
 let button = tv({
   extend: focusRing,
-  base: "px-5 py-2 text-sm text-center transition rounded-lg border border-black/10 dark:border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] dark:shadow-none cursor-default",
+  base: "px-5 py-2 text-sm text-center transition rounded-lg border border-black/10 dark:border-white/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] dark:shadow-none cursor-pointer",
   variants: {
     variant: {
       primary:
-        "bg-amber-600 hover:bg-amber-700 pressed:bg-amber-800 text-white",
+        "bg-amber-500 hover:bg-amber-600 pressed:bg-amber-800 text-white",
       secondary:
         "bg-gray-100 hover:bg-gray-200 pressed:bg-gray-300 text-gray-800 dark:bg-slate-600 dark:hover:bg-slate-500 dark:pressed:bg-slate-400 dark:text-slate-100",
       icon: "border-0 p-1 flex items-center justify-center text-gray-600 hover:bg-black/[5%] pressed:bg-black/10 dark:text-slate-400 dark:hover:bg-white/10 dark:pressed:bg-white/20 disabled:bg-transparent",

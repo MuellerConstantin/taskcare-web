@@ -26,7 +26,7 @@ export function ListBox<T extends object>({
       {...props}
       className={composeTailwindRenderProps(
         props.className,
-        "rounded-lg border border-gray-300 p-1 outline-0 dark:border-slate-600",
+        "rounded-lg border border-slate-300 p-1 outline-0 dark:border-slate-600",
       )}
     >
       {children}
@@ -41,10 +41,10 @@ export const itemStyles = tv({
     isSelected: {
       false:
         "text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 -outline-offset-2",
-      true: "bg-amber-600 text-white forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] [&:has(+[data-selected])]:rounded-b-none [&+[data-selected]]:rounded-t-none -outline-offset-4 outline-white dark:outline-white forced-colors:outline-[HighlightText]",
+      true: "bg-amber-500 text-white forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] [&:has(+[data-selected])]:rounded-b-none [&+[data-selected]]:rounded-t-none -outline-offset-4 outline-white dark:outline-white forced-colors:outline-[HighlightText]",
     },
     isDisabled: {
-      true: "text-slate-300 dark:text-slate-600 forced-colors:text-[GrayText]",
+      true: "text-slate-300 dark:text-slate-600 forced-colors:text-[slateText]",
     },
   },
 });
@@ -69,18 +69,18 @@ export const dropdownItemStyles = tv({
   base: "group flex items-center gap-4 cursor-default select-none py-2 pl-3 pr-1 rounded-lg outline outline-0 text-sm forced-color-adjust-none",
   variants: {
     isDisabled: {
-      false: "text-gray-900 dark:text-slate-100",
-      true: "text-gray-300 dark:text-slate-600 forced-colors:text-[GrayText]",
+      false: "text-slate-900 dark:text-slate-100",
+      true: "text-slate-300 dark:text-slate-600 forced-colors:text-[slateText]",
     },
     isFocused: {
-      true: "bg-amber-600 text-white forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
+      true: "bg-amber-500 text-white forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
     },
   },
   compoundVariants: [
     {
       isFocused: false,
       isOpen: true,
-      className: "bg-gray-100 dark:bg-slate-700/60",
+      className: "bg-slate-100 dark:bg-slate-700/60",
     },
   ],
 });
@@ -119,7 +119,7 @@ export function DropdownSection<T extends object>(
 ) {
   return (
     <ListBoxSection className="after:block after:h-[5px] after:content-[''] first:-mt-[5px]">
-      <Header className="sticky -top-[5px] z-10 -mx-1 -mt-px truncate border-y border-y-gray-200 bg-gray-100/60 px-4 py-1 text-sm font-semibold text-gray-500 backdrop-blur-md supports-[-moz-appearance:none]:bg-gray-100 dark:border-y-slate-700 dark:bg-slate-700/60 dark:text-slate-300 [&+*]:mt-1">
+      <Header className="sticky -top-[5px] z-10 -mx-1 -mt-px truncate border-y border-y-slate-200 bg-slate-100/60 px-4 py-1 text-sm font-semibold text-slate-500 backdrop-blur-md supports-[-moz-appearance:none]:bg-slate-100 dark:border-y-slate-700 dark:bg-slate-700/60 dark:text-slate-300 [&+*]:mt-1">
         {props.title}
       </Header>
       <Collection items={props.items}>{props.children}</Collection>

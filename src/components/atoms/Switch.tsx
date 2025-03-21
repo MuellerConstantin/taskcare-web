@@ -17,7 +17,7 @@ const track = tv({
     isSelected: {
       false:
         "bg-gray-400 dark:bg-slate-400 group-pressed:bg-gray-500 dark:group-pressed:bg-slate-300",
-      true: "bg-amber-600 forced-colors:bg-[Highlight]! group-pressed:bg-gray-800 dark:group-pressed:bg-slate-200",
+      true: "bg-amber-500 forced-colors:bg-[Highlight]! group-pressed:bg-gray-800 dark:group-pressed:bg-slate-200",
     },
     isDisabled: {
       true: "bg-gray-200 dark:bg-slate-700 forced-colors:group-selected:bg-[GrayText]! forced-colors:border-[GrayText]",

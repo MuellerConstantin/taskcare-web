@@ -55,13 +55,13 @@ export const fieldBorderStyles = tv({
     isFocusWithin: {
       false:
         "border-gray-300 dark:border-slate-500 forced-colors:border-[ButtonBorder]",
-      true: "border-amber-600 dark:border-slate-300 forced-colors:border-[Highlight]",
+      true: "border-amber-500 dark:border-slate-300 forced-colors:border-[Highlight]",
     },
     isInvalid: {
       true: "border-red-600 dark:border-red-600 forced-colors:border-[Mark]",
     },
     isDisabled: {
-      true: "border-gray-200 dark:border-slate-700 forced-colors:border-[GrayText]",
+      true: "border-slate-200 dark:border-slate-700 forced-colors:border-[GrayText]",
     },
   },
 });
