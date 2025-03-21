@@ -14,11 +14,13 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.6.1",
     "lucide-react": "^0.483.0",
     "next": "15.2.3",
     "react": "^19.0.0",
     "react-aria-components": "^1.7.1",
     "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
     "tailwind-variants": "^1.0.0"
   },
   "devDependencies": {

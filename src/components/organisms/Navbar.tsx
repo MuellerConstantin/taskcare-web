@@ -10,6 +10,8 @@ import { Link } from "@/components/atoms/Link";
 import { Switch } from "@/components/atoms/Switch";
 import { Menu, MenuItem } from "@/components/molecules/Menu";
 import { Popover } from "@/components/atoms/Popover";
+import { useAppSelector, useAppDispatch } from "@/store";
+import themeSlice from "@/store/slices/theme";
 
 interface NavbarProps<T> {}
 
@@ -84,19 +86,17 @@ interface NavbarOptionsMenuProps<T> {}
 export function NavbarOptionsMenu<T extends object>(
   props: NavbarOptionsMenuProps<T>,
 ) {
-  const [darkMode, setDarkMode] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
+  const dispatch = useAppDispatch();
+  const darkMode = useAppSelector((state) => state.theme.darkMode);
 
   return (
     <Popover className="entering:animate-in entering:fade-in entering:placement-bottom:slide-in-from-top-1 entering:placement-top:slide-in-from-bottom-1 exiting:animate-out exiting:fade-out exiting:placement-bottom:slide-out-to-top-1 exiting:placement-top:slide-out-to-bottom-1 fill-mode-forwards origin-top-left overflow-auto rounded-lg bg-white p-2 shadow-lg ring-1 ring-black/10 outline-hidden dark:bg-slate-950 dark:ring-white/15">
-      <Switch isSelected={darkMode} onChange={setDarkMode}>
+      <Switch
+        isSelected={darkMode}
+        onChange={(newDarkMode) =>
+          dispatch(themeSlice.actions.setDarkMode(newDarkMode))
+        }
+      >
         Dark Mode
       </Switch>
     </Popover>
