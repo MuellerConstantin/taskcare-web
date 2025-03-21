@@ -370,3 +370,6 @@ fabric.properties
 
 # IDE Files
 .vscode
+
+# Storybook
+*storybook.log
