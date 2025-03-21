@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { StackTemplate } from "@/components/templates/StackTemplate";
 
 export const metadata: Metadata = {
   title: "TaskCare | Home",
@@ -9,5 +10,5 @@ export default function HomeLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return children;
+  return <StackTemplate>{children}</StackTemplate>;
 }

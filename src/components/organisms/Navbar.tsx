@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useMemo } from "react";
 import NextLink from "next/link";
 import Image from "next/image";
@@ -19,9 +21,9 @@ export function Navbar<T extends object>(props: NavbarProps<T>) {
   }, []);
 
   return (
-    <nav className="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
+    <nav className="relative border-b border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
       <div className="flex items-center justify-center p-4 md:justify-between md:space-x-10">
-        <div className="absolute left-6 md:hidden">
+        <div className="absolute left-4 md:hidden">
           <MenuTrigger>
             <Button variant="icon">
               <MenuIcon className="h-6 w-6" />
