@@ -23,9 +23,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
       </head>
-      <body
-        className={`${lato.variable} bg-white antialiased dark:bg-gray-900`}
-      >
+      <body className={`${lato.variable} bg-white dark:bg-slate-800`}>
         {children}
       </body>
     </html>

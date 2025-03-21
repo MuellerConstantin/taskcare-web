@@ -14,7 +14,9 @@ export function StackTemplate({
       <header>
         <Navbar />
       </header>
-      <main className="flex grow flex-col">{children}</main>
+      <main className="flex grow flex-col bg-white dark:bg-slate-800">
+        {children}
+      </main>
       <footer>
         <Footer />
       </footer>
