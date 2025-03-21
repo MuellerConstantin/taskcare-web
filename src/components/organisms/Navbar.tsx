@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import NextLink from "next/link";
 import Image from "next/image";
 import { Menu as MenuIcon, EllipsisVertical } from "lucide-react";
@@ -13,9 +13,9 @@ import { Popover } from "@/components/atoms/Popover";
 import { useAppSelector, useAppDispatch } from "@/store";
 import themeSlice from "@/store/slices/theme";
 
-interface NavbarProps<T> {}
+interface NavbarProps {}
 
-export function Navbar<T extends object>(props: NavbarProps<T>) {
+export function Navbar(props: NavbarProps) {
   const navigation = useMemo(() => {
     return [
       { name: "Home", href: "/" },
