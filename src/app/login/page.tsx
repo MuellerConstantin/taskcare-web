@@ -1,13 +1,17 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Form } from "@/components/atoms/Form";
 import { TextField } from "@/components/atoms/TextField";
 import { Button } from "@/components/atoms/Button";
 import { Spinner } from "@/components/atoms/Spinner";
+import { useAppDispatch } from "@/store";
+import useApi from "@/hooks/useApi";
+import authSlice from "@/store/slices/auth";
 
 const schema = yup.object().shape({
   username: yup.string().required("Is required"),
@@ -15,15 +19,61 @@ const schema = yup.object().shape({
 });
 
 export default function Login() {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
+  const api = useApi();
+
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const login = useCallback(async () => {
-    setLoading(true);
-  }, []);
+  const login = useCallback(
+    async ({ username, password }: { username: string; password: string }) => {
+      setLoading(true);
+      setError(null);
+
+      api
+        .post("/auth/token", {
+          username,
+          password,
+        })
+        .then((res) => {
+          dispatch(
+            authSlice.actions.setAuthentication({
+              accessToken: res.data.accessToken,
+              refreshToken: res.data.refreshToken,
+              principalName: res.data.principal,
+            }),
+          );
+        })
+        .then(() => {
+          router.push("/");
+        })
+        .catch((err) => {
+          if (err.response && err.response.status === 401) {
+            setError("Either username or password are wrong!");
+          } else {
+            setError("An unexpected error occurred, please retry!");
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    [api, dispatch, router],
+  );
+
+  useEffect(() => {
+    const logout = searchParams.get("logout");
+
+    if (logout === "true") {
+      dispatch(authSlice.actions.clearAuthentication());
+    }
+  }, [searchParams, dispatch]);
 
   return (
     <div
-      className="flex min-h-screen grow items-center justify-center overflow-hidden px-4 py-12 lg:justify-end lg:px-0 lg:py-0"
+      className="flex grow items-center justify-center overflow-hidden px-4 py-12 lg:justify-end lg:px-0 lg:py-0"
       style={{
         backgroundImage: "url('/images/wave-background.svg')",
         backgroundRepeat: "no-repeat",
@@ -50,10 +100,16 @@ export default function Login() {
               Login to continue
             </h3>
           </div>
+          {!loading && !error && searchParams.get("logout") === "true" && (
+            <p className="text-center text-amber-500">
+              You have been logged out
+            </p>
+          )}
+          {error && <p className="text-center text-red-500">{error}</p>}
           <Formik
             initialValues={{ username: "", password: "" }}
             validationSchema={schema}
-            onSubmit={() => login()}
+            onSubmit={(values) => login(values)}
           >
             {(props) => (
               <Form onSubmit={props.handleSubmit} validationBehavior="aria">
@@ -61,6 +117,7 @@ export default function Login() {
                   placeholder="Username"
                   name="username"
                   type="text"
+                  isDisabled={loading}
                   value={props.values.username}
                   onBlur={props.handleBlur}
                   onChange={(value) => props.setFieldValue("username", value)}
@@ -73,6 +130,7 @@ export default function Login() {
                   type="password"
                   value={props.values.password}
                   placeholder="Password"
+                  isDisabled={loading}
                   onBlur={props.handleBlur}
                   onChange={(value) => props.setFieldValue("password", value)}
                   isInvalid={

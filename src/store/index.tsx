@@ -16,16 +16,19 @@ import {
 import { PersistGate } from "redux-persist/integration/react";
 import storage from "redux-persist/lib/storage";
 import themeSlice from "@/store/slices/theme";
+import authSlice from "./slices/auth";
+import { injectStore } from "@/api";
 
 const persistConfig = {
   key: "taskcare",
   version: 1,
   storage,
-  whitelist: ["theme"],
+  whitelist: ["theme", "auth"],
 };
 
 export const rootReducer = combineReducers({
   theme: themeSlice.reducer,
+  auth: authSlice.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -81,6 +84,7 @@ export function StoreProvider({
 
   if (!storeRef.current) {
     storeRef.current = makeStore();
+    injectStore(storeRef.current[0]);
   }
 
   return (
