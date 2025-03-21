@@ -1,5 +1,5 @@
+import type { Metadata } from "next";
 import { Lato } from "next/font/google";
-import { ThemeModeScript } from "flowbite-react";
 
 import "./globals.css";
 
@@ -9,19 +9,22 @@ const lato = Lato({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "TaskCare | Home"
+export const metadata: Metadata = {
+  title: "TaskCare",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="de" className="dark">
+    <html lang="de">
       <head>
         <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
-        <ThemeModeScript />
       </head>
       <body
-        className={`${lato.variable} antialiased bg-white dark:bg-gray-900`}
+        className={`${lato.variable} bg-white antialiased dark:bg-gray-900`}
       >
         {children}
       </body>

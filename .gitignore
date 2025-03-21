@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/react,nextjs,node,visualstudiocode,webstorm+all,eclipse
-# Edit at https://www.toptal.com/developers/gitignore?templates=react,nextjs,node,visualstudiocode,webstorm+all,eclipse
+# Created by https://www.toptal.com/developers/gitignore/api/react,nextjs,node,visualstudiocode,webstorm+all,eclipse,storybookjs
+# Edit at https://www.toptal.com/developers/gitignore?templates=react,nextjs,node,visualstudiocode,webstorm+all,eclipse,storybookjs
 
 ### Eclipse ###
 .metadata
@@ -251,6 +251,12 @@ psd
 thumb
 sketch
 
+### StorybookJs ###
+# gitignore template for the Storybook, UI guide for front apps
+# website: https://storybook.js.org/
+
+storybook-static/
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -358,7 +364,7 @@ fabric.properties
 !.idea/codeStyles
 !.idea/runConfigurations
 
-# End of https://www.toptal.com/developers/gitignore/api/react,nextjs,node,visualstudiocode,webstorm+all,eclipse
+# End of https://www.toptal.com/developers/gitignore/api/react,nextjs,node,visualstudiocode,webstorm+all,eclipse,storybookjs
 
 ### TaskCare ###
 
