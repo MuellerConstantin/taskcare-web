@@ -1,6 +1,13 @@
 import { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
-import { Button, Spinner, Avatar, TextInput, Modal, Label } from "flowbite-react";
+import {
+  Button,
+  Spinner,
+  Avatar,
+  TextInput,
+  Modal,
+  Label,
+} from "flowbite-react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useSWR from "swr";
@@ -9,19 +16,20 @@ import useApi from "@/hooks/useApi";
 import Select from "@/components/atoms/Select";
 
 const customButtonTheme = {
-  "color": {
-    "amber": "border border-transparent bg-amber-500 text-white focus:ring-4 focus:ring-amber-300 enabled:hover:bg-amber-600 dark:focus:ring-amber-900"
-  }
+  color: {
+    amber:
+      "border border-transparent bg-amber-500 text-white focus:ring-4 focus:ring-amber-300 enabled:hover:bg-amber-600 dark:focus:ring-amber-900",
+  },
 };
 
 const customTextInputTheme = {
-  "field": {
-    "input": {
-      "colors": {
-        "gray": "border-gray-300 bg-gray-50 text-gray-900 focus:border-amber-500 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-500 dark:focus:ring-amber-500"
-      }
-    }
-  }
+  field: {
+    input: {
+      colors: {
+        gray: "border-gray-300 bg-gray-50 text-gray-900 focus:border-amber-500 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-500 dark:focus:ring-amber-500",
+      },
+    },
+  },
 };
 
 const schema = yup.object().shape({
@@ -30,13 +38,21 @@ const schema = yup.object().shape({
   passwordConfirmation: yup
     .string()
     .oneOf([yup.ref("password")], "Passwords must match"),
-  role: yup.object({
-    label: yup.string(),
-    value: yup.string().oneOf(["ADMINISTRATOR", "USER"])
-  }).nullable(),
+  role: yup
+    .object({
+      label: yup.string(),
+      value: yup.string().oneOf(["ADMINISTRATOR", "USER"]),
+    })
+    .nullable(),
 });
 
-export default function UserEditDialog({show, importedUser, onEdit, onClose, userId}) {
+export default function UserEditDialog({
+  show,
+  importedUser,
+  onEdit,
+  onClose,
+  userId,
+}) {
   const api = useApi();
 
   const [editLoading, setEditLoading] = useState(false);
@@ -44,46 +60,54 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
 
   const roleOptions = useMemo(() => {
     return [
-      {"label": "Administrator", "value": "ADMINISTRATOR"},
-      {"label": "User", "value": "USER"},
+      { label: "Administrator", value: "ADMINISTRATOR" },
+      { label: "User", value: "USER" },
     ];
   }, []);
 
   const {
     data,
     error,
-    isLoading: loading
-  } = useSWR(userId ? `/users/${userId}` : null,
-    (url) => api.get(url).then((res) => res.data));
+    isLoading: loading,
+  } = useSWR(userId ? `/users/${userId}` : null, (url) =>
+    api.get(url).then((res) => res.data),
+  );
 
-  const editUser = useCallback(async ({ displayName, password, role }, { setFieldError }) => {
-    setEditLoading(true);
-    setEditError(null);
+  const editUser = useCallback(
+    async ({ displayName, password, role }, { setFieldError }) => {
+      setEditLoading(true);
+      setEditError(null);
 
-    api.patch(`/users/${userId}`, {
-      displayName: displayName && displayName.length > 0 ? displayName : null,
-      password: password && password.length > 0 ? password : null,
-      role: role ? role.value : null
-    })
-    .then(() => onEdit())
-    .catch((err) => {
-      console.error(err);
-      if (err.response && err.response.status === 422) {
-        err.response.data.details?.forEach((detail) =>
-          setFieldError(detail.field, detail.message)
-        );
-      } else if (err.response &&
-        err.response.status === 409 &&
-        err.response.data?.error === "IllegalDefaultAdminAlterationError") {
-          setEditError("You cannot alter the default admin user!");
-      } else {
-        setEditError("An unexpected error occurred, please retry!");
-      }
-    })
-    .finally(() => {
-      setEditLoading(false);
-    });
-  }, [api, userId]);
+      api
+        .patch(`/users/${userId}`, {
+          displayName:
+            displayName && displayName.length > 0 ? displayName : null,
+          password: password && password.length > 0 ? password : null,
+          role: role ? role.value : null,
+        })
+        .then(() => onEdit())
+        .catch((err) => {
+          console.error(err);
+          if (err.response && err.response.status === 422) {
+            err.response.data.details?.forEach((detail) =>
+              setFieldError(detail.field, detail.message),
+            );
+          } else if (
+            err.response &&
+            err.response.status === 409 &&
+            err.response.data?.error === "IllegalDefaultAdminAlterationError"
+          ) {
+            setEditError("You cannot alter the default admin user!");
+          } else {
+            setEditError("An unexpected error occurred, please retry!");
+          }
+        })
+        .finally(() => {
+          setEditLoading(false);
+        });
+    },
+    [api, userId],
+  );
 
   return (
     <Modal size="md" show={show} onClose={onClose}>
@@ -93,32 +117,41 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
           displayName: data?.displayName || "",
           password: "",
           passwordConfirmation: "",
-          role: data?.role && roleOptions.find((option) => option.value === data?.role) || null
+          role:
+            (data?.role &&
+              roleOptions.find((option) => option.value === data?.role)) ||
+            null,
         }}
         validationSchema={schema}
-        onSubmit={(values, { setFieldError }) => editUser(values, { setFieldError })}
+        onSubmit={(values, { setFieldError }) =>
+          editUser(values, { setFieldError })
+        }
       >
         {(props) => (
           <form
-            className="space-y-4 overflow-y-auto grow"
+            className="grow space-y-4 overflow-y-auto"
             onSubmit={props.handleSubmit}
             noValidate
           >
-            <div className="shrink-0 relative h-24 bg-amber-500 mb-6">
-              <div className="absolute top-12 m-auto left-0 right-0 bg-gray-100 dark:bg-gray-800 rounded-full w-fit">
-                <UserAvatar size="lg" username={data?.username} userId={userId} />
+            <div className="relative mb-6 h-24 shrink-0 bg-amber-500">
+              <div className="absolute left-0 right-0 top-12 m-auto w-fit rounded-full bg-gray-100 dark:bg-gray-800">
+                <UserAvatar
+                  size="lg"
+                  username={data?.username}
+                  userId={userId}
+                />
               </div>
             </div>
-            <Modal.Body className="space-y-4 flex flex-col">
-              <div className="w-full flex justify-center">
+            <Modal.Body className="flex flex-col space-y-4">
+              <div className="flex w-full justify-center">
                 {loading ? (
                   <div className="animate-pulse">
-                    <div className="h-3 bg-gray-200 rounded-full dark:bg-gray-800 w-32" />
+                    <div className="h-3 w-32 rounded-full bg-gray-200 dark:bg-gray-800" />
                   </div>
                 ) : error ? (
-                  <div className="h-3 bg-red-200 dark:bg-red-400 rounded-full w-32" />
+                  <div className="h-3 w-32 rounded-full bg-red-200 dark:bg-red-400" />
                 ) : (
-                  <h1 className="font-semibold max-w-[50%]">
+                  <h1 className="max-w-[50%] font-semibold">
                     {data?.username}
                   </h1>
                 )}
@@ -126,9 +159,7 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
               {editError && (
                 <p className="text-center text-red-500">{editError}</p>
               )}
-              {error && (
-                <p className="text-center text-red-500">{error}</p>
-              )}
+              {error && <p className="text-center text-red-500">{error}</p>}
               <div className="flex flex-col space-y-6 text-gray-900 dark:text-white">
                 {!importedUser && (
                   <div>
@@ -141,8 +172,16 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
                       onChange={props.handleChange}
                       onBlur={props.handleBlur}
                       value={props.values.displayName}
-                      color={props.errors.displayName && props.touched.displayName ? "failure" : "gray"}
-                      helperText={props.errors.displayName && props.touched.displayName ? props.errors.displayName : null}
+                      color={
+                        props.errors.displayName && props.touched.displayName
+                          ? "failure"
+                          : "gray"
+                      }
+                      helperText={
+                        props.errors.displayName && props.touched.displayName
+                          ? props.errors.displayName
+                          : null
+                      }
                     />
                   </div>
                 )}
@@ -157,8 +196,16 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
                       onChange={props.handleChange}
                       onBlur={props.handleBlur}
                       value={props.values.password}
-                      color={props.errors.password && props.touched.password ? "failure" : "gray"}
-                      helperText={props.errors.password && props.touched.password ? props.errors.password : null}
+                      color={
+                        props.errors.password && props.touched.password
+                          ? "failure"
+                          : "gray"
+                      }
+                      helperText={
+                        props.errors.password && props.touched.password
+                          ? props.errors.password
+                          : null
+                      }
                     />
                   </div>
                 )}
@@ -173,8 +220,18 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
                       onChange={props.handleChange}
                       onBlur={props.handleBlur}
                       value={props.values.passwordConfirmation}
-                      color={props.errors.passwordConfirmation && props.touched.passwordConfirmation ? "failure" : "gray"}
-                      helperText={props.errors.passwordConfirmation && props.touched.passwordConfirmation ? props.errors.passwordConfirmation : null}
+                      color={
+                        props.errors.passwordConfirmation &&
+                        props.touched.passwordConfirmation
+                          ? "failure"
+                          : "gray"
+                      }
+                      helperText={
+                        props.errors.passwordConfirmation &&
+                        props.touched.passwordConfirmation
+                          ? props.errors.passwordConfirmation
+                          : null
+                      }
                     />
                   </div>
                 )}
@@ -191,12 +248,21 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
                     onChange={(option) => props.setFieldValue("role", option)}
                     onBlur={() => props.setFieldTouched("role", true)}
                     value={props.values.role}
-                    color={props.errors.role && props.touched.role ? "failure" : "gray"}
-                    helperText={props.errors.role && props.touched.role ? props.errors.role : null}
+                    color={
+                      props.errors.role && props.touched.role
+                        ? "failure"
+                        : "gray"
+                    }
+                    helperText={
+                      props.errors.role && props.touched.role
+                        ? props.errors.role
+                        : null
+                    }
                   />
-                  <div className="text-xs mt-2">
+                  <div className="mt-2 text-xs">
                     <span className="text-amber-600">Attention: </span>
-                    Depending on the role selected, the user is granted extensive rights for the entire platform.
+                    Depending on the role selected, the user is granted
+                    extensive rights for the entire platform.
                   </div>
                 </div>
               </div>
@@ -207,7 +273,9 @@ export default function UserEditDialog({show, importedUser, onEdit, onClose, use
                 color="amber"
                 type="submit"
                 className="w-full"
-                disabled={!(props.isValid && props.dirty) || loading || editLoading}
+                disabled={
+                  !(props.isValid && props.dirty) || loading || editLoading
+                }
               >
                 {!editLoading && <span>Edit User</span>}
                 {editLoading && <Spinner size="sm" className="fill-white" />}

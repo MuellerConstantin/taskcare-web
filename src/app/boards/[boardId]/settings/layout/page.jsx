@@ -4,7 +4,11 @@ import { useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { Pagination, Tooltip, Badge } from "flowbite-react";
 import { useDrag, useDrop } from "react-dnd";
-import { DndProvider, TouchTransition, MouseTransition } from "react-dnd-multi-backend";
+import {
+  DndProvider,
+  TouchTransition,
+  MouseTransition,
+} from "react-dnd-multi-backend";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
 import dynamic from "next/dynamic";
@@ -12,65 +16,72 @@ import { mdiDrag, mdiDelete, mdiHelp } from "@mdi/js";
 import useSWR from "swr";
 import useApi from "@/hooks/useApi";
 
-const Icon = dynamic(() => import("@mdi/react").then(module => module.Icon), { ssr: false });
+const Icon = dynamic(() => import("@mdi/react").then((module) => module.Icon), {
+  ssr: false,
+});
 
 const customPaginationTheme = {
-  "layout": {
-    "table": {
-      "base": "text-xs text-gray-700 dark:text-gray-400 text-center",
-      "span": "font-semibold text-gray-900 dark:text-white"
-    }
+  layout: {
+    table: {
+      base: "text-xs text-gray-700 dark:text-gray-400 text-center",
+      span: "font-semibold text-gray-900 dark:text-white",
+    },
   },
-  "pages": {
-    "selector": {
-      "base": "w-12 border border-gray-300 bg-white py-1.5 leading-tight text-gray-500 enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white",
-      "active": "bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white",
+  pages: {
+    selector: {
+      base: "w-12 border border-gray-300 bg-white py-1.5 leading-tight text-gray-500 enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white",
+      active:
+        "bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white",
     },
-    "previous": {
-      "base": "ml-0 rounded-l-lg border border-gray-300 bg-white px-2 py-1.5 leading-tight text-gray-500 enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white",
+    previous: {
+      base: "ml-0 rounded-l-lg border border-gray-300 bg-white px-2 py-1.5 leading-tight text-gray-500 enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white",
     },
-    "next": {
-      "base": "rounded-r-lg border border-gray-300 bg-white px-2 py-1.5 leading-tight text-gray-500 enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white",
+    next: {
+      base: "rounded-r-lg border border-gray-300 bg-white px-2 py-1.5 leading-tight text-gray-500 enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white",
     },
-  }
+  },
 };
 
-function BoardStatus({status}) {
-  const [{ opacity }, dragRef] = useDrag(() => ({
-    type: "BoardStatus",
-    item: status,
-  }), []);
+function BoardStatus({ status }) {
+  const [{ opacity }, dragRef] = useDrag(
+    () => ({
+      type: "BoardStatus",
+      item: status,
+    }),
+    [],
+  );
 
   return (
     <div
       ref={dragRef}
       style={{ opacity }}
-      className="bg-gray-100 dark:bg-gray-800 rounded-md p-2 flex items-center space-x-2 cursor-grab"
+      className="flex cursor-grab items-center space-x-2 rounded-md bg-gray-100 p-2 dark:bg-gray-800"
     >
       <div className="flex grow items-center justify-between space-x-4 overflow-hidden">
-        <span className="truncate font-semibold">
-          {status.name}
-        </span>
+        <span className="truncate font-semibold">{status.name}</span>
         <Icon path={mdiDrag} size={1} />
       </div>
     </div>
   );
 }
 
-function BoardColumn({status, onDelete}) {
-  const [{ opacity }, dragRef] = useDrag(() => ({
-    type: "BoardStatus",
-    item: status,
-  }), []);
+function BoardColumn({ status, onDelete }) {
+  const [{ opacity }, dragRef] = useDrag(
+    () => ({
+      type: "BoardStatus",
+      item: status,
+    }),
+    [],
+  );
 
   return (
     <div
       ref={dragRef}
       style={{ opacity }}
-      className="w-[20rem] min-w-[15rem] h-full flex bg-gray-100 dark:bg-gray-800 rounded-md cursor-grab"
+      className="flex h-full w-[20rem] min-w-[15rem] cursor-grab rounded-md bg-gray-100 dark:bg-gray-800"
     >
-      <div className="flex flex-col text-gray-900 dark:text-white flex w-full items-start space-y-6">
-        <div className="p-2 space-y-4">
+      <div className="flex w-full flex-col items-start space-y-6 text-gray-900 dark:text-white">
+        <div className="space-y-4 p-2">
           <div className="flex w-full items-center justify-between space-x-4">
             <span className="truncate text-sm font-semibold">
               {status.name}
@@ -78,7 +89,7 @@ function BoardColumn({status, onDelete}) {
             <div className="flex space-x-2">
               <button
                 onClick={() => onDelete(status.id)}
-                className="h-fit flex items-center justify-center"
+                className="flex h-fit items-center justify-center"
               >
                 <Icon path={mdiDelete} size={0.75} />
               </button>
@@ -87,78 +98,98 @@ function BoardColumn({status, onDelete}) {
           </div>
           <Badge
             size="xs"
-            color={status.category === "DONE" ? "green" :
-              status.category === "IN_PROGRESS" ? "blue" : "dark"}
+            color={
+              status.category === "DONE"
+                ? "green"
+                : status.category === "IN_PROGRESS"
+                  ? "blue"
+                  : "dark"
+            }
             className="w-fit"
           >
             {status.category}
           </Badge>
         </div>
-        <div className="grow w-full px-4">
-          <div className="w-full h-full rounded-t-md bg-gray-200 dark:bg-gray-700" />
+        <div className="w-full grow px-4">
+          <div className="h-full w-full rounded-t-md bg-gray-200 dark:bg-gray-700" />
         </div>
       </div>
     </div>
   );
 }
 
-function BoardLayout({columns: initialColumns = []}) {
+function BoardLayout({ columns: initialColumns = [] }) {
   const api = useApi();
   const { boardId } = useParams();
 
   const containerRef = useRef(null);
   const [columns, setColumns] = useState(initialColumns);
 
-  const updateLayout = useCallback((newColumns) => {
-    setColumns(newColumns);
+  const updateLayout = useCallback(
+    (newColumns) => {
+      setColumns(newColumns);
 
-    api.patch(`/boards/${boardId}`, {
-      columns: newColumns.map((col) => col.id),
-    });
-  }, [boardId]);
-  
-  const [, dropRef] = useDrop(() => ({
-    accept: ["BoardStatus", "BoardColumn"],
-    drop: async (status, monitor) => {
-      const clientOffset = monitor.getClientOffset();
-
-      if (!containerRef.current || !clientOffset) return;
-
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const relativeX = clientOffset.x - containerRect.left;
-
-      let targetIndex = columns.length;
-      const columnWidth = containerRect.width / columns.length;
-
-      for (let index = 0; index < columns.length; index++) {
-        if (relativeX < columnWidth * (index + 1)) {
-          targetIndex = index;
-          break;
-        }
-      }
-
-      const filteredColumns = columns.filter((col) => col.id !== status.id);
-
-      const newColumns = [
-        ...filteredColumns.slice(0, targetIndex),
-        status,
-        ...filteredColumns.slice(targetIndex),
-      ];
-
-      updateLayout(newColumns);
+      api.patch(`/boards/${boardId}`, {
+        columns: newColumns.map((col) => col.id),
+      });
     },
-  }), [columns]);
+    [boardId],
+  );
+
+  const [, dropRef] = useDrop(
+    () => ({
+      accept: ["BoardStatus", "BoardColumn"],
+      drop: async (status, monitor) => {
+        const clientOffset = monitor.getClientOffset();
+
+        if (!containerRef.current || !clientOffset) return;
+
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const relativeX = clientOffset.x - containerRect.left;
+
+        let targetIndex = columns.length;
+        const columnWidth = containerRect.width / columns.length;
+
+        for (let index = 0; index < columns.length; index++) {
+          if (relativeX < columnWidth * (index + 1)) {
+            targetIndex = index;
+            break;
+          }
+        }
+
+        const filteredColumns = columns.filter((col) => col.id !== status.id);
+
+        const newColumns = [
+          ...filteredColumns.slice(0, targetIndex),
+          status,
+          ...filteredColumns.slice(targetIndex),
+        ];
+
+        updateLayout(newColumns);
+      },
+    }),
+    [columns],
+  );
 
   return (
     <div ref={containerRef} className="h-48">
       {columns?.length > 0 ? (
-        <div ref={dropRef} className="flex gap-4 overflow-x-auto h-full grow">
+        <div ref={dropRef} className="flex h-full grow gap-4 overflow-x-auto">
           {columns.map((column) => (
-            <BoardColumn key={column.id} status={column} onDelete={(id) => updateLayout(columns.filter((col) => col.id !== id))} />
+            <BoardColumn
+              key={column.id}
+              status={column}
+              onDelete={(id) =>
+                updateLayout(columns.filter((col) => col.id !== id))
+              }
+            />
           ))}
         </div>
       ) : (
-        <div ref={dropRef} className="w-full h-full text-center border border-dashed border-gray-300 dark:border-gray-700 rounded-md p-4">
+        <div
+          ref={dropRef}
+          className="h-full w-full rounded-md border border-dashed border-gray-300 p-4 text-center dark:border-gray-700"
+        >
           It seems that no layout has been assigned to the board yet.
         </div>
       )}
@@ -171,47 +202,56 @@ function BoardSettingsLayout() {
   const { boardId } = useParams();
 
   const [statusesPage, setStatusesPage] = useState(1);
-  const [statusesPerPage,] = useState(25);
+  const [statusesPerPage] = useState(25);
 
   const {
     data: statusesData,
     error: statusesError,
-    isLoading: statusesLoading
-  } = useSWR(boardId ? `/boards/${boardId}/statuses?page=${statusesPage - 1}&perPage=${statusesPerPage}` : null,
-    (url) => api.get(url).then((res) => res.data));
+    isLoading: statusesLoading,
+  } = useSWR(
+    boardId
+      ? `/boards/${boardId}/statuses?page=${statusesPage - 1}&perPage=${statusesPerPage}`
+      : null,
+    (url) => api.get(url).then((res) => res.data),
+  );
 
   const {
     data: boardData,
     error: boardError,
-    isLoading: boardLoading
-  } = useSWR(boardId ? `/boards/${boardId}` : null,
-    (url) => api.get(url).then((res) => res.data));
+    isLoading: boardLoading,
+  } = useSWR(boardId ? `/boards/${boardId}` : null, (url) =>
+    api.get(url).then((res) => res.data),
+  );
 
   const {
     data: columnsData,
     error: columnsError,
-    isLoading: columnsLoading
+    isLoading: columnsLoading,
   } = useSWR(
-    boardData?.columns ? boardData.columns.map(statusId => `/boards/${boardId}/statuses/${statusId}`) : null,
+    boardData?.columns
+      ? boardData.columns.map(
+          (statusId) => `/boards/${boardId}/statuses/${statusId}`,
+        )
+      : null,
     async (urls) => {
-      return await Promise.all(urls.map(url => api.get(url).then(res => res.data)));
-    }
+      return await Promise.all(
+        urls.map((url) => api.get(url).then((res) => res.data)),
+      );
+    },
   );
 
   return (
-    <div className="text-gray-900 dark:text-white space-y-4">
+    <div className="space-y-4 text-gray-900 dark:text-white">
       <div className="space-y-4">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <h3 className="text-xl font-semibold">
-              Available Statuses
-            </h3>
+            <h3 className="text-xl font-semibold">Available Statuses</h3>
             <Tooltip
               content="Are you missing something? Statuses can be managed via the separate tab. The board layout can be put together using the listed statuses."
               placement="bottom"
               className="max-w-xs"
             >
-              <button className="rounded-full bg-gray-100 dark:bg-gray-800 p-0.5">
+              <button className="rounded-full bg-gray-100 p-0.5 dark:bg-gray-800">
                 <Icon path={mdiHelp} size={0.5} />
               </button>
             </Tooltip>
@@ -219,25 +259,25 @@ function BoardSettingsLayout() {
           <hr />
         </div>
         {statusesLoading ? (
-          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {Array.from(Array(6).keys()).map((key) => (
               <li key={key}>
-                <div className="animate-pulse h-8 bg-gray-200 dark:bg-gray-700 rounded-md dark:bg-gray-800 w-full" />
+                <div className="h-8 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 dark:bg-gray-800" />
               </li>
             ))}
           </ul>
         ) : statusesError ? (
-          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {Array.from(Array(6).keys()).map((key) => (
               <li key={key}>
-                <div className="h-8 bg-red-200 dark:bg-red-400 rounded-md dark:bg-gray-800 w-full" />
+                <div className="h-8 w-full rounded-md bg-red-200 dark:bg-gray-800 dark:bg-red-400" />
               </li>
             ))}
           </ul>
         ) : (
           <>
             {statusesData?.info.totalElements > 0 ? (
-              <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {statusesData?.content.map((status) => (
                   <li key={status.id}>
                     <BoardStatus status={status} />
@@ -258,7 +298,11 @@ function BoardSettingsLayout() {
               layout="pagination"
               showIcons
               currentPage={statusesPage}
-              totalPages={statusesData?.info?.totalPages ? statusesData.info.totalPages : 1}
+              totalPages={
+                statusesData?.info?.totalPages
+                  ? statusesData.info.totalPages
+                  : 1
+              }
               onPageChange={setStatusesPage}
               className="hidden md:block"
             />
@@ -267,7 +311,11 @@ function BoardSettingsLayout() {
               layout="table"
               showIcons
               currentPage={statusesPage}
-              totalPages={statusesData?.info?.totalPages ? statusesData.info.totalPages : 1}
+              totalPages={
+                statusesData?.info?.totalPages
+                  ? statusesData.info.totalPages
+                  : 1
+              }
               onPageChange={setStatusesPage}
               className="block md:hidden"
             />
@@ -277,35 +325,33 @@ function BoardSettingsLayout() {
       <div className="space-y-4">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <h3 className="text-lg font-semibold">
-              Board Layout
-            </h3>
+            <h3 className="text-lg font-semibold">Board Layout</h3>
             <Tooltip
               content="Define the board layout by dragging and dropping new statuses into the layout or rearranging existing columns."
               placement="bottom"
               className="max-w-xs"
             >
-              <button className="rounded-full bg-gray-100 dark:bg-gray-800 p-0.5">
+              <button className="rounded-full bg-gray-100 p-0.5 dark:bg-gray-800">
                 <Icon path={mdiHelp} size={0.5} />
               </button>
             </Tooltip>
           </div>
           <hr />
         </div>
-        <div className="flex flex-col grow h-full">
-          {(boardLoading || columnsLoading) ? (
-            <div className="flex gap-4 overflow-x-auto h-full grow">
+        <div className="flex h-full grow flex-col">
+          {boardLoading || columnsLoading ? (
+            <div className="flex h-full grow gap-4 overflow-x-auto">
               {Array.from(Array(4).keys()).map((key) => (
                 <div key={key}>
-                  <div className="animate-pulse w-[20rem] h-32 flex bg-gray-100 dark:bg-gray-800 rounded-md" />
+                  <div className="flex h-32 w-[20rem] animate-pulse rounded-md bg-gray-100 dark:bg-gray-800" />
                 </div>
               ))}
             </div>
-          ) : (boardError || columnsError) ? (
-            <div className="flex gap-4 overflow-x-auto h-full grow">
+          ) : boardError || columnsError ? (
+            <div className="flex h-full grow gap-4 overflow-x-auto">
               {Array.from(Array(4).keys()).map((key) => (
                 <div key={key}>
-                  <div className="bg-red-200 dark:bg-red-400 w-[20rem] h-32 flex rounded-md" />
+                  <div className="flex h-32 w-[20rem] rounded-md bg-red-200 dark:bg-red-400" />
                 </div>
               ))}
             </div>
@@ -329,7 +375,7 @@ export default function BoardSettingsLayoutWrapper() {
       {
         id: "touch",
         backend: TouchBackend,
-        options: {enableMouseEvents: true},
+        options: { enableMouseEvents: true },
         preview: true,
         transition: TouchTransition,
       },

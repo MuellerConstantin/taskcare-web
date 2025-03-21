@@ -8,7 +8,7 @@ export default function useApi() {
   return api;
 }
 
-export function ApiLogoutInterceptor({children}) {
+export function ApiLogoutInterceptor({ children }) {
   const api = useApi();
   const router = useRouter();
 
@@ -16,14 +16,17 @@ export function ApiLogoutInterceptor({children}) {
     const logoutInterceptor = api.interceptors.response.use(
       (res) => res,
       (err) => {
-        if (err.response &&
+        if (
+          err.response &&
           err.response.status === 401 &&
-          (err.response.data?.error === "AuthenticationError" || err.response.data?.error === "InvalidTokenError")) {
+          (err.response.data?.error === "AuthenticationError" ||
+            err.response.data?.error === "InvalidTokenError")
+        ) {
           router.push("/login?logout=true");
         }
 
         return Promise.reject(err);
-      }
+      },
     );
 
     return () => {

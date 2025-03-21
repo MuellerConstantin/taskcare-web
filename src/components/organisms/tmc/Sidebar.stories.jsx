@@ -1,5 +1,5 @@
 import Sidebar from "./Sidebar";
- 
+
 const meta = {
   title: "Organisms/TMC/Sidebar",
   component: (args) => (
@@ -23,6 +23,6 @@ export const Default = {
       navigation: {
         pathname: "/tmc/boards",
       },
-    },    
-  }
-}
+    },
+  },
+};

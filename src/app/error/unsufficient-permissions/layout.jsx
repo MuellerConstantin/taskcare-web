@@ -1,7 +1,7 @@
 import StackTemplate from "@/components/templates/StackTemplate";
 
 export const metadata = {
-  title: "TaskCare | Unsufficient Permissions"
+  title: "TaskCare | Unsufficient Permissions",
 };
 
 export default function UnsufficientPermissionsLayout({ children }) {

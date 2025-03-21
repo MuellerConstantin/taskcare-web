@@ -13,9 +13,10 @@ export default function SystemRoleGuard({ children, roles }) {
   const {
     data,
     error,
-    isLoading: loading
-  } = useSWR(isAuthenticated ? "/user/me" : null,
-    (url) => api.get(url).then((res) => res.data));
+    isLoading: loading,
+  } = useSWR(isAuthenticated ? "/user/me" : null, (url) =>
+    api.get(url).then((res) => res.data),
+  );
 
   useEffect(() => {
     if (!isAuthenticated || (data && !roles.includes(data?.role))) {
@@ -24,4 +25,4 @@ export default function SystemRoleGuard({ children, roles }) {
   }, [isAuthenticated, data]);
 
   return isAuthenticated && roles.includes(data?.role) ? children : null;
-};
+}

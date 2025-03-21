@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "TaskCare | Board - Backlog"
+  title: "TaskCare | Board - Backlog",
 };
 
 export default function BoardBacklogLayout({ children }) {

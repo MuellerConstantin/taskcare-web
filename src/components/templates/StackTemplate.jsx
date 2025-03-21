@@ -5,13 +5,11 @@ import Footer from "@/components/molecules/Footer";
 
 export default function StackTemplate({ children }) {
   return (
-    <div className="h-full min-h-screen flex flex-col">
+    <div className="flex h-full min-h-screen flex-col">
       <header>
         <Navbar />
       </header>
-      <main className="grow flex flex-col">
-        {children}
-      </main>
+      <main className="flex grow flex-col">{children}</main>
       <footer>
         <Footer />
       </footer>

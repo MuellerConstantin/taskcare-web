@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { useSelector } from "react-redux";
 
 export default function AuthGuard({ children }) {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -14,4 +14,4 @@ export default function AuthGuard({ children }) {
   }, [isAuthenticated]);
 
   return isAuthenticated ? children : null;
-};
+}

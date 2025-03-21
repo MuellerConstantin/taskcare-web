@@ -7,8 +7,8 @@ export default function Board() {
   const { boardId } = useParams();
 
   return (
-    <div className="flex flex-col grow w-full space-y-4">
-      <div className="grow flex-col flex">
+    <div className="flex w-full grow flex-col space-y-4">
+      <div className="flex grow flex-col">
         <KanbanView boardId={boardId} />
       </div>
     </div>

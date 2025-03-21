@@ -59,15 +59,18 @@ async function proxyRequest(req, params) {
   } catch (error) {
     console.error("Proxy-Error:", error);
 
-    return new Response(JSON.stringify({
-      error: "BffProxyError",
-      status: 500,
-      timestamp: new Date().toISOString(),
-      path: targetUrl.pathname,
-      details: []
-    }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        error: "BffProxyError",
+        status: 500,
+        timestamp: new Date().toISOString(),
+        path: targetUrl.pathname,
+        details: [],
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 }

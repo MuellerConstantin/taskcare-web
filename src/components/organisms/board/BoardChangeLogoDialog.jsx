@@ -4,28 +4,35 @@ import { Button, Spinner, Modal, FileInput, Label } from "flowbite-react";
 import useApi from "@/hooks/useApi";
 
 const customButtonTheme = {
-  "color": {
-    "amber": "border border-transparent bg-amber-500 text-white focus:ring-4 focus:ring-amber-300 enabled:hover:bg-amber-600 dark:focus:ring-amber-900"
-  }
+  color: {
+    amber:
+      "border border-transparent bg-amber-500 text-white focus:ring-4 focus:ring-amber-300 enabled:hover:bg-amber-600 dark:focus:ring-amber-900",
+  },
 };
 
 const customClearButtonTheme = {
-  "color": {
-    "light": "border border-gray-300 bg-white text-gray-900 focus:ring-4 focus:ring-amber-300 enabled:hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:focus:ring-gray-700 dark:enabled:hover:border-gray-700 dark:enabled:hover:bg-gray-700",
-  }
+  color: {
+    light:
+      "border border-gray-300 bg-white text-gray-900 focus:ring-4 focus:ring-amber-300 enabled:hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:focus:ring-gray-700 dark:enabled:hover:border-gray-700 dark:enabled:hover:bg-gray-700",
+  },
 };
 
 const customFileInputTheme = {
-  "field": {
-    "input": {
-      "colors": {
-        "gray": "border-gray-300 bg-gray-50 text-gray-900 focus:border-amber-500 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-500 dark:focus:ring-amber-500",
-      }
-    }
-  }
+  field: {
+    input: {
+      colors: {
+        gray: "border-gray-300 bg-gray-50 text-gray-900 focus:border-amber-500 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-500 dark:focus:ring-amber-500",
+      },
+    },
+  },
 };
 
-export default function BoardChangeLogoDialog({show, boardId, onChange, onClose}) {
+export default function BoardChangeLogoDialog({
+  show,
+  boardId,
+  onChange,
+  onClose,
+}) {
   const api = useApi();
 
   const [changeLoading, setChangeLoading] = useState(false);
@@ -41,34 +48,38 @@ export default function BoardChangeLogoDialog({show, boardId, onChange, onClose}
     const data = new FormData();
     data.append("file", selectedFile);
 
-    api.post(`/boards/${boardId}/logo-image`, data, {headers: {"Content-Type": "multipart/form-data"}})
-    .then(onChange)
-    .catch((err) => {
-      setChangeError("An unexpected error occurred, please retry!");
-    })
-    .finally(() => {
-      setChangeLoading(false);
-    });
+    api
+      .post(`/boards/${boardId}/logo-image`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then(onChange)
+      .catch((err) => {
+        setChangeError("An unexpected error occurred, please retry!");
+      })
+      .finally(() => {
+        setChangeLoading(false);
+      });
   }, [api, boardId, selectedFile]);
 
   const clearLogo = useCallback(async () => {
     setChangeLoading(true);
     setChangeError(null);
 
-    api.delete(`/boards/${boardId}/logo-image`)
-    .then(onChange)
-    .catch((err) => {
-      setChangeError("An unexpected error occurred, please retry!");
-    })
-    .finally(() => {
-      setChangeLoading(false);
-    });
+    api
+      .delete(`/boards/${boardId}/logo-image`)
+      .then(onChange)
+      .catch((err) => {
+        setChangeError("An unexpected error occurred, please retry!");
+      })
+      .finally(() => {
+        setChangeLoading(false);
+      });
   }, [api, boardId]);
 
   return (
     <Modal size="lg" show={show} onClose={onClose}>
       <Modal.Header>Change Logo</Modal.Header>
-      <Modal.Body className="space-y-4 flex flex-col">
+      <Modal.Body className="flex flex-col space-y-4">
         {changeError && (
           <p className="text-center text-red-500">{changeError}</p>
         )}
@@ -92,7 +103,7 @@ export default function BoardChangeLogoDialog({show, boardId, onChange, onClose}
             <div>
               <Label htmlFor="file-preview" value="Preview" />
               <div id="file-preview" className="flex justify-center">
-                <div className="rounded-full bg-gray-200 dark:bg-gray-800 w-48 h-48 relative overflow-hidden">
+                <div className="relative h-48 w-48 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
                   <Image
                     src={preview}
                     alt="Preview"

@@ -18,8 +18,5 @@ export default {
       },
     },
   },
-  plugins: [
-    flowbite.plugin(),
-    typography,
-  ],
+  plugins: [flowbite.plugin(), typography],
 };

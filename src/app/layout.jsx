@@ -12,7 +12,7 @@ const lato = Lato({
 });
 
 export const metadata = {
-  title: "TaskCare"
+  title: "TaskCare",
 };
 
 export default function RootLayout({ children }) {
@@ -22,13 +22,11 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
       </head>
       <body
-        className={`${lato.variable} antialiased bg-white dark:bg-gray-900`}
+        className={`${lato.variable} bg-white antialiased dark:bg-gray-900`}
       >
         <SWRConfig>
           <StoreProvider>
-            <ApiLogoutInterceptor>
-              {children}
-            </ApiLogoutInterceptor>
+            <ApiLogoutInterceptor>{children}</ApiLogoutInterceptor>
           </StoreProvider>
         </SWRConfig>
       </body>

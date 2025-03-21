@@ -3,31 +3,33 @@ import RootLayout from "./layout";
 import StackTemplate from "@/components/templates/StackTemplate";
 
 export const metadata = {
-  title: "TaskCare | Not Found"
+  title: "TaskCare | Not Found",
 };
 
 const customButtonTheme = {
-  "color": {
-    "amber": "border border-transparent bg-amber-500 text-white focus:ring-4 focus:ring-amber-300 enabled:hover:bg-amber-600 dark:focus:ring-amber-900"
-  }
+  color: {
+    amber:
+      "border border-transparent bg-amber-500 text-white focus:ring-4 focus:ring-amber-300 enabled:hover:bg-amber-600 dark:focus:ring-amber-900",
+  },
 };
 
 export default function NotFound() {
   return (
     <RootLayout>
       <StackTemplate>
-        <div className="grow flex items-center justify-center px-4 py-12 relative isolate overflow-hidden">
+        <div className="relative isolate flex grow items-center justify-center overflow-hidden px-4 py-12">
           <section className="bg-white dark:bg-gray-900">
-            <div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
-              <div className="flex flex-col items-center max-w-screen-sm">
-                <h1 className="text-center mb-4 text-7xl tracking-tight font-extrabold lg:text-9xl text-amber-500 dark:text-amber-500">
+            <div className="mx-auto max-w-screen-xl px-4 py-8 lg:px-6 lg:py-16">
+              <div className="flex max-w-screen-sm flex-col items-center">
+                <h1 className="mb-4 text-center text-7xl font-extrabold tracking-tight text-amber-500 dark:text-amber-500 lg:text-9xl">
                   404
                 </h1>
-                <p className="text-center mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">
+                <p className="mb-4 text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-white md:text-4xl">
                   Something's missing.
                 </p>
-                <p className="text-center mb-4 text-lg font-light text-gray-500 dark:text-gray-400">
-                  Sorry, we can't find that page. You'll find lots to explore on the home page.
+                <p className="mb-4 text-center text-lg font-light text-gray-500 dark:text-gray-400">
+                  Sorry, we can't find that page. You'll find lots to explore on
+                  the home page.
                 </p>
                 <Button
                   href="/"

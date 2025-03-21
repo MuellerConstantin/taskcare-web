@@ -12,6 +12,7 @@ using so called environment files. If you decide to configure the service using 
 config file, the service expects a file called `.env` in the project's root directory.
 
 ---
+
 **NOTE**
 
 The configuration of the web client is based on the technical possibilities of
@@ -31,7 +32,7 @@ here for the sake of completeness.
 Build time configuration variables are in general prefixed with `NEXT_PUBLIC_`. Changing these variables
 requires a rebuild of the web client. These variables are loaded and hardcoded at build time.
 
-*None variables to configure.*
+_None variables to configure._
 
 ### Runtime configuration
 
@@ -39,5 +40,5 @@ Runtime configuration variables are used by the frontend's web server responsibl
 requires a restart of the web server.
 
 | Environment Variable | Description                                                                                         | Required |
-|----------------------|-----------------------------------------------------------------------------------------------------|----------|
+| -------------------- | --------------------------------------------------------------------------------------------------- | -------- |
 | TASKCARE_API_URL     | Url of the TaskCare API. Including the api prefix and version. (e.g. `http://<HOST>:<PORT>/api/v1`) | Yes      |

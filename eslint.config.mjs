@@ -9,6 +9,13 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-const eslintConfig = [...compat.extends("next/core-web-vitals", "plugin:storybook/recommended")];
+/** @type {import('eslint').Linter.Config[]} */
+const eslintConfig = [
+  ...compat.extends(
+    "next/core-web-vitals",
+    "plugin:storybook/recommended",
+    "plugin:prettier/recommended",
+  ),
+];
 
 export default eslintConfig;

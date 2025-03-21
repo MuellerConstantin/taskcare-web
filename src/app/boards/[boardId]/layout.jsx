@@ -4,7 +4,7 @@ import BoardNavbar from "@/components/organisms/board/BoardNavbar";
 import BoardMemberGuard from "@/components/organisms/BoardMemberGuard";
 
 export const metadata = {
-  title: "TaskCare | Board"
+  title: "TaskCare | Board",
 };
 
 export default function BoardLayout({ children }) {
@@ -12,7 +12,7 @@ export default function BoardLayout({ children }) {
     <AuthGuard>
       <BoardMemberGuard>
         <StackTemplate>
-          <div className="grow flex flex-col">
+          <div className="flex grow flex-col">
             <BoardNavbar />
             {children}
           </div>

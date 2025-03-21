@@ -14,9 +14,10 @@ export default function BoardMemberGuard({ children }) {
   const {
     data,
     error,
-    isLoading: loading
-  } = useSWR(boardId ? `/boards/${boardId}` : null,
-    (url) => api.get(url).then((res) => res.data));
+    isLoading: loading,
+  } = useSWR(boardId ? `/boards/${boardId}` : null, (url) =>
+    api.get(url).then((res) => res.data),
+  );
 
   useEffect(() => {
     if (!isAuthenticated || (error && error.status === 403)) {
@@ -25,4 +26,4 @@ export default function BoardMemberGuard({ children }) {
   }, [isAuthenticated, error]);
 
   return isAuthenticated && !error ? children : null;
-};
+}

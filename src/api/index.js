@@ -33,7 +33,7 @@ const onAuthRefreshFailed = (error) => {
 };
 
 api.interceptors.request.use((config) => {
-  if(!store) return config;
+  if (!store) return config;
 
   const state = store.getState();
 
@@ -47,30 +47,34 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
-    if(!store) return Promise.reject(err);
+    if (!store) return Promise.reject(err);
 
     const { response, config } = err;
 
     if (response && config.url !== "/auth/refresh") {
-      if (response.status === 401 && response.data?.error === "AuthenticationError" && !config._retry) {
+      if (
+        response.status === 401 &&
+        response.data?.error === "AuthenticationError" &&
+        !config._retry
+      ) {
         config._retry = true;
         const state = store.getState();
 
         if (state.auth.refreshToken) {
-          if(!isRefreshingAuth) {
+          if (!isRefreshingAuth) {
             isRefreshingAuth = true;
 
             try {
               const refreshRes = await api.post("/auth/refresh", {
                 refreshToken: state.auth.refreshToken,
               });
-  
+
               store.dispatch(
                 authSlice.actions.setAuthentication({
                   accessToken: refreshRes.data.accessToken,
                   refreshToken: refreshRes.data.refreshToken,
-                  principalName: refreshRes.data.principal
-                })
+                  principalName: refreshRes.data.principal,
+                }),
               );
 
               onAuthRefreshed(refreshRes.data.accessToken);
@@ -98,7 +102,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(err);
-  }
+  },
 );
 
 export default api;

@@ -42,12 +42,12 @@ export const makeStore = () => {
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
       }),
-  })
+  });
 
   const persistor = persistStore(store);
 
   return [store, persistor];
-}
+};
 
 export function StoreProvider({ children }) {
   const storeRef = useRef(undefined);

@@ -4,10 +4,10 @@ import { useMemo } from "react";
 import { Footer as FlowbiteFooter } from "flowbite-react";
 
 const customFooterTheme = {
-  "root": {
-    "base": "w-full px-2 py-3 sm:px-4 bg-gray-50 dark:bg-gray-800 md:flex md:items-center md:justify-between",
+  root: {
+    base: "w-full px-2 py-3 sm:px-4 bg-gray-50 dark:bg-gray-800 md:flex md:items-center md:justify-between",
   },
-}
+};
 
 export default function Footer() {
   const navigation = useMemo(() => {
@@ -38,7 +38,11 @@ export default function Footer() {
             </FlowbiteFooter.LinkGroup>
           </div>
           <FlowbiteFooter.Divider />
-          <FlowbiteFooter.Copyright href="https://github.com/MuellerConstantin" by="Constantin Müller" year={new Date().getFullYear()} />
+          <FlowbiteFooter.Copyright
+            href="https://github.com/MuellerConstantin"
+            by="Constantin Müller"
+            year={new Date().getFullYear()}
+          />
         </div>
       </FlowbiteFooter>
     </div>

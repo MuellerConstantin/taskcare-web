@@ -14,19 +14,22 @@ export default function BoardRoleGuard({ children, roles }) {
   const {
     data: currentUserData,
     error: currentUserError,
-    isLoading: currentUserLoading
-  } = useSWR("/user/me",
-    (url) => api.get(url).then((res) => res.data));
+    isLoading: currentUserLoading,
+  } = useSWR("/user/me", (url) => api.get(url).then((res) => res.data));
 
   const {
     data: currentMemberData,
     error: currentMemberError,
-    isLoading: currentMemberLoading
-  } = useSWR(boardId && currentUserData ? `/boards/${boardId}/members?search=${encodeURIComponent(`userId=="${currentUserData.id}"`)}` : null,
-    (url) => api.get(url).then((res) => res.data));
+    isLoading: currentMemberLoading,
+  } = useSWR(
+    boardId && currentUserData
+      ? `/boards/${boardId}/members?search=${encodeURIComponent(`userId=="${currentUserData.id}"`)}`
+      : null,
+    (url) => api.get(url).then((res) => res.data),
+  );
 
   const currentMemberRole = useMemo(() => {
-    if(currentMemberData && currentMemberData.content.length == 1) {
+    if (currentMemberData && currentMemberData.content.length == 1) {
       return currentMemberData.content[0].role;
     } else {
       return null;
@@ -34,10 +37,13 @@ export default function BoardRoleGuard({ children, roles }) {
   }, [currentMemberData]);
 
   useEffect(() => {
-    if (!isAuthenticated || (currentMemberRole && !roles.includes(currentMemberRole))) {
+    if (
+      !isAuthenticated ||
+      (currentMemberRole && !roles.includes(currentMemberRole))
+    ) {
       return redirect("/error/unsufficient-permissions");
     }
   }, [isAuthenticated, currentMemberRole]);
 
   return isAuthenticated && roles.includes(currentMemberRole) ? children : null;
-};
+}
