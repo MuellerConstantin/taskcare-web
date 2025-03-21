@@ -3,21 +3,50 @@
 import React, { useRef, useEffect } from "react";
 import { Provider, useDispatch, useSelector, useStore } from "react-redux";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
+import storage from "redux-persist/lib/storage";
 import themeSlice from "@/store/slices/theme";
+
+const persistConfig = {
+  key: "taskcare",
+  version: 1,
+  storage,
+  whitelist: ["theme"],
+};
 
 export const rootReducer = combineReducers({
   theme: themeSlice.reducer,
 });
 
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export const makeStore = () => {
   const store = configureStore({
-    reducer: rootReducer,
+    reducer: persistedReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
   });
 
-  return store;
+  const persistor = persistStore(store);
+
+  return [store, persistor] as const;
 };
 
-export type AppStore = ReturnType<typeof makeStore>;
+export type AppStore = ReturnType<typeof makeStore>[0];
 export type RootState = ReturnType<AppStore["getState"]>;
 export type AppDispatch = AppStore["dispatch"];
 
@@ -48,15 +77,17 @@ export function StoreProvider({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const storeRef = useRef<AppStore>(undefined);
+  const storeRef = useRef<ReturnType<typeof makeStore>>(undefined);
 
   if (!storeRef.current) {
     storeRef.current = makeStore();
   }
 
   return (
-    <Provider store={storeRef.current}>
-      <ThemeSwitcher>{children}</ThemeSwitcher>
+    <Provider store={storeRef.current[0]}>
+      <PersistGate loading={null} persistor={storeRef.current[1]}>
+        <ThemeSwitcher>{children}</ThemeSwitcher>
+      </PersistGate>
     </Provider>
   );
 }
