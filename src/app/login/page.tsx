@@ -73,7 +73,7 @@ export default function Login() {
 
   return (
     <div
-      className="flex grow items-center justify-center overflow-hidden px-4 py-12 lg:justify-end lg:px-0 lg:py-0"
+      className="flex grow flex-col items-center justify-center overflow-hidden px-4 py-12 lg:items-end lg:px-0 lg:py-0"
       style={{
         backgroundImage: "url('/images/wave-background.svg')",
         backgroundRepeat: "no-repeat",
@@ -81,8 +81,8 @@ export default function Login() {
         backgroundPosition: "center",
       }}
     >
-      <div className="flex w-full flex-col items-center justify-center">
-        <div className="w-full max-w-lg space-y-8 rounded-md bg-white/75 p-8 text-slate-700 shadow dark:bg-slate-800/90 dark:text-white">
+      <div className="flex w-full max-w-lg items-center justify-center rounded-md bg-white/75 p-8 text-slate-700 shadow lg:grow lg:rounded-none lg:bg-white dark:bg-slate-700/90 dark:text-white lg:dark:bg-slate-700">
+        <div className="w-full max-w-sm space-y-8">
           <div className="flex flex-col space-y-4">
             <div className="flex items-center justify-center space-x-6">
               <Image
