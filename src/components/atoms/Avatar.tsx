@@ -9,7 +9,7 @@ interface AvatarProps {
 }
 
 const avatar = tv({
-  base: "inline-flex items-center justify-center rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden font-medium text-white",
+  base: "inline-flex items-center justify-center rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden font-medium text-white",
   variants: {
     size: {
       xs: "w-6 h-6 text-xs",
@@ -35,7 +35,7 @@ export const Avatar: React.FC<AvatarProps> = ({ src, alt, size = "md" }) => {
   const initials = getInitials(alt);
 
   return (
-    <div className={avatar({ size })} role="img" aria-label={alt}>
+    <div className={avatar({ size })} aria-label={alt}>
       {src ? (
         <Image
           src={src}
@@ -47,7 +47,7 @@ export const Avatar: React.FC<AvatarProps> = ({ src, alt, size = "md" }) => {
       ) : initials ? (
         <span>{initials}</span>
       ) : (
-        <span className="h-full w-full bg-gray-400" />
+        <span className="h-full w-full" />
       )}
     </div>
   );

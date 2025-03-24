@@ -3,54 +3,27 @@
 import React, { useRef, useEffect } from "react";
 import { Provider, useDispatch, useSelector, useStore } from "react-redux";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
-import { PersistGate } from "redux-persist/integration/react";
-import storage from "redux-persist/lib/storage";
 import themeSlice from "@/store/slices/theme";
 import authSlice from "@/store/slices/auth";
 import { injectStore } from "@/api";
-
-const persistConfig = {
-  key: "taskcare",
-  version: 1,
-  storage,
-  whitelist: ["theme", "auth"],
-};
 
 export const rootReducer = combineReducers({
   theme: themeSlice.reducer,
   auth: authSlice.reducer,
 });
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+export type RootState = ReturnType<typeof rootReducer>;
 
-export const makeStore = () => {
+export const makeStore = (preloadedState?: Partial<RootState>) => {
   const store = configureStore({
-    reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: {
-          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-        },
-      }),
+    reducer: rootReducer,
+    preloadedState,
   });
 
-  const persistor = persistStore(store);
-
-  return [store, persistor] as const;
+  return store;
 };
 
-export type AppStore = ReturnType<typeof makeStore>[0];
-export type RootState = ReturnType<AppStore["getState"]>;
+export type AppStore = ReturnType<typeof makeStore>;
 export type AppDispatch = AppStore["dispatch"];
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
@@ -75,23 +48,23 @@ function ThemeSwitcher({
   return children;
 }
 
-export function StoreProvider({
+export function StoreMockProvider({
   children,
+  preloadedState,
 }: Readonly<{
   children: React.ReactNode;
+  preloadedState?: Partial<RootState>;
 }>) {
   const storeRef = useRef<ReturnType<typeof makeStore>>(undefined);
 
   if (!storeRef.current) {
-    storeRef.current = makeStore();
-    injectStore(storeRef.current[0]);
+    storeRef.current = makeStore(preloadedState);
+    injectStore(storeRef.current as any);
   }
 
   return (
-    <Provider store={storeRef.current[0]}>
-      <PersistGate loading={null} persistor={storeRef.current[1]}>
-        <ThemeSwitcher>{children}</ThemeSwitcher>
-      </PersistGate>
+    <Provider store={storeRef.current}>
+      <ThemeSwitcher>{children}</ThemeSwitcher>
     </Provider>
   );
 }
