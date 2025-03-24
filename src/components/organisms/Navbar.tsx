@@ -11,7 +11,7 @@ import { Link } from "@/components/atoms/Link";
 import { Switch } from "@/components/atoms/Switch";
 import { Menu, MenuItem } from "@/components/molecules/Menu";
 import { Popover } from "@/components/atoms/Popover";
-import { Avatar } from "@/components/atoms/Avatar";
+import { PrincipalAvatar } from "@/components/organisms/user/PrincipalAvatar";
 import { ListBox, ListBoxItem } from "@/components/atoms/ListBox";
 import { useAppSelector, useAppDispatch } from "@/store";
 import themeSlice from "@/store/slices/theme";
@@ -124,7 +124,7 @@ function NavbarAuthenticatedOptionsMenu(
     <Popover className="entering:animate-in entering:fade-in entering:placement-bottom:slide-in-from-top-1 entering:placement-top:slide-in-from-bottom-1 exiting:animate-out exiting:fade-out exiting:placement-bottom:slide-out-to-top-1 exiting:placement-top:slide-out-to-bottom-1 fill-mode-forwards origin-top-left overflow-auto rounded-lg bg-white p-2 shadow-lg ring-1 ring-black/10 outline-hidden dark:bg-zinc-950 dark:ring-white/15">
       <div className="flex w-[15rem] flex-col gap-4 overflow-hidden p-2">
         <div className="flex gap-4 overflow-hidden">
-          <NavbarAvatar size="md" />
+          <PrincipalAvatar size="md" />
           <div className="flex flex-col gap-2 overflow-hidden">
             <div className="flex flex-col gap-1">
               {isLoading ? (
@@ -169,75 +169,6 @@ function NavbarAuthenticatedOptionsMenu(
   );
 }
 
-interface NavbarAvatarProps {
-  size?: "xs" | "sm" | "md" | "lg";
-}
-
-function NavbarAvatar(props: NavbarAvatarProps) {
-  const api = useApi();
-
-  const { data: userData } = useSWR(
-    "/user/me",
-    (url) => api.get(url).then((res) => res.data),
-    {
-      keepPreviousData: true,
-    },
-  );
-
-  const {
-    data: imageData,
-    error: imageError,
-    isLoading: imageIsLoading,
-  } = useSWR(
-    "/user/me/profile-image",
-    (url) =>
-      api
-        .get(url, { responseType: "arraybuffer" })
-        .then((res) =>
-          URL.createObjectURL(
-            new Blob([res.data], { type: res.headers["content-type"] }),
-          ),
-        ),
-    { keepPreviousData: true },
-  );
-
-  const isMissing = useMemo(
-    () => !!imageError && imageError.status === 404,
-    [imageError],
-  );
-
-  const isInitialLoading = useMemo(
-    () => imageIsLoading && !imageData && !isMissing,
-    [imageIsLoading, imageData, isMissing],
-  );
-
-  const isRefreshLoading = useMemo(
-    () => imageIsLoading && (!!imageData || isMissing),
-    [imageIsLoading, imageData, isMissing],
-  );
-
-  const hasErrored = useMemo(
-    () => !imageIsLoading && !!imageError && !isMissing,
-    [imageIsLoading, imageError, isMissing],
-  );
-
-  return (
-    <div className="relative flex h-fit items-center">
-      <Avatar
-        size="sm"
-        alt={userData?.displayName || userData?.username || ""}
-        src={imageData}
-        {...props}
-      />
-      {isInitialLoading || isRefreshLoading ? (
-        <div className="absolute inset-0 h-full w-full animate-pulse rounded-full bg-slate-400/50 dark:bg-slate-700/50" />
-      ) : hasErrored ? (
-        <div className="absolute inset-0 rounded-full bg-red-400/50 dark:bg-red-700/50" />
-      ) : null}
-    </div>
-  );
-}
-
 interface NavbarOptionsMenuProps {}
 
 export function NavbarOptionsMenu(props: NavbarOptionsMenuProps) {
@@ -247,7 +178,7 @@ export function NavbarOptionsMenu(props: NavbarOptionsMenuProps) {
     <MenuTrigger>
       <Button variant="icon">
         {isAuthenticated ? (
-          <NavbarAvatar />
+          <PrincipalAvatar />
         ) : (
           <EllipsisVertical className="h-6 w-6" />
         )}

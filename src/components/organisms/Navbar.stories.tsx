@@ -21,7 +21,7 @@ export const Unauthenticated: StoryObj<typeof Navbar> = {
   args: {},
   decorators: [
     (Story) => (
-      <SWRConfig value={{ dedupingInterval: 0 }}>
+      <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
         <StoreMockProvider
           preloadedState={{
             auth: {
@@ -65,7 +65,7 @@ export const Authenticated: StoryObj<typeof Navbar> = {
   },
   decorators: [
     (Story) => (
-      <SWRConfig value={{ dedupingInterval: 0 }}>
+      <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
         <StoreMockProvider
           preloadedState={{
             auth: {
@@ -103,7 +103,7 @@ export const Errored: StoryObj<typeof Navbar> = {
   },
   decorators: [
     (Story) => (
-      <SWRConfig value={{ dedupingInterval: 0 }}>
+      <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
         <StoreMockProvider
           preloadedState={{
             auth: {
