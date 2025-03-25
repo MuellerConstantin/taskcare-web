@@ -15,7 +15,7 @@ const avatar = tv({
   slots: {
     base: "inline-flex items-center justify-center rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden font-medium text-white",
     image: "h-full w-full object-cover",
-    icon: "text-slate-800 dark:text-slate-100",
+    icon: "text-slate-200 dark:text-slate-800",
   },
   variants: {
     size: {
@@ -38,8 +38,8 @@ const avatar = tv({
     },
     failed: {
       true: {
-        base: "bg-red-300 dark:bg-red-700",
-        icon: "text-red-800 dark:text-red-100",
+        base: "bg-red-200 dark:bg-red-400",
+        icon: "text-red-300 dark:text-red-500",
       },
     },
   },
