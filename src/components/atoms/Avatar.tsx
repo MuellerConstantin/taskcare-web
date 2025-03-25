@@ -4,18 +4,43 @@ import { StaticImport } from "next/dist/shared/lib/get-img-props";
 
 interface AvatarProps {
   src?: string | StaticImport;
+  icon?: React.ReactNode;
   alt: string;
   size?: "xs" | "sm" | "md" | "lg";
+  failed?: boolean;
+  className?: string;
 }
 
 const avatar = tv({
-  base: "inline-flex items-center justify-center rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden font-medium text-white",
+  slots: {
+    base: "inline-flex items-center justify-center rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden font-medium text-white",
+    image: "h-full w-full object-cover",
+    icon: "text-slate-800 dark:text-slate-100",
+  },
   variants: {
     size: {
-      xs: "w-6 h-6 text-xs",
-      sm: "w-8 h-8 text-sm",
-      md: "w-12 h-12 text-base",
-      lg: "w-16 h-16 text-lg",
+      xs: {
+        base: "w-6 h-6 text-xs",
+        icon: "p-1",
+      },
+      sm: {
+        base: "w-8 h-8 text-sm",
+        icon: "p-1",
+      },
+      md: {
+        base: "w-12 h-12 text-base",
+        icon: "p-2",
+      },
+      lg: {
+        base: "w-16 h-16 text-lg",
+        icon: "p-2",
+      },
+    },
+    failed: {
+      true: {
+        base: "bg-red-300 dark:bg-red-700",
+        icon: "text-red-800 dark:text-red-100",
+      },
     },
   },
   defaultVariants: {
@@ -31,19 +56,34 @@ const getInitials = (name: string) => {
     .toUpperCase();
 };
 
-export const Avatar: React.FC<AvatarProps> = ({ src, alt, size = "md" }) => {
+export const Avatar: React.FC<AvatarProps> = ({
+  src,
+  icon,
+  alt,
+  failed = false,
+  size = "md",
+  className,
+}) => {
   const initials = getInitials(alt);
 
+  const {
+    base: baseClass,
+    icon: iconClass,
+    image: imageClass,
+  } = avatar({ size, failed });
+
   return (
-    <div className={avatar({ size })} aria-label={alt}>
+    <div className={`${baseClass()} ${className}`} aria-label={alt}>
       {src ? (
         <Image
           src={src}
           alt={alt}
           width={64}
           height={64}
-          className="h-full w-full object-cover"
+          className={imageClass()}
         />
+      ) : icon ? (
+        <div className={iconClass()}>{icon}</div>
       ) : initials ? (
         <span>{initials}</span>
       ) : (

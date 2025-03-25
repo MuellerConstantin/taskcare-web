@@ -1,5 +1,6 @@
 import type { Meta } from "@storybook/react";
 import React from "react";
+import { User } from "lucide-react";
 import { Avatar } from "@/components/atoms/Avatar";
 
 const meta: Meta<typeof Avatar> = {
@@ -15,14 +16,14 @@ export default meta;
 export const Default = (args: any) => <Avatar {...args} />;
 
 Default.args = {
-  src: "https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80",
+  src: "https://placehold.co/600x400.png",
   alt: "Avatar",
 };
 
 export const Small = (args: any) => <Avatar {...args} />;
 
 Small.args = {
-  src: "https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80",
+  src: "https://placehold.co/600x400.png",
   alt: "Avatar",
   size: "sm",
 };
@@ -30,7 +31,7 @@ Small.args = {
 export const Large = (args: any) => <Avatar {...args} />;
 
 Large.args = {
-  src: "https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80",
+  src: "https://placehold.co/600x400.png",
   alt: "Avatar",
   size: "lg",
 };
@@ -38,7 +39,7 @@ Large.args = {
 export const ExtraSmall = (args: any) => <Avatar {...args} />;
 
 ExtraSmall.args = {
-  src: "https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80",
+  src: "https://placehold.co/600x400.png",
   alt: "Avatar",
   size: "xs",
 };
@@ -54,4 +55,28 @@ export const NoImageExtraSmall = (args: any) => <Avatar {...args} />;
 NoImageExtraSmall.args = {
   alt: "Avatar",
   size: "xs",
+};
+
+export const Icon = (args: any) => <Avatar {...args} />;
+
+Icon.args = {
+  alt: "Avatar",
+  icon: <User className="h-full w-full" />,
+};
+
+export const IconFailed = (args: any) => <Avatar {...args} />;
+
+IconFailed.args = {
+  alt: "Avatar",
+  failed: true,
+  icon: <User className="h-full w-full" />,
+};
+
+export const IconLoading = (args: any) => (
+  <Avatar {...args} className="animate-pulse" />
+);
+
+IconLoading.args = {
+  alt: "Avatar",
+  icon: <User className="h-full w-full" />,
 };

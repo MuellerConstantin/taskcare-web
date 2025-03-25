@@ -29,9 +29,9 @@ export const Default: StoryObj<typeof PrincipalAvatar> = {
           });
         }),
         http.get("/api/proxy/user/me/profile-image", async () => {
-          const buffer = await fetch(
-            "https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80",
-          ).then((response) => response.arrayBuffer());
+          const buffer = await fetch("https://placehold.co/600x400.png").then(
+            (response) => response.arrayBuffer(),
+          );
 
           return HttpResponse.arrayBuffer(buffer);
         }),
@@ -109,19 +109,13 @@ export const Errored: StoryObj<typeof PrincipalAvatar> = {
   ],
 };
 
-export const Loading: StoryObj<typeof PrincipalAvatar> = {
+export const InitialLoading: StoryObj<typeof PrincipalAvatar> = {
   args: {},
   parameters: {
     msw: {
       handlers: [
         http.get("/api/proxy/user/me", async () => {
-          return HttpResponse.json({
-            id: "55b8dec2-a09f-42e3-8a89-969a89ebaa59",
-            username: "john.doe",
-            displayName: "John Doe",
-            role: "USER",
-            identityProvider: "LOCAL",
-          });
+          return new Promise(() => {});
         }),
         http.get("/api/proxy/user/me/profile-image", async () => {
           return new Promise(() => {});

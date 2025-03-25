@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { User } from "lucide-react";
 import useSWR from "swr";
 import { Avatar } from "@/components/atoms/Avatar";
 import useApi from "@/hooks/useApi";
@@ -10,7 +11,7 @@ interface PrincipalAvatarProps {
 export function PrincipalAvatar(props: PrincipalAvatarProps) {
   const api = useApi();
 
-  const { data: userData } = useSWR(
+  const { data: userData, isLoading: userIsLoading } = useSWR(
     "/user/me",
     (url) => api.get(url).then((res) => res.data),
     {
@@ -41,13 +42,16 @@ export function PrincipalAvatar(props: PrincipalAvatarProps) {
   );
 
   const isInitialLoading = useMemo(
-    () => imageIsLoading && !imageData && !isMissing,
-    [imageIsLoading, imageData, isMissing],
+    () =>
+      imageIsLoading && !imageData && !isMissing && userIsLoading && !userData,
+    [imageIsLoading, imageData, isMissing, userIsLoading, userData],
   );
 
   const isRefreshLoading = useMemo(
-    () => imageIsLoading && (!!imageData || isMissing),
-    [imageIsLoading, imageData, isMissing],
+    () =>
+      (imageIsLoading && (!!imageData || isMissing)) ||
+      (userIsLoading && !!userData),
+    [imageIsLoading, imageData, isMissing, userIsLoading, userData],
   );
 
   const hasErrored = useMemo(
@@ -55,19 +59,37 @@ export function PrincipalAvatar(props: PrincipalAvatarProps) {
     [imageIsLoading, imageError, isMissing],
   );
 
-  return (
-    <div className="relative flex h-fit items-center">
+  if (isInitialLoading) {
+    return (
       <Avatar
         size="sm"
-        alt={userData?.displayName || userData?.username || ""}
-        src={imageData}
+        alt={""}
+        icon={<User className="h-full w-full" />}
+        className="animate-pulse"
         {...props}
       />
-      {isInitialLoading || isRefreshLoading ? (
-        <div className="absolute inset-0 h-full w-full animate-pulse rounded-full bg-slate-400/50 dark:bg-slate-700/50" />
-      ) : hasErrored ? (
-        <div className="absolute inset-0 rounded-full bg-red-400/50 dark:bg-red-700/50" />
-      ) : null}
-    </div>
+    );
+  }
+
+  if (hasErrored) {
+    return (
+      <Avatar
+        size="sm"
+        alt={""}
+        icon={<User className="h-full w-full" />}
+        failed
+        {...props}
+      />
+    );
+  }
+
+  return (
+    <Avatar
+      size="sm"
+      alt={userData?.displayName || userData?.username || ""}
+      src={imageData}
+      className={isRefreshLoading ? "animate-pulse" : ""}
+      {...props}
+    />
   );
 }
