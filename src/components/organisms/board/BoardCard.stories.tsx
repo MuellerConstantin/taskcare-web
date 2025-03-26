@@ -54,9 +54,9 @@ export const Default: StoryObj<typeof BoardCard> = {
   args: {
     board: {
       id: SUCCESS_ID,
-      name: "Lorem ipsum",
+      name: "Board #1",
       description:
-        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut l",
+        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt",
     },
   },
   decorators: [

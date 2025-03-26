@@ -1,7 +1,5 @@
 import React from "react";
-import { SWRConfig } from "swr";
 import type { Meta, StoryObj } from "@storybook/react";
-import { http, HttpResponse } from "msw";
 import { BoardCardSkeleton } from "./BoardCardSkeleton";
 
 const meta: Meta<typeof BoardCardSkeleton> = {

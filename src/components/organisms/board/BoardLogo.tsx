@@ -66,18 +66,18 @@ export function BoardLogo({ boardId, className }: BoardLogoProps) {
       return (
         <div className="relative h-full w-full">
           <div
-            className={`h-32 w-32 overflow-hidden bg-gray-100 dark:bg-gray-800 ${className}`}
+            className={`h-32 w-32 overflow-hidden bg-slate-100 dark:bg-slate-900 ${className}`}
           >
             <IdentIcon value={boardId} />
           </div>
-          <div className="bg-opacity-50 dark:bg-opacity-50 absolute inset-0 z-50 h-full w-full animate-pulse bg-gray-200 dark:bg-gray-800" />
+          <div className="bg-opacity-50 dark:bg-opacity-50 absolute inset-0 z-50 h-full w-full animate-pulse bg-slate-200 dark:bg-slate-900" />
         </div>
       );
     } else {
       return (
         <div className="relative h-full w-full">
           <div
-            className={`relative h-32 w-32 overflow-hidden bg-gray-100 dark:bg-gray-800 ${className}`}
+            className={`relative h-32 w-32 overflow-hidden bg-slate-100 dark:bg-slate-900 ${className}`}
           >
             <Image
               src={data as any}
@@ -87,7 +87,7 @@ export function BoardLogo({ boardId, className }: BoardLogoProps) {
               layout="fill"
             />
           </div>
-          <div className="bg-opacity-50 dark:bg-opacity-50 absolute inset-0 z-50 h-full w-full animate-pulse bg-gray-200 dark:bg-gray-800" />
+          <div className="bg-opacity-50 dark:bg-opacity-50 absolute inset-0 z-50 h-full w-full animate-pulse bg-slate-200 dark:bg-slate-900" />
         </div>
       );
     }
@@ -107,7 +107,7 @@ export function BoardLogo({ boardId, className }: BoardLogoProps) {
     if (isMissing) {
       return (
         <div
-          className={`h-32 w-32 overflow-hidden bg-gray-100 dark:bg-gray-800 ${className}`}
+          className={`h-32 w-32 overflow-hidden bg-slate-100 dark:bg-slate-900 ${className}`}
         >
           <IdentIcon value={boardId} />
         </div>
@@ -115,7 +115,7 @@ export function BoardLogo({ boardId, className }: BoardLogoProps) {
     } else {
       return (
         <div
-          className={`relative h-32 w-32 overflow-hidden bg-gray-100 dark:bg-gray-800 ${className}`}
+          className={`relative h-32 w-32 overflow-hidden bg-slate-100 dark:bg-slate-900 ${className}`}
         >
           <Image
             src={data as any}

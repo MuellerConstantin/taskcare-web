@@ -23,7 +23,7 @@ export function IdentIcon({ value, className }: IdentIconProps) {
       ref={icon}
       height="auto"
       width="auto"
-      className={`relative h-full w-full bg-gray-100 dark:bg-gray-800 ${className}`}
+      className={`relative h-full w-full bg-gray-100 dark:bg-gray-900 ${className}`}
     />
   );
 }
