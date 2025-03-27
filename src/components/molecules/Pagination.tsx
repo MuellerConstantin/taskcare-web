@@ -13,8 +13,8 @@ interface PaginationProps {
 const pagination = tv({
   slots: {
     base: "flex items-center gap-2",
-    next: "rounded-md p-2 bg-slate-200 dark:bg-gray-800 p-2 hover:bg-slate-300 hover:dark:bg-slate-700 flex items-center justify-center",
-    prev: "rounded-md p-2 bg-slate-200 dark:bg-gray-800 p-2 hover:bg-slate-300 hover:dark:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-white",
+    next: "rounded-md p-2 bg-slate-200 dark:bg-gray-900 p-2 hover:bg-slate-300 hover:dark:bg-slate-700 flex items-center justify-center",
+    prev: "rounded-md p-2 bg-slate-200 dark:bg-gray-900 p-2 hover:bg-slate-300 hover:dark:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-white",
     item: "rounded-md p-2 flex items-center justify-center",
     icon: "text-slate-800 dark:text-white",
   },
@@ -53,7 +53,7 @@ const pagination = tv({
         item: "bg-amber-500 text-white",
       },
       false: {
-        item: "bg-slate-200 dark:bg-gray-800 text-slate-800 dark:text-white p-2 hover:bg-slate-300 hover:dark:bg-slate-700",
+        item: "bg-slate-200 dark:bg-gray-900 text-slate-800 dark:text-white p-2 hover:bg-slate-300 hover:dark:bg-slate-700",
       },
     },
   },

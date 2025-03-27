@@ -1,8 +1,11 @@
+"use client";
+
 import { useState, useMemo } from "react";
 import useSWR from "swr";
 import { BoardCard } from "@/components/organisms/board/BoardCard";
 import { BoardCardSkeleton } from "@/components/organisms/board/BoardCardSkeleton";
 import { Pagination } from "@/components/molecules/Pagination";
+import { SearchBar } from "@/components/molecules/SearchBar";
 import useApi from "@/hooks/useApi";
 
 interface PrincipalBoardGalleryProps {}
@@ -12,6 +15,17 @@ export function PrincipalBoardGallery(props: PrincipalBoardGalleryProps) {
 
   const [page, setPage] = useState(1);
   const [perPage] = useState(25);
+
+  const [searchProperty, setSearchProperty] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string | null>(null);
+
+  const searchQuery = useMemo(() => {
+    if (searchProperty && searchTerm && searchTerm.length > 0) {
+      return encodeURIComponent(`${searchProperty}=like="%${searchTerm}%"`);
+    } else {
+      return null;
+    }
+  }, [searchProperty, searchTerm]);
 
   const { data, error, isLoading } = useSWR<{
     info: {
@@ -26,7 +40,7 @@ export function PrincipalBoardGallery(props: PrincipalBoardGalleryProps) {
       description: string;
     }[];
   }>(
-    `/user/me/boards?page=${page - 1}&perPage=${perPage}`,
+    `/user/me/boards?page=${page - 1}&perPage=${perPage}${searchQuery ? `&search=${searchQuery}` : ""}`,
     (url) => api.get(url).then((res) => res.data),
     { keepPreviousData: true },
   );
@@ -53,8 +67,27 @@ export function PrincipalBoardGallery(props: PrincipalBoardGalleryProps) {
     [hasSucceeded, data],
   );
 
+  const isFiltered = useMemo(
+    () => hasSucceeded && searchQuery,
+    [hasSucceeded, searchQuery],
+  );
+
   return (
     <div className="flex h-full w-full flex-col space-y-4">
+      <div>
+        <SearchBar
+          isDisabled={isLoading || hasErrored}
+          onSearch={(property, searchTerm) => {
+            setSearchProperty(property);
+            setSearchTerm(searchTerm);
+          }}
+          properties={[
+            { label: "ID", value: "id" },
+            { label: "Name", value: "name" },
+            { label: "Description", value: "description" },
+          ]}
+        />
+      </div>
       <div className="relative flex flex-col flex-wrap gap-4 md:flex-row">
         {isInitialLoading &&
           Array.from(Array(6).keys()).map((key) => (
@@ -84,9 +117,15 @@ export function PrincipalBoardGallery(props: PrincipalBoardGalleryProps) {
                 <BoardCard key={board.id} board={board} />
               ))}
 
-            {!hasData && (
+            {!hasData && !isFiltered && (
               <div className="w-full text-center">
                 It seems like you are not a member of a board yet.
+              </div>
+            )}
+
+            {!hasData && isFiltered && (
+              <div className="w-full text-center">
+                It seems like no results were found.
               </div>
             )}
           </>
@@ -103,7 +142,10 @@ export function PrincipalBoardGallery(props: PrincipalBoardGalleryProps) {
             Viewing{" "}
             <span className="font-semibold text-slate-800 dark:text-white">
               {data!.info.page * data!.info.perPage + 1}-
-              {data!.info.page * data!.info.perPage + data!.info.perPage}
+              {Math.min(
+                data!.info.page * data!.info.perPage + data!.info.perPage,
+                data!.info.totalElements,
+              )}
             </span>{" "}
             of{" "}
             <span className="font-semibold text-slate-800 dark:text-white">
