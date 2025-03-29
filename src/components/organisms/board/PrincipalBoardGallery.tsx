@@ -2,16 +2,23 @@
 
 import { useState, useMemo } from "react";
 import useSWR from "swr";
+import { useSWRConfig } from "swr";
+import { Plus } from "lucide-react";
+import { DialogTrigger } from "react-aria-components";
 import { BoardCard } from "@/components/organisms/board/BoardCard";
 import { BoardCardSkeleton } from "@/components/organisms/board/BoardCardSkeleton";
 import { Pagination } from "@/components/molecules/Pagination";
 import { SearchBar } from "@/components/molecules/SearchBar";
+import { Button } from "@/components/atoms/Button";
+import { Modal } from "@/components/atoms/Modal";
+import { AddBoardDialog } from "./AddBoardDialog";
 import useApi from "@/hooks/useApi";
 
 interface PrincipalBoardGalleryProps {}
 
 export function PrincipalBoardGallery(props: PrincipalBoardGalleryProps) {
   const api = useApi();
+  const { mutate } = useSWRConfig();
 
   const [page, setPage] = useState(1);
   const [perPage] = useState(25);
@@ -74,7 +81,7 @@ export function PrincipalBoardGallery(props: PrincipalBoardGalleryProps) {
 
   return (
     <div className="flex h-full w-full flex-col space-y-4">
-      <div>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <SearchBar
           isDisabled={isLoading || hasErrored}
           onSearch={(property, searchTerm) => {
@@ -87,6 +94,25 @@ export function PrincipalBoardGallery(props: PrincipalBoardGalleryProps) {
             { label: "Description", value: "description" },
           ]}
         />
+        <DialogTrigger>
+          <Button
+            variant="secondary"
+            className="flex items-center justify-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            <div>Add Board</div>
+          </Button>
+          <Modal>
+            <AddBoardDialog
+              onAdd={() => {
+                mutate(
+                  (key: string) => /^.*\/user\/me\/boards.*$/.test(key),
+                  null,
+                );
+              }}
+            />
+          </Modal>
+        </DialogTrigger>
       </div>
       <div className="relative flex flex-col flex-wrap gap-4 md:flex-row">
         {isInitialLoading &&

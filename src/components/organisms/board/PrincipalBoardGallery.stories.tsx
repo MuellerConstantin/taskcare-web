@@ -2,7 +2,7 @@ import React from "react";
 import { v4 as uuid } from "uuid";
 import { SWRConfig } from "swr";
 import type { Meta, StoryObj } from "@storybook/react";
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse, PathParams } from "msw";
 import { PrincipalBoardGallery } from "./PrincipalBoardGallery";
 
 const meta: Meta<typeof PrincipalBoardGallery> = {
@@ -11,6 +11,13 @@ const meta: Meta<typeof PrincipalBoardGallery> = {
 };
 
 export default meta;
+
+const mockBoards = Array.from(Array(75).keys()).map((index) => ({
+  id: uuid(),
+  name: `Board #${index + 1}`,
+  description:
+    "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt",
+}));
 
 export const Default: StoryObj<typeof PrincipalBoardGallery> = {
   args: {},
@@ -26,7 +33,7 @@ export const Default: StoryObj<typeof PrincipalBoardGallery> = {
             ? Number(url.searchParams.get("perPage"))
             : 25;
 
-          const totalElements = 75;
+          const totalElements = mockBoards.length;
           const totalPages = Math.ceil(totalElements / perPage);
 
           if (page >= totalPages) {
@@ -41,11 +48,6 @@ export const Default: StoryObj<typeof PrincipalBoardGallery> = {
             });
           }
 
-          const currenPageElements = Math.min(
-            perPage,
-            totalElements - page * perPage,
-          );
-
           return HttpResponse.json({
             info: {
               page,
@@ -53,15 +55,23 @@ export const Default: StoryObj<typeof PrincipalBoardGallery> = {
               totalPages,
               totalElements,
             },
-            content: Array.from(Array(currenPageElements).keys()).map(
-              (index) => ({
-                id: uuid(),
-                name: `Board #${page * perPage + index + 1}`,
-                description:
-                  "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt",
-              }),
-            ),
+            content: mockBoards.slice(page * perPage, page * perPage + perPage),
           });
+        }),
+        http.post<
+          PathParams,
+          { name: string; description: string },
+          HttpResponse
+        >("/api/proxy/boards", async ({ request }) => {
+          const board = await request.json();
+
+          mockBoards.push({
+            id: uuid(),
+            name: board.name,
+            description: board.description,
+          });
+
+          return new HttpResponse(null, { status: 201 });
         }),
       ],
     },

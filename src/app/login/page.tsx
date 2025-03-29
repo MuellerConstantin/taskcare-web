@@ -25,11 +25,11 @@ export default function Login() {
   const api = useApi();
 
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const login = useCallback(
     async ({ username, password }: { username: string; password: string }) => {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
 
       api
@@ -57,7 +57,7 @@ export default function Login() {
           }
         })
         .finally(() => {
-          setLoading(false);
+          setIsLoading(false);
         });
     },
     [api, dispatch, router],
@@ -100,7 +100,7 @@ export default function Login() {
               Login to continue
             </h3>
           </div>
-          {!loading && !error && searchParams.get("logout") === "true" && (
+          {!isLoading && !error && searchParams.get("logout") === "true" && (
             <p className="text-center text-amber-500">
               You have been logged out
             </p>
@@ -117,7 +117,7 @@ export default function Login() {
                   placeholder="Username"
                   name="username"
                   type="text"
-                  isDisabled={loading}
+                  isDisabled={isLoading}
                   value={props.values.username}
                   onBlur={props.handleBlur}
                   onChange={(value) => props.setFieldValue("username", value)}
@@ -130,7 +130,7 @@ export default function Login() {
                   type="password"
                   value={props.values.password}
                   placeholder="Password"
-                  isDisabled={loading}
+                  isDisabled={isLoading}
                   onBlur={props.handleBlur}
                   onChange={(value) => props.setFieldValue("password", value)}
                   isInvalid={
@@ -138,9 +138,13 @@ export default function Login() {
                   }
                   errorMessage={props.errors.password}
                 />
-                <Button type="submit" className="flex justify-center">
-                  {!loading && <span>Login</span>}
-                  {loading && <Spinner />}
+                <Button
+                  type="submit"
+                  isDisabled={!(props.isValid && props.dirty) || isLoading}
+                  className="flex justify-center"
+                >
+                  {!isLoading && <span>Login</span>}
+                  {isLoading && <Spinner />}
                 </Button>
               </Form>
             )}
