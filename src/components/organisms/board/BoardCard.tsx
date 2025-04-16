@@ -10,7 +10,10 @@ interface BoardCardProps {
 
 export function BoardCard({ board }: BoardCardProps) {
   return (
-    <div className="flex h-fit w-[14rem] max-w-sm flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:cursor-pointer dark:border-gray-700 dark:bg-gray-800">
+    <a
+      href={`/boards/${board.id}`}
+      className="flex h-fit w-[14rem] max-w-sm flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:cursor-pointer dark:border-gray-700 dark:bg-gray-800"
+    >
       <div className="aspect-video h-auto w-full shrink-0">
         <BoardLogo boardId={board.id} className="h-full w-full" />
       </div>
@@ -19,6 +22,6 @@ export function BoardCard({ board }: BoardCardProps) {
           {board.name}
         </h5>
       </div>
-    </div>
+    </a>
   );
 }
