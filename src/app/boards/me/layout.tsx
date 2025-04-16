@@ -3,10 +3,10 @@ import { StackTemplate } from "@/components/templates/StackTemplate";
 import AuthGuard from "@/components/organisms/AuthGuard";
 
 export const metadata: Metadata = {
-  title: "TaskCare | Home",
+  title: "TaskCare | My Boards",
 };
 
-export default function HomeLayout({
+export default function MyBoardsLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
