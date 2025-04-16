@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { StackTemplate } from "@/components/templates/StackTemplate";
 import AuthGuard from "@/components/organisms/AuthGuard";
+import { BoardNavbar } from "@/components/organisms/board/BoardNavbar";
 
 export const metadata: Metadata = {
   title: "TaskCare | Board",
@@ -13,7 +14,12 @@ export default function BoardLayout({
 }>) {
   return (
     <AuthGuard>
-      <StackTemplate>{children}</StackTemplate>
+      <StackTemplate>
+        <div className="flex grow flex-col">
+          <BoardNavbar />
+          {children}
+        </div>
+      </StackTemplate>
     </AuthGuard>
   );
 }
