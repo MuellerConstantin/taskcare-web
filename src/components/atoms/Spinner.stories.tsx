@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import { Spinner } from "@/components/atoms/Spinner";
 
@@ -12,14 +12,20 @@ const meta: Meta<typeof Spinner> = {
 
 export default meta;
 
-export const Default = (args: any) => <Spinner />;
+export const Default: StoryObj<typeof Spinner> = {
+  render: () => <Spinner />,
+};
 
 Default.args = {};
 
-export const Small = (args: any) => <Spinner size={12} />;
+export const Small: StoryObj<typeof Spinner> = {
+  render: () => <Spinner />,
+};
 
-Small.args = {};
+Small.args = { size: 12 };
 
-export const Large = (args: any) => <Spinner size={36} />;
+export const Large: StoryObj<typeof Spinner> = {
+  render: () => <Spinner />,
+};
 
-Large.args = {};
+Large.args = { size: 36 };

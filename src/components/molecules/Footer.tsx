@@ -1,9 +1,7 @@
 import React, { useMemo } from "react";
 import { Link } from "@/components/atoms/Link";
 
-interface FooterProps {}
-
-export function Footer(props: FooterProps) {
+export function Footer() {
   const navigation = useMemo(() => {
     return [
       { name: "Home", href: "/" },

@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
-import { Form } from "react-aria-components";
 import { Select, SelectItem, SelectSection } from "@/components/atoms/Select";
 
 const meta: Meta<typeof Select> = {
@@ -40,7 +39,7 @@ export const DisabledItems: StoryObj<typeof Select> = {
 };
 
 export const Sections: StoryObj<typeof Select> = {
-  render: (args: any) => (
+  render: (args) => (
     <Select {...args}>
       <SelectSection title="Item Group #1">
         <SelectItem id="item-1">Item 1</SelectItem>

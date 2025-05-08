@@ -1,7 +1,7 @@
 import { Image as ImageIcon } from "lucide-react";
 
 interface BoardCardSkeletonProps {
-  error?: any;
+  error?: string;
 }
 
 export function BoardCardSkeleton({ error }: BoardCardSkeletonProps) {

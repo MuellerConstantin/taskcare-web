@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import React from "react";
 import { IdentIcon } from "@/components/atoms/IdentIcon";
 
 const meta: Meta<typeof IdentIcon> = {

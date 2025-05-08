@@ -14,9 +14,7 @@ import { Modal } from "@/components/atoms/Modal";
 import { AddBoardDialog } from "./AddBoardDialog";
 import useApi from "@/hooks/useApi";
 
-interface PrincipalBoardGalleryProps {}
-
-export function PrincipalBoardGallery(props: PrincipalBoardGalleryProps) {
+export function PrincipalBoardGallery() {
   const api = useApi();
   const { mutate } = useSWRConfig();
 

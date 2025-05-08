@@ -17,9 +17,7 @@ import { useAppSelector, useAppDispatch } from "@/store";
 import themeSlice from "@/store/slices/theme";
 import useApi from "@/hooks/useApi";
 
-interface NavbarProps {}
-
-export function Navbar(props: NavbarProps) {
+export function Navbar() {
   const navigation = useMemo(() => {
     return [
       { name: "Home", href: "/" },
@@ -80,11 +78,7 @@ export function Navbar(props: NavbarProps) {
   );
 }
 
-interface NavbarUnauthenticatedOptionsMenuProps {}
-
-function NavbarUnauthenticatedOptionsMenu(
-  props: NavbarUnauthenticatedOptionsMenuProps,
-) {
+function NavbarUnauthenticatedOptionsMenu() {
   const dispatch = useAppDispatch();
   const darkMode = useAppSelector((state) => state.theme.darkMode);
 
@@ -102,11 +96,7 @@ function NavbarUnauthenticatedOptionsMenu(
   );
 }
 
-interface NavbarAuthenticatedOptionsMenuProps {}
-
-function NavbarAuthenticatedOptionsMenu(
-  props: NavbarAuthenticatedOptionsMenuProps,
-) {
+function NavbarAuthenticatedOptionsMenu() {
   const api = useApi();
   const dispatch = useAppDispatch();
 
@@ -169,9 +159,7 @@ function NavbarAuthenticatedOptionsMenu(
   );
 }
 
-interface NavbarOptionsMenuProps {}
-
-export function NavbarOptionsMenu(props: NavbarOptionsMenuProps) {
+export function NavbarOptionsMenu() {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   return (

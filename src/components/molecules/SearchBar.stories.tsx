@@ -18,6 +18,6 @@ export const Default: StoryObj<typeof SearchBar> = {
       { label: "Property 2", value: "property-2" },
       { label: "Property 3", value: "property-3" },
     ],
-    onSearch: (property, searchTerm) => {},
+    onSearch: () => {},
   },
 };

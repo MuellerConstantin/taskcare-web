@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import { Button } from "@/components/atoms/Button";
 import { Form } from "@/components/atoms/Form";
@@ -14,14 +14,16 @@ const meta: Meta<typeof Form> = {
 
 export default meta;
 
-export const Default = (args: any) => (
-  <Form {...args}>
-    <TextField label="Email" name="email" type="email" isRequired />
-    <div className="flex gap-2">
-      <Button type="submit">Submit</Button>
-      <Button type="reset" variant="secondary">
-        Reset
-      </Button>
-    </div>
-  </Form>
-);
+export const Default: StoryObj<typeof Form> = {
+  render: (args) => (
+    <Form {...args}>
+      <TextField label="Email" name="email" type="email" isRequired />
+      <div className="flex gap-2">
+        <Button type="submit">Submit</Button>
+        <Button type="reset" variant="secondary">
+          Reset
+        </Button>
+      </div>
+    </Form>
+  ),
+};

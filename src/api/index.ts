@@ -85,6 +85,7 @@ api.interceptors.response.use(
 
               onAuthRefreshed(refreshRes.data.accessToken);
               return api(config);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (refeshError: any) {
               onAuthRefreshFailed(refeshError);
               return Promise.reject(refeshError);

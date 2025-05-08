@@ -44,8 +44,9 @@ export function AddBoardDialog({ onAdd, ...props }: AddBoardDialogProps) {
         .then(chain(() => onAdd?.(), close))
         .catch((err) => {
           if (err.response && err.response.status === 422) {
-            err.response.data.details?.forEach((detail: any) =>
-              setFieldError(detail.field, detail.message),
+            err.response.data.details?.forEach(
+              (detail: { field: string; message: string }) =>
+                setFieldError(detail.field, detail.message),
             );
           } else {
             setError("An unexpected error occurred, please retry!");
@@ -55,7 +56,7 @@ export function AddBoardDialog({ onAdd, ...props }: AddBoardDialogProps) {
           setIsLoading(false);
         });
     },
-    [api],
+    [api, onAdd],
   );
 
   return (

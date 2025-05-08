@@ -26,10 +26,7 @@ export function BoardLogo({ boardId, className }: BoardLogoProps) {
     { keepPreviousData: true },
   );
 
-  const isMissing = useMemo(
-    () => error && error.status === 404,
-    [isLoading, error],
-  );
+  const isMissing = useMemo(() => error && error.status === 404, [error]);
 
   const isInitialLoading = useMemo(
     () => isLoading && !data && !isMissing,
@@ -80,7 +77,7 @@ export function BoardLogo({ boardId, className }: BoardLogoProps) {
             className={`relative h-32 w-32 overflow-hidden bg-slate-100 dark:bg-slate-900 ${className}`}
           >
             <Image
-              src={data as any}
+              src={data!}
               alt={boardId}
               fill
               objectFit="cover"
@@ -118,7 +115,7 @@ export function BoardLogo({ boardId, className }: BoardLogoProps) {
           className={`relative h-32 w-32 overflow-hidden bg-slate-100 dark:bg-slate-900 ${className}`}
         >
           <Image
-            src={data as any}
+            src={data!}
             alt={boardId}
             fill
             objectFit="cover"

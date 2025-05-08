@@ -1,4 +1,3 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { BoardCardSkeleton } from "./BoardCardSkeleton";
 
@@ -13,6 +12,6 @@ export const Default: StoryObj<typeof BoardCardSkeleton> = {};
 
 export const Errored: StoryObj<typeof BoardCardSkeleton> = {
   args: {
-    error: true,
+    error: "Some error",
   },
 };

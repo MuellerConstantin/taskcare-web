@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import { Form } from "react-aria-components";
 import { Button } from "@/components/atoms/Button";
@@ -17,29 +17,37 @@ const meta: Meta<typeof TextField> = {
 
 export default meta;
 
-export const Default = (args: any) => <TextField {...args} />;
+export const Default: StoryObj<typeof TextField> = {
+  render: (args) => <TextField {...args} />,
+};
 
-export const WithDescription = (args: any) => <TextField {...args} />;
+export const WithDescription: StoryObj<typeof TextField> = {
+  render: (args) => <TextField {...args} />,
+};
 
 WithDescription.args = {
   description: "Lorem ipsum dolor sit amet",
 };
 
-export const Errored = (args: any) => <TextField {...args} />;
+export const Errored: StoryObj<typeof TextField> = {
+  render: (args) => <TextField {...args} />,
+};
 
 Errored.args = {
   isInvalid: true,
   errorMessage: "Error message",
 };
 
-export const Validation = (args: any) => (
-  <Form className="flex flex-col items-start gap-2">
-    <TextField {...args} />
-    <Button type="submit" variant="secondary">
-      Submit
-    </Button>
-  </Form>
-);
+export const Validation: StoryObj<typeof TextField> = {
+  render: (args) => (
+    <Form className="flex flex-col items-start gap-2">
+      <TextField {...args} />
+      <Button type="submit" variant="secondary">
+        Submit
+      </Button>
+    </Form>
+  ),
+};
 
 Validation.args = {
   isRequired: true,

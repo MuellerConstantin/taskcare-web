@@ -18,7 +18,7 @@ export default meta;
 
 export const Default: StoryObj<typeof AddBoardDialog> = {
   args: {},
-  render: (args: any) => (
+  render: (args) => (
     <DialogTrigger>
       <Button variant="secondary">Show...</Button>
       <Modal>
@@ -39,7 +39,7 @@ export const Default: StoryObj<typeof AddBoardDialog> = {
 
 export const Errored: StoryObj<typeof AddBoardDialog> = {
   args: {},
-  render: (args: any) => (
+  render: (args) => (
     <DialogTrigger>
       <Button variant="secondary">Show...</Button>
       <Modal>
@@ -60,7 +60,7 @@ export const Errored: StoryObj<typeof AddBoardDialog> = {
 
 export const Loading: StoryObj<typeof AddBoardDialog> = {
   args: {},
-  render: (args: any) => (
+  render: (args) => (
     <DialogTrigger>
       <Button variant="secondary">Show...</Button>
       <Modal>

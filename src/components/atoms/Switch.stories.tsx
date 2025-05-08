@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import { Switch } from "@/components/atoms/Switch";
 
@@ -12,4 +12,6 @@ const meta: Meta<typeof Switch> = {
 
 export default meta;
 
-export const Default = (args: any) => <Switch {...args}>Option</Switch>;
+export const Default: StoryObj<typeof Switch> = {
+  render: (args) => <Switch {...args}>Option</Switch>,
+};

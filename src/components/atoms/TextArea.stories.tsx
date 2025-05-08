@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import { Form } from "react-aria-components";
 import { Button } from "@/components/atoms/Button";
@@ -17,29 +17,37 @@ const meta: Meta<typeof TextArea> = {
 
 export default meta;
 
-export const Default = (args: any) => <TextArea {...args} />;
+export const Default: StoryObj<typeof TextArea> = {
+  render: (args) => <TextArea {...args} />,
+};
 
-export const WithDescription = (args: any) => <TextArea {...args} />;
+export const WithDescription: StoryObj<typeof TextArea> = {
+  render: (args) => <TextArea {...args} />,
+};
 
 WithDescription.args = {
   description: "Lorem ipsum dolor sit amet",
 };
 
-export const Errored = (args: any) => <TextArea {...args} />;
+export const Errored: StoryObj<typeof TextArea> = {
+  render: (args) => <TextArea {...args} />,
+};
 
 Errored.args = {
   isInvalid: true,
   errorMessage: "Error message",
 };
 
-export const Validation = (args: any) => (
-  <Form className="flex flex-col items-start gap-2">
-    <TextArea {...args} />
-    <Button type="submit" variant="secondary">
-      Submit
-    </Button>
-  </Form>
-);
+export const Validation: StoryObj<typeof TextArea> = {
+  render: (args) => (
+    <Form className="flex flex-col items-start gap-2">
+      <TextArea {...args} />
+      <Button type="submit" variant="secondary">
+        Submit
+      </Button>
+    </Form>
+  ),
+};
 
 Validation.args = {
   isRequired: true,

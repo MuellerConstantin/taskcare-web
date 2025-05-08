@@ -18,8 +18,8 @@ export default function UnsufficientPermissions() {
               Unsufficient Permissions.
             </p>
             <p className="mb-4 text-center text-lg font-light text-gray-500 dark:text-gray-400">
-              Sorry, we can't show you this page. You don't have the needed
-              permissions.
+              Sorry, we can{"'"}t show you this page. You don{"'"}t have the
+              needed permissions.
             </p>
             <Button
               variant="primary"
