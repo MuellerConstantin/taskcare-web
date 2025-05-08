@@ -33,7 +33,7 @@ export function Breadcrumb(
     >
       <Link variant="secondary" {...props} />
       {props.href && (
-        <ChevronRight className="h-3 w-3 text-gray-600 dark:text-zinc-400" />
+        <ChevronRight className="h-3 w-3 text-gray-600 dark:text-slate-400" />
       )}
     </AriaBreadcrumb>
   );
