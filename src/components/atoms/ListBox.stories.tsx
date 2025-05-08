@@ -27,6 +27,22 @@ Default.args = {
   selectionMode: "single",
 };
 
+export const Selected: StoryObj<typeof ListBox> = {
+  render: (args) => (
+    <ListBox aria-label="Items" {...args}>
+      <ListBoxItem id="item-1">Item 1</ListBoxItem>
+      <ListBoxItem id="item-2">Item 2</ListBoxItem>
+      <ListBoxItem id="item-3">Item 3</ListBoxItem>
+      <ListBoxItem id="item-4">Item 4</ListBoxItem>
+    </ListBox>
+  ),
+};
+
+Selected.args = {
+  ...Default.args,
+  selectedKeys: ["item-2"],
+};
+
 export const MultipleItems: StoryObj<typeof ListBox> = {
   render: (args) => (
     <ListBox aria-label="Items" {...args}>
